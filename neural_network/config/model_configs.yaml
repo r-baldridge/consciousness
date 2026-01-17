@@ -563,3 +563,152 @@ forms:
     priority: "low"
     preemptible: true
     background: true
+
+  # ============================================
+  # PHILOSOPHICAL CONSCIOUSNESS (Form 28)
+  # ============================================
+
+  "28-philosophy":
+    name: "Philosophical Consciousness"
+    model_type: "rag_embeddings_enhanced"
+    model_name: "sentence-transformers/all-mpnet-base-v2"
+    fallback_model: "sentence-transformers/all-MiniLM-L6-v2"
+    quantization: "int8"
+    size_mb: 1200
+    vram_mb: 1000
+    max_batch_size: 16
+    timeout_ms: 150
+    input_spec:
+      type: "philosophical_query"
+      supports_semantic_search: true
+      supports_tradition_filter: true
+      supports_domain_filter: true
+      supports_cross_tradition_synthesis: true
+      traditions:
+        - "stoicism"
+        - "aristotelian"
+        - "kantian"
+        - "phenomenology"
+        - "existentialism"
+        - "buddhist"
+        - "daoist"
+        - "vedantic"
+        - "confucian"
+      domains:
+        - "metaphysics"
+        - "epistemology"
+        - "ethics"
+        - "philosophy_of_mind"
+        - "consciousness_studies"
+    output_spec:
+      type: "philosophical_response"
+      includes_concepts: true
+      includes_figures: true
+      includes_texts: true
+      includes_synthesis: true
+      includes_wisdom_teachings: true
+      includes_relevance_scores: true
+      embedding_dimensions: 768
+    priority: "normal"
+    preemptible: true
+    update_frequency_hz: 1.0
+
+  # ============================================
+  # FOLK & INDIGENOUS WISDOM (Form 29)
+  # ============================================
+
+  "29-folk-wisdom":
+    name: "Folk & Indigenous Wisdom"
+    model_type: "rag_embeddings_enhanced"
+    model_name: "sentence-transformers/all-mpnet-base-v2"
+    fallback_model: "sentence-transformers/all-MiniLM-L6-v2"
+    quantization: "int8"
+    size_mb: 1200
+    vram_mb: 1000
+    max_batch_size: 16
+    timeout_ms: 150
+    input_spec:
+      type: "folk_wisdom_query"
+      supports_semantic_search: true
+      supports_region_filter: true
+      supports_domain_filter: true
+      supports_transmission_mode_filter: true
+      regions:
+        - "west_african"
+        - "celtic"
+        - "norse_germanic"
+        - "slavic"
+        - "siberian"
+        - "polynesian"
+        - "aboriginal_australian"
+        - "arctic_indigenous"
+        - "plains_indigenous"
+        - "amazonian"
+        - "andean_folk"
+      domains:
+        - "nature_spirits"
+        - "ancestor_relations"
+        - "animal_powers"
+        - "elemental_forces"
+        - "land_consciousness"
+    output_spec:
+      type: "folk_wisdom_response"
+      includes_teachings: true
+      includes_practices: true
+      includes_cosmologies: true
+      includes_oral_traditions: true
+      includes_animal_wisdom: true
+      includes_source_communities: true
+      embedding_dimensions: 768
+    priority: "normal"
+    preemptible: true
+    update_frequency_hz: 1.0
+
+  # ============================================
+  # ANIMAL COGNITION & ETHOLOGY (Form 30)
+  # ============================================
+
+  "30-animal-cognition":
+    name: "Animal Cognition & Ethology"
+    model_type: "rag_embeddings_enhanced"
+    model_name: "sentence-transformers/all-mpnet-base-v2"
+    fallback_model: "sentence-transformers/all-MiniLM-L6-v2"
+    quantization: "int8"
+    size_mb: 1200
+    vram_mb: 1000
+    max_batch_size: 16
+    timeout_ms: 150
+    input_spec:
+      type: "animal_cognition_query"
+      supports_semantic_search: true
+      supports_taxonomic_filter: true
+      supports_cognition_domain_filter: true
+      supports_cross_species_synthesis: true
+      taxonomic_groups:
+        - "great_apes"
+        - "cetaceans"
+        - "elephants"
+        - "corvids"
+        - "parrots"
+        - "cephalopods"
+        - "canids"
+        - "social_insects"
+      cognition_domains:
+        - "tool_use"
+        - "theory_of_mind"
+        - "self_recognition"
+        - "social_learning"
+        - "cooperation"
+        - "communication"
+        - "emotional_processing"
+    output_spec:
+      type: "animal_cognition_response"
+      includes_species_profiles: true
+      includes_behavioral_insights: true
+      includes_cross_species_synthesis: true
+      includes_indigenous_perspectives: true
+      includes_evidence_strength: true
+      embedding_dimensions: 768
+    priority: "normal"
+    preemptible: true
+    update_frequency_hz: 1.0

@@ -57,6 +57,13 @@ from .specialized import (
     AlteredAdapter,
 )
 
+# Extended Adapters (Forms 28-30)
+from .extended import (
+    PhilosophyAdapter,
+    FolkWisdomAdapter,
+    AnimalCognitionAdapter,
+)
+
 __all__ = [
     # Base
     'FormAdapter',
@@ -98,4 +105,8 @@ __all__ = [
     'MysticalAdapter',
     'ThresholdAdapter',
     'AlteredAdapter',
+    # Extended (28-30)
+    'PhilosophyAdapter',
+    'FolkWisdomAdapter',
+    'AnimalCognitionAdapter',
 ]

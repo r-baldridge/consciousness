@@ -41,6 +41,25 @@ class MessageType(Enum):
     PREDICTION_ERROR = "prediction_error"
     RECURRENT_FEEDBACK = "recurrent_feedback"
 
+    # Philosophical Consciousness (Form 28)
+    PHILOSOPHICAL_QUERY = "philosophical_query"
+    PHILOSOPHICAL_RESPONSE = "philosophical_response"
+    WISDOM_BROADCAST = "wisdom_broadcast"
+
+    # Folk & Indigenous Wisdom (Form 29)
+    FOLK_WISDOM_QUERY = "folk_wisdom_query"
+    FOLK_WISDOM_RESPONSE = "folk_wisdom_response"
+    TRADITION_INSIGHT = "tradition_insight"
+
+    # Animal Cognition (Form 30)
+    ANIMAL_COGNITION_QUERY = "animal_cognition_query"
+    ANIMAL_COGNITION_RESPONSE = "animal_cognition_response"
+    SPECIES_INSIGHT = "species_insight"
+
+    # Cross-form Integration
+    CROSS_FORM_SYNTHESIS = "cross_form_synthesis"
+    INDIGENOUS_KNOWLEDGE_LINK = "indigenous_knowledge_link"
+
 
 @dataclass
 class MessageHeader:

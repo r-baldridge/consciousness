@@ -63,6 +63,9 @@ priority_tiers:
       - "19-reflective-consciousness"
       - "20-collective-consciousness"
       - "21-artificial-consciousness"
+      - "28-philosophy"
+      - "29-folk-wisdom"
+      - "30-animal-cognition"
     preemptible: true
     can_preempt: ["low"]
     reserved_vram_mb: 0

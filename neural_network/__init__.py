@@ -1,7 +1,7 @@
 """
 Neural Network Module - Consciousness System Nervous System
 
-This module coordinates local specialized AI models for each of the 27 consciousness
+This module coordinates local specialized AI models for each of the 30 consciousness
 forms, functioning as the "nervous system" that enables inter-form communication
 and resource management.
 
@@ -70,6 +70,13 @@ from .adapters.base_adapter import (
     SpecializedAdapter,
 )
 
+# Extended Adapters (Forms 28-30)
+from .adapters.extended import (
+    PhilosophyAdapter,
+    FolkWisdomAdapter,
+    AnimalCognitionAdapter,
+)
+
 # Model Utilities
 from .models import (
     ModelLoader,
@@ -112,6 +119,10 @@ __all__ = [
     'CognitiveAdapter',
     'TheoreticalAdapter',
     'SpecializedAdapter',
+    # Extended Adapters (Forms 28-30)
+    'PhilosophyAdapter',
+    'FolkWisdomAdapter',
+    'AnimalCognitionAdapter',
     # Models
     'ModelLoader',
     'LoadedModelInfo',
