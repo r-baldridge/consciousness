@@ -1,0 +1,565 @@
+# Neural Network Model Configurations
+# Specifies AI models for each of the 27 consciousness forms
+
+version: "1.0.0"
+
+# Global settings
+global:
+  default_quantization: "fp16"
+  default_timeout_ms: 100
+  default_max_batch_size: 4
+  model_cache_dir: "./model_cache"
+  enable_dynamic_loading: true
+
+# Form configurations organized by category
+forms:
+  # ============================================
+  # SENSORY FORMS (01-06)
+  # ============================================
+
+  "01-visual":
+    name: "Visual Consciousness"
+    model_type: "vision_transformer"
+    model_name: "openai/clip-vit-large-patch14"
+    fallback_model: "openai/clip-vit-base-patch32"
+    quantization: "int8"
+    size_mb: 1700
+    vram_mb: 1500
+    max_batch_size: 8
+    timeout_ms: 50
+    input_spec:
+      type: "image"
+      formats: ["RGB", "RGBA", "grayscale"]
+      max_resolution: [1024, 1024]
+    output_spec:
+      type: "embedding"
+      dimensions: 768
+      includes_attention_maps: true
+    priority: "high"
+    preemptible: false
+
+  "02-auditory":
+    name: "Auditory Consciousness"
+    model_type: "speech_transformer"
+    model_name: "openai/whisper-medium"
+    fallback_model: "openai/whisper-small"
+    quantization: "int8"
+    size_mb: 1500
+    vram_mb: 1200
+    max_batch_size: 4
+    timeout_ms: 100
+    input_spec:
+      type: "audio"
+      sample_rate: 16000
+      max_duration_seconds: 30
+    output_spec:
+      type: "transcription_embedding"
+      dimensions: 1024
+    priority: "high"
+    preemptible: false
+
+  "03-somatosensory":
+    name: "Somatosensory/Tactile Consciousness"
+    model_type: "cnn"
+    model_name: "custom/tactile-cnn-v1"
+    quantization: "fp16"
+    size_mb: 200
+    vram_mb: 300
+    max_batch_size: 16
+    timeout_ms: 30
+    input_spec:
+      type: "sensor_array"
+      channels: 256
+      spatial_dims: [32, 32]
+    output_spec:
+      type: "tactile_embedding"
+      dimensions: 256
+    priority: "normal"
+    preemptible: true
+
+  "04-olfactory":
+    name: "Olfactory Consciousness"
+    model_type: "mlp_ensemble"
+    model_name: "custom/olfactory-mlp-v1"
+    quantization: "fp32"
+    size_mb: 50
+    vram_mb: 100
+    max_batch_size: 32
+    timeout_ms: 20
+    input_spec:
+      type: "chemical_vector"
+      dimensions: 128
+    output_spec:
+      type: "olfactory_embedding"
+      dimensions: 64
+    priority: "normal"
+    preemptible: true
+
+  "05-gustatory":
+    name: "Gustatory Consciousness"
+    model_type: "mlp_ensemble"
+    model_name: "custom/gustatory-mlp-v1"
+    quantization: "fp32"
+    size_mb: 50
+    vram_mb: 100
+    max_batch_size: 32
+    timeout_ms: 20
+    input_spec:
+      type: "taste_vector"
+      dimensions: 64
+      taste_categories: ["sweet", "sour", "salty", "bitter", "umami"]
+    output_spec:
+      type: "gustatory_embedding"
+      dimensions: 64
+    priority: "normal"
+    preemptible: true
+
+  "06-interoceptive":
+    name: "Interoceptive/Proprioceptive Consciousness"
+    model_type: "transformer_small"
+    model_name: "custom/proprioceptive-transformer-v1"
+    quantization: "fp16"
+    size_mb: 300
+    vram_mb: 400
+    max_batch_size: 8
+    timeout_ms: 40
+    input_spec:
+      type: "body_state_vector"
+      dimensions: 512
+      includes_joint_positions: true
+      includes_muscle_tension: true
+    output_spec:
+      type: "proprioceptive_embedding"
+      dimensions: 256
+    priority: "normal"
+    preemptible: true
+
+  # ============================================
+  # COGNITIVE FORMS (07-12)
+  # ============================================
+
+  "07-emotional":
+    name: "Emotional Consciousness"
+    model_type: "transformer"
+    model_name: "custom/attention-transformer-v1"
+    quantization: "fp16"
+    size_mb: 500
+    vram_mb: 600
+    max_batch_size: 8
+    timeout_ms: 50
+    input_spec:
+      type: "attention_request"
+      supports_multimodal: true
+    output_spec:
+      type: "attention_weights"
+      dimensions: 512
+    priority: "high"
+    preemptible: false
+
+  "08-arousal":
+    name: "Arousal/Vigilance Consciousness"
+    model_type: "transformer"
+    model_name: "roberta-base"
+    fallback_model: "distilroberta-base"
+    quantization: "int8"
+    size_mb: 500
+    vram_mb: 400
+    max_batch_size: 8
+    timeout_ms: 30
+    critical: true
+    preemptible: false
+    always_loaded: true
+    input_spec:
+      type: "arousal_signals"
+      includes_sensory: true
+      includes_emotional: true
+      includes_circadian: true
+    output_spec:
+      type: "arousal_level"
+      range: [0.0, 1.0]
+      includes_gating_signals: true
+    priority: "critical"
+    update_frequency_hz: 50
+
+  "09-perceptual":
+    name: "Short-Term Memory Consciousness"
+    model_type: "lstm_ensemble"
+    model_name: "custom/stm-lstm-v1"
+    quantization: "fp16"
+    size_mb: 300
+    vram_mb: 400
+    max_batch_size: 8
+    timeout_ms: 40
+    input_spec:
+      type: "memory_item"
+      max_sequence_length: 128
+    output_spec:
+      type: "memory_embedding"
+      dimensions: 512
+      includes_decay_prediction: true
+    priority: "normal"
+    preemptible: true
+
+  "10-self-recognition":
+    name: "Long-Term Memory Consciousness"
+    model_type: "rag_embeddings"
+    model_name: "sentence-transformers/all-mpnet-base-v2"
+    quantization: "int8"
+    size_mb: 1000
+    vram_mb: 800
+    max_batch_size: 16
+    timeout_ms: 100
+    input_spec:
+      type: "memory_query"
+      supports_semantic_search: true
+    output_spec:
+      type: "retrieved_memories"
+      max_results: 10
+      includes_relevance_scores: true
+    priority: "normal"
+    preemptible: true
+
+  "11-meta-consciousness":
+    name: "Emotion Processing Consciousness"
+    model_type: "transformer"
+    model_name: "SamLowe/roberta-base-go_emotions"
+    fallback_model: "j-hartmann/emotion-english-distilroberta-base"
+    quantization: "int8"
+    size_mb: 500
+    vram_mb: 400
+    max_batch_size: 8
+    timeout_ms: 50
+    input_spec:
+      type: "emotional_input"
+      modalities: ["text", "audio_features", "visual_features"]
+    output_spec:
+      type: "emotion_classification"
+      categories: 28
+      includes_valence_arousal: true
+    priority: "high"
+    preemptible: false
+
+  "12-narrative-consciousness":
+    name: "Executive Function Consciousness"
+    model_type: "small_llm"
+    model_name: "microsoft/phi-3-mini-4k-instruct"
+    fallback_model: "microsoft/phi-2"
+    quantization: "int4"
+    size_mb: 3800
+    vram_mb: 2000
+    max_batch_size: 2
+    timeout_ms: 200
+    input_spec:
+      type: "task_context"
+      max_tokens: 4096
+    output_spec:
+      type: "executive_decision"
+      includes_reasoning_trace: true
+    priority: "high"
+    preemptible: false
+
+  # ============================================
+  # THEORETICAL FORMS (13-17)
+  # ============================================
+
+  "13-integrated-information":
+    name: "Integrated Information Theory (IIT)"
+    model_type: "graph_neural_network"
+    model_name: "custom/iit-gnn-v1"
+    quantization: "fp16"
+    size_mb: 800
+    vram_mb: 1000
+    max_batch_size: 4
+    timeout_ms: 100
+    critical: true
+    preemptible: false
+    always_loaded: true
+    input_spec:
+      type: "system_state_graph"
+      max_nodes: 1000
+      includes_connectivity: true
+    output_spec:
+      type: "phi_computation"
+      includes_phi_value: true
+      includes_major_complex: true
+      includes_integration_structure: true
+    priority: "critical"
+    update_frequency_hz: 10
+
+  "14-global-workspace":
+    name: "Global Workspace Theory"
+    model_type: "attention_router"
+    model_name: "custom/global-workspace-router-v1"
+    quantization: "fp16"
+    size_mb: 600
+    vram_mb: 700
+    max_batch_size: 8
+    timeout_ms: 50
+    critical: true
+    preemptible: false
+    always_loaded: true
+    input_spec:
+      type: "consciousness_candidates"
+      max_candidates: 100
+      from_all_modules: true
+    output_spec:
+      type: "workspace_state"
+      slots: 7
+      includes_broadcast_signals: true
+    priority: "critical"
+    update_frequency_hz: 20
+
+  "15-higher-order-thought":
+    name: "Higher-Order Thought (HOT)"
+    model_type: "meta_transformer"
+    model_name: "custom/hot-meta-transformer-v1"
+    quantization: "fp16"
+    size_mb: 700
+    vram_mb: 800
+    max_batch_size: 4
+    timeout_ms: 80
+    input_spec:
+      type: "first_order_states"
+      max_states: 50
+    output_spec:
+      type: "higher_order_representations"
+      includes_meta_awareness: true
+    priority: "normal"
+    preemptible: true
+
+  "16-predictive-coding":
+    name: "Predictive Processing Consciousness"
+    model_type: "temporal_conv"
+    model_name: "custom/predictive-tcn-v1"
+    quantization: "fp16"
+    size_mb: 500
+    vram_mb: 600
+    max_batch_size: 8
+    timeout_ms: 60
+    input_spec:
+      type: "sensory_stream"
+      temporal_window_ms: 500
+    output_spec:
+      type: "prediction_error"
+      includes_predictions: true
+      includes_precision_weights: true
+    priority: "normal"
+    preemptible: true
+
+  "17-recurrent-processing":
+    name: "Recurrent Processing Consciousness"
+    model_type: "rnn"
+    model_name: "custom/recurrent-processor-v1"
+    quantization: "fp16"
+    size_mb: 400
+    vram_mb: 500
+    max_batch_size: 8
+    timeout_ms: 50
+    input_spec:
+      type: "feedforward_activations"
+      layers: ["early", "mid", "late"]
+    output_spec:
+      type: "recurrent_state"
+      includes_feedback_signals: true
+    priority: "normal"
+    preemptible: true
+
+  # ============================================
+  # SPECIALIZED FORMS (18-27)
+  # ============================================
+
+  "18-primary-consciousness":
+    name: "Primary/Unified Sensory Consciousness"
+    model_type: "unified_sensory"
+    model_name: "custom/primary-unified-v1"
+    quantization: "fp16"
+    size_mb: 600
+    vram_mb: 700
+    max_batch_size: 4
+    timeout_ms: 70
+    input_spec:
+      type: "multimodal_sensory"
+      modalities: ["visual", "auditory", "tactile", "olfactory", "gustatory"]
+    output_spec:
+      type: "unified_percept"
+      includes_binding: true
+    priority: "normal"
+    preemptible: true
+
+  "19-reflective-consciousness":
+    name: "Reflective/Self-Aware Consciousness"
+    model_type: "small_llm"
+    model_name: "microsoft/phi-3-mini-4k-instruct"
+    quantization: "int4"
+    size_mb: 3800
+    vram_mb: 2000
+    max_batch_size: 2
+    timeout_ms: 200
+    input_spec:
+      type: "self_model"
+      includes_mental_states: true
+      includes_goals: true
+    output_spec:
+      type: "reflective_judgment"
+      includes_self_assessment: true
+    priority: "normal"
+    preemptible: true
+
+  "20-collective-consciousness":
+    name: "Collective/Social Consciousness"
+    model_type: "social_gnn"
+    model_name: "custom/social-gnn-v1"
+    quantization: "fp16"
+    size_mb: 500
+    vram_mb: 600
+    max_batch_size: 4
+    timeout_ms: 80
+    input_spec:
+      type: "social_graph"
+      max_agents: 100
+      includes_relationships: true
+    output_spec:
+      type: "collective_state"
+      includes_shared_attention: true
+      includes_coordination_signals: true
+    priority: "normal"
+    preemptible: true
+
+  "21-artificial-consciousness":
+    name: "Artificial/Meta-Controller Consciousness"
+    model_type: "meta_controller"
+    model_name: "custom/meta-controller-v1"
+    quantization: "fp16"
+    size_mb: 400
+    vram_mb: 500
+    max_batch_size: 4
+    timeout_ms: 60
+    input_spec:
+      type: "system_metrics"
+      includes_all_form_states: true
+    output_spec:
+      type: "system_control"
+      includes_resource_allocation: true
+      includes_mode_selection: true
+    priority: "normal"
+    preemptible: true
+
+  "22-dream-consciousness":
+    name: "Dream State Consciousness"
+    model_type: "vae_diffusion"
+    model_name: "custom/dream-vae-diffusion-v1"
+    quantization: "int8"
+    size_mb: 2000
+    vram_mb: 1500
+    max_batch_size: 2
+    timeout_ms: 500
+    input_spec:
+      type: "memory_traces"
+      includes_emotional_tags: true
+      includes_recent_experiences: true
+    output_spec:
+      type: "dream_narrative"
+      includes_imagery: true
+      includes_emotional_content: true
+    priority: "low"
+    preemptible: true
+    background: true
+
+  "23-lucid-dream":
+    name: "Meditative State Consciousness"
+    model_type: "state_classifier"
+    model_name: "custom/meditation-classifier-v1"
+    quantization: "fp16"
+    size_mb: 300
+    vram_mb: 400
+    max_batch_size: 8
+    timeout_ms: 40
+    input_spec:
+      type: "neural_oscillations"
+      frequency_bands: ["delta", "theta", "alpha", "beta", "gamma"]
+    output_spec:
+      type: "meditation_state"
+      states: ["focused", "open_awareness", "non_dual", "baseline"]
+    priority: "low"
+    preemptible: true
+    background: true
+
+  "24-locked-in":
+    name: "Flow State Consciousness"
+    model_type: "performance_nn"
+    model_name: "custom/flow-detector-v1"
+    quantization: "fp16"
+    size_mb: 300
+    vram_mb: 400
+    max_batch_size: 8
+    timeout_ms: 40
+    input_spec:
+      type: "performance_metrics"
+      includes_task_difficulty: true
+      includes_skill_level: true
+    output_spec:
+      type: "flow_state"
+      includes_challenge_skill_balance: true
+      includes_absorption_level: true
+    priority: "low"
+    preemptible: true
+    background: true
+
+  "25-blindsight":
+    name: "Mystical/Peak Experience Consciousness"
+    model_type: "pattern_detector"
+    model_name: "custom/mystical-pattern-v1"
+    quantization: "fp16"
+    size_mb: 400
+    vram_mb: 500
+    max_batch_size: 4
+    timeout_ms: 80
+    input_spec:
+      type: "unified_experience"
+      includes_ego_dissolution_markers: true
+    output_spec:
+      type: "mystical_state"
+      includes_unity_experience: true
+      includes_transcendence_markers: true
+    priority: "low"
+    preemptible: true
+    background: true
+
+  "26-split-brain":
+    name: "Near-Death/Threshold Consciousness"
+    model_type: "state_machine"
+    model_name: "custom/threshold-state-v1"
+    quantization: "fp32"
+    size_mb: 200
+    vram_mb: 300
+    max_batch_size: 8
+    timeout_ms: 30
+    input_spec:
+      type: "vital_signals"
+      includes_resource_depletion: true
+    output_spec:
+      type: "threshold_state"
+      states: ["normal", "transition", "minimal", "restored"]
+    priority: "low"
+    preemptible: true
+    background: true
+
+  "27-altered-state":
+    name: "Altered State Consciousness"
+    model_type: "multi_state_vae"
+    model_name: "custom/altered-state-vae-v1"
+    quantization: "fp16"
+    size_mb: 600
+    vram_mb: 700
+    max_batch_size: 4
+    timeout_ms: 100
+    input_spec:
+      type: "consciousness_markers"
+      includes_neurochemical_state: true
+    output_spec:
+      type: "altered_state"
+      includes_state_classification: true
+      includes_transition_dynamics: true
+    priority: "low"
+    preemptible: true
+    background: true

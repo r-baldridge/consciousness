@@ -1,0 +1,201 @@
+# Resource Budget Configuration
+# Defines GPU/CPU/memory allocation strategy for the neural network module
+
+version: "1.0.0"
+
+# Total available resources
+resources:
+  gpu:
+    total_memory_mb: 16384  # 16GB
+    compute_units: 100      # Abstract compute units
+    max_concurrent_models: 12
+  cpu:
+    total_cores: 8
+    max_threads: 16
+  memory:
+    total_ram_mb: 32768     # 32GB system RAM
+    model_cache_mb: 8192    # 8GB for model caching
+
+# Priority tier definitions
+priority_tiers:
+  critical:
+    description: "Core consciousness functions - never preempted"
+    forms: ["08-arousal", "13-integrated-information", "14-global-workspace"]
+    preemptible: false
+    reserved_vram_mb: 2100
+    reserved_compute_units: 30
+    max_latency_ms: 50
+    properties:
+      always_loaded: true
+      auto_restart: true
+      health_check_interval_ms: 1000
+
+  high:
+    description: "Primary sensory and cognitive processing"
+    forms:
+      - "01-visual"
+      - "02-auditory"
+      - "07-emotional"
+      - "11-meta-consciousness"
+      - "12-narrative-consciousness"
+    preemptible: false
+    can_preempt: ["low"]
+    reserved_vram_mb: 5000
+    reserved_compute_units: 40
+    max_latency_ms: 100
+    properties:
+      load_on_demand: true
+      unload_idle_timeout_ms: 60000
+
+  normal:
+    description: "Secondary sensory and cognitive processing"
+    forms:
+      - "03-somatosensory"
+      - "04-olfactory"
+      - "05-gustatory"
+      - "06-interoceptive"
+      - "09-perceptual"
+      - "10-self-recognition"
+      - "15-higher-order-thought"
+      - "16-predictive-coding"
+      - "17-recurrent-processing"
+      - "18-primary-consciousness"
+      - "19-reflective-consciousness"
+      - "20-collective-consciousness"
+      - "21-artificial-consciousness"
+    preemptible: true
+    can_preempt: ["low"]
+    reserved_vram_mb: 0
+    reserved_compute_units: 20
+    max_latency_ms: 200
+    properties:
+      load_on_demand: true
+      unload_idle_timeout_ms: 30000
+
+  low:
+    description: "Background and specialized states"
+    forms:
+      - "22-dream-consciousness"
+      - "23-lucid-dream"
+      - "24-locked-in"
+      - "25-blindsight"
+      - "26-split-brain"
+      - "27-altered-state"
+    preemptible: true
+    can_preempt: []
+    reserved_vram_mb: 0
+    reserved_compute_units: 10
+    max_latency_ms: 500
+    properties:
+      background: true
+      load_on_demand: true
+      unload_idle_timeout_ms: 10000
+
+# Preemption rules
+preemption:
+  grace_period_ms: 100
+  max_preemptions_per_minute: 10
+  preemption_cooldown_ms: 5000
+  rules:
+    - description: "Higher priority can always preempt lower"
+      condition: "source_priority > target_priority"
+      action: "allow"
+    - description: "Same priority cannot preempt"
+      condition: "source_priority == target_priority"
+      action: "deny"
+    - description: "Critical forms are never preempted"
+      condition: "target_priority == critical"
+      action: "deny"
+    - description: "Emergency override"
+      condition: "emergency == true"
+      action: "allow_except_critical"
+
+# Arousal-based resource gating
+arousal_gating:
+  enabled: true
+  thresholds:
+    sleep:
+      range: [0.0, 0.1]
+      active_tiers: ["critical"]
+      max_concurrent_forms: 3
+      processing_rate: 0.1
+    drowsy:
+      range: [0.1, 0.3]
+      active_tiers: ["critical", "high"]
+      max_concurrent_forms: 5
+      processing_rate: 0.3
+    relaxed:
+      range: [0.3, 0.5]
+      active_tiers: ["critical", "high", "normal"]
+      max_concurrent_forms: 8
+      processing_rate: 0.6
+    alert:
+      range: [0.5, 0.7]
+      active_tiers: ["critical", "high", "normal"]
+      max_concurrent_forms: 12
+      processing_rate: 0.9
+    focused:
+      range: [0.7, 0.9]
+      active_tiers: ["critical", "high", "normal", "low"]
+      max_concurrent_forms: 15
+      processing_rate: 1.0
+    hyperaroused:
+      range: [0.9, 1.0]
+      active_tiers: ["critical", "high"]
+      max_concurrent_forms: 6
+      processing_rate: 1.0
+      note: "Narrow focus on high-priority only"
+
+# Memory management
+memory_management:
+  model_loading:
+    strategy: "lazy"  # lazy, eager, hybrid
+    prefetch_enabled: true
+    prefetch_forms: ["01-visual", "02-auditory", "08-arousal"]
+
+  caching:
+    enabled: true
+    max_cache_size_mb: 8192
+    eviction_policy: "lru_priority_aware"
+    cache_warm_forms: ["08-arousal", "13-integrated-information", "14-global-workspace"]
+
+  swapping:
+    enabled: true
+    swap_to_cpu: true
+    swap_threshold_percent: 90
+    swap_priority: "low_first"
+
+# Performance targets
+performance:
+  latency:
+    critical_target_ms: 30
+    critical_max_ms: 50
+    high_target_ms: 75
+    high_max_ms: 100
+    normal_target_ms: 150
+    normal_max_ms: 200
+    low_target_ms: 300
+    low_max_ms: 500
+
+  throughput:
+    global_workspace_updates_per_second: 20
+    phi_computations_per_second: 10
+    sensory_processing_fps: 30
+
+  utilization:
+    target_gpu_percent: 80
+    max_gpu_percent: 95
+    target_cpu_percent: 70
+    max_cpu_percent: 90
+
+# Monitoring and alerting
+monitoring:
+  metrics_interval_ms: 100
+  health_check_interval_ms: 5000
+  alerting:
+    gpu_memory_warning_percent: 80
+    gpu_memory_critical_percent: 95
+    latency_warning_multiplier: 1.5
+    latency_critical_multiplier: 2.0
+    queue_depth_warning: 100
+    queue_depth_critical: 500
