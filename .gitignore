@@ -53,3 +53,7 @@ model_cache/
 *.pth
 *.bin
 *.onnx
+
+# Local files
+.serena/
+FORMS_31-40_EXPANSION_PLAN.md
