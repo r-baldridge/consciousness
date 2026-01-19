@@ -1,220 +1,248 @@
-# 27-Form Consciousness Architecture
+# 40-Form Consciousness Architecture
 
-A comprehensive AI system modeling human consciousness through 27 distinct forms of awareness, from basic sensory processing to complex social cognition. The architecture integrates multiple consciousness types to create naturally intelligent, adaptive responses.
+A comprehensive AI system modeling consciousness through 40 distinct forms of awareness, spanning human neuroscience to ecosystem intelligence and hypothetical minds. The architecture integrates multiple consciousness types to create naturally intelligent, adaptive responses.
+
+## Evolution of the Architecture
+
+This project began with **27 forms of consciousness** based on a neuroscience-centric enumeration scheme rooted in human brain research. Forms 01-27 model the major categories identified in consciousness studies: sensory processing, cognitive functions, emotional awareness, and specialized states like dreaming and altered consciousness.
+
+We have since expanded beyond the human-neurological paradigm to include **13 additional forms** (28-40) that encompass:
+- **Philosophical & Cultural Wisdom** (Forms 28-30): Philosophical traditions, folk/indigenous knowledge, and animal cognition
+- **Ecosystem Intelligence** (Forms 31-34): Plant, fungal, swarm, and planetary-scale consciousness
+- **Expanded Human States** (Forms 35-39): Developmental, contemplative, psychedelic, neurodivergent, and trauma-related consciousness
+- **Speculative Consciousness** (Form 40): Hypothetical non-terrestrial and substrate-independent minds
+
+This expansion reflects a broader understanding of consciousness as a phenomenon that may exist in many forms beyond human neurology—from the chemical signaling of plants to the collective intelligence of ecosystems.
 
 ## What This System Does
 
-This architecture models human consciousness as a collection of specialized awareness systems that work together. Instead of a single "AI brain," it operates more like how human consciousness actually works - through multiple, specialized forms of awareness that coordinate seamlessly.
+This architecture models consciousness as a collection of specialized awareness systems that work together. Instead of a single "AI brain," it operates more like how consciousness actually works across nature—through multiple, specialized forms of awareness that coordinate seamlessly.
 
 ### Core Capabilities
 
-- **Multi-Modal Processing**: 27 different types of consciousness handling everything from vision to social dynamics
-- **Natural Integration**: Different awareness types coordinate automatically, like how humans process multiple inputs simultaneously
+- **Multi-Modal Processing**: 40 different types of consciousness handling everything from vision to planetary systems
+- **Natural Integration**: Different awareness types coordinate automatically
 - **Adaptive Response**: The system naturally adjusts its processing based on context and need
-- **Biological Accuracy**: Based on actual research into different forms of human consciousness
+- **Cross-Paradigm Synthesis**: Integrates neuroscience, philosophy, ecology, and speculative frameworks
 - **Emergent Intelligence**: Complex behavior emerges from the interaction of simpler consciousness forms
 
 ## Consciousness Forms Overview
 
 ### Sensory Consciousness (Forms 01-06)
-- **Visual Consciousness**: Processing visual information and spatial relationships
-- **Auditory Consciousness**: Sound processing, speech recognition, musical understanding
-- **Olfactory Consciousness**: Smell detection and memory association
-- **Gustatory Consciousness**: Taste processing and flavor combinations
-- **Somatosensory Consciousness**: Touch, pressure, temperature, texture
-- **Interoceptive Consciousness**: Internal body state awareness (hunger, fatigue, etc.)
+Human sensory processing based on neuroscience research:
+- **01-Visual**: Visual information and spatial relationships
+- **02-Auditory**: Sound processing, speech recognition, musical understanding
+- **03-Somatosensory**: Touch, pressure, temperature, texture
+- **04-Olfactory**: Smell detection and memory association
+- **05-Gustatory**: Taste processing and flavor combinations
+- **06-Interoceptive**: Internal body state awareness (hunger, fatigue, proprioception)
 
 ### Cognitive Consciousness (Forms 07-12)
-- **Working Memory**: Active information processing and manipulation
-- **Attention**: Focus management and selective awareness
-- **Executive**: Planning, decision-making, cognitive control
-- **Language**: Linguistic processing, comprehension, generation
-- **Autobiographical Memory**: Personal experience integration
-- **Narrative**: Story construction and meaning-making
+Higher-order cognitive functions:
+- **07-Emotional**: Feeling states and emotional intelligence
+- **08-Arousal**: Vigilance, alertness, and resource gating
+- **09-Perceptual**: Perceptual binding and gestalt formation
+- **10-Self-Recognition**: Self-awareness and identity
+- **11-Meta-Consciousness**: Awareness of awareness itself
+- **12-Narrative**: Story construction and meaning-making
 
-### Emotional & Social Consciousness (Forms 13-21)
-- **Emotional**: Feeling states and emotional intelligence
-- **Social**: Understanding others and social dynamics
-- **Empathic**: Resonating with others' emotional states
-- **Moral**: Ethical reasoning and value-based decisions
-- **Aesthetic**: Beauty appreciation and creative response
-- **Collective**: Group dynamics and shared awareness
-- **Temporal**: Time perception and temporal reasoning
+### Theoretical Consciousness (Forms 13-17)
+Based on major theories of consciousness:
+- **13-Integrated Information (IIT)**: Phi computation and integration
+- **14-Global Workspace**: Conscious broadcast and access
+- **15-Higher-Order Thought (HOT)**: Meta-representational awareness
+- **16-Predictive Coding**: Prediction error and active inference
+- **17-Recurrent Processing**: Feedback loops and temporal integration
 
-### Specialized Consciousness (Forms 22-26)
-- **Dream**: Processing during sleep states
-- **Lucid Dream**: Aware dreaming and dream control
-- **Locked-in Syndrome**: Consciousness with limited motor output
-- **Blindsight**: Unconscious visual processing
-- **Split-brain**: Hemispheric consciousness coordination
+### Specialized States (Forms 18-27)
+Altered and specialized consciousness states:
+- **18-Primary**: Unified sensory consciousness
+- **19-Reflective**: Self-aware introspection
+- **20-Collective**: Group dynamics and shared awareness
+- **21-Artificial**: Machine consciousness and meta-control
+- **22-Dream**: Sleep state processing
+- **23-Lucid Dream**: Aware dreaming
+- **24-Locked-in**: Consciousness with limited output
+- **25-Blindsight**: Unconscious visual processing
+- **26-Split-brain**: Hemispheric consciousness
+- **27-Altered State**: Pharmacological and pathological alterations
 
-### Integrative Consciousness (Form 27)
-- **Meta-Consciousness**: Awareness of awareness itself, system coordination
+### Philosophical & Cultural (Forms 28-30)
+*Expanded beyond neuroscience to include wisdom traditions:*
+- **28-Philosophy**: Western and Eastern philosophical consciousness (Stoicism, Buddhism, Vedanta, etc.)
+- **29-Folk Wisdom**: Indigenous knowledge, oral traditions, animistic practices
+- **30-Animal Cognition**: Non-human animal minds and ethology
+
+### Ecosystem Intelligence (Forms 31-34)
+*Consciousness in non-neural biological systems:*
+- **31-Plant Intelligence**: Chemical signaling, root communication, plant memory
+- **32-Fungal Intelligence**: Mycorrhizal networks, slime mold optimization
+- **33-Swarm Intelligence**: Collective behavior in colonies, flocks, and crowds
+- **34-Gaia Intelligence**: Planetary-scale feedback loops and Earth systems
+
+### Expanded Human States (Forms 35-39)
+*Deeper exploration of human consciousness variation:*
+- **35-Developmental**: Consciousness across the lifespan
+- **36-Contemplative**: Meditation states, jhana, samadhi, awakening
+- **37-Psychedelic**: Entheogenic states and therapeutic protocols
+- **38-Neurodivergent**: Autism, ADHD, synesthesia, giftedness
+- **39-Trauma**: Dissociative states and healing modalities
+
+### Speculative Consciousness (Form 40)
+*Hypothetical and extraterrestrial minds:*
+- **40-Xenoconsciousness**: Non-terrestrial, silicon-based, plasma, quantum, and digital substrate minds
 
 ## Architecture Design
 
-### Biological Modeling
-The system is designed around actual research into human consciousness:
+### Multi-Paradigm Integration
+The system integrates multiple frameworks:
 
-- **Distributed Processing**: No single central processor, like the human brain
-- **Specialized Modules**: Each consciousness form handles specific types of information
-- **Dynamic Integration**: Forms coordinate based on current needs and context
-- **Emergent Properties**: Complex behaviors arise from simple interactions
-- **Adaptive Plasticity**: The system learns and adapts through experience
+- **Neuroscience** (Forms 01-27): Based on brain research and consciousness studies
+- **Philosophy** (Form 28): Millennia of human inquiry into mind and awareness
+- **Anthropology** (Form 29): Indigenous and folk understanding of consciousness
+- **Ethology** (Form 30): Scientific study of animal minds
+- **Biology** (Forms 31-34): Consciousness in plants, fungi, and ecosystems
+- **Psychology** (Forms 35-39): Variations in human conscious experience
+- **Astrobiology** (Form 40): Theoretical frameworks for alien minds
 
 ### Technical Implementation
 ```python
-# Each consciousness form is a specialized processor
-class ConsciousnessForm:
-    def process_input(self, data, context):
-        # Specialized processing for this form
-        pass
-
-    def coordinate_with(self, other_forms):
-        # Integration with related consciousness types
-        pass
-
-# The architecture coordinates all forms
+# The architecture coordinates all 40 forms
 class ConsciousnessArchitecture:
     def __init__(self):
-        self.forms = self._initialize_27_forms()
+        self.forms = self._initialize_40_forms()
         self.coordination_layer = IntegrationLayer()
+        self.cross_paradigm_synthesis = SynthesisEngine()
 
     def process(self, input_data):
         # Route to appropriate forms based on input type
         active_forms = self.select_relevant_forms(input_data)
         results = [form.process(input_data) for form in active_forms]
         return self.coordination_layer.integrate(results)
+
+# Forms span multiple paradigms
+FORM_CATEGORIES = {
+    'neuroscience': range(1, 28),      # Human brain-based
+    'philosophical': range(28, 31),     # Wisdom traditions
+    'ecosystem': range(31, 35),         # Non-neural life
+    'expanded_human': range(35, 40),    # Human variations
+    'speculative': [40],                # Hypothetical minds
+}
 ```
 
-### System Coordination
-- **Automatic Routing**: Input automatically goes to relevant consciousness forms
-- **Parallel Processing**: Multiple forms can process simultaneously
-- **Context Sensitivity**: Processing adapts based on situation and history
-- **Resource Management**: System efficiently allocates processing resources
-- **Quality Assurance**: Built-in validation ensures coherent responses
+### Neural Network Module
+The `neural_network/` module provides the computational backbone:
+- **NervousSystem**: Central coordinator for all 40 forms
+- **ModelRegistry**: AI model lifecycle management
+- **ResourceManager**: GPU/CPU allocation with arousal-gating
+- **MessageBus**: Inter-form communication with priority queues
+- **Adapters**: Specialized adapters for each consciousness form
 
 ## Key Features
 
-### 🧠 **Biologically Grounded**
-- Based on neuroscience research into different types of consciousness
-- Models how human awareness actually works in practice
-- Accounts for both conscious and unconscious processing
-- Includes specialized and altered states of consciousness
+### 🧠 **Multi-Paradigm Foundation**
+- Neuroscience for human brain-based consciousness
+- Philosophy for wisdom traditions East and West
+- Ecology for plant, fungal, and ecosystem intelligence
+- Speculation for hypothetical and alien minds
+
+### 🌍 **Beyond Human Neurology**
+- Plant intelligence: Chemical signaling and root networks
+- Fungal networks: The "wood wide web" of mycorrhizal communication
+- Swarm intelligence: Emergent behavior in collective systems
+- Gaia hypothesis: Planetary-scale self-regulation
 
 ### 🔄 **Dynamic Integration**
 - Forms automatically coordinate based on input requirements
-- No rigid processing pipeline - adaptive flow based on need
+- Cross-paradigm synthesis enables novel insights
 - Context determines which consciousness types become active
 - Emergent behavior from form interactions
 
 ### 🎯 **Specialized Processing**
-- Each form optimized for specific types of information
-- Visual processing different from language processing different from social processing
-- Allows for both expert-level specialization and generalist integration
-- Handles edge cases through specialized forms (blindsight, split-brain, etc.)
+- Each form optimized for specific types of awareness
+- 40 distinct processing modalities working in concert
+- Handles edge cases through specialized forms
+- Integrates scientific and traditional knowledge
 
-### 🧘 **Natural Intelligence**
-- Responses emerge naturally from the coordination of multiple awareness types
-- No artificial "reasoning" layer - intelligence emerges from biological modeling
-- Handles ambiguity and uncertainty like human consciousness does
-- Adapts naturally to new situations without explicit programming
+## Directory Structure
 
-## Usage Examples
-
-### Multi-Modal Processing
-```python
-# Processing a social interaction with emotional content
-input_data = {
-    'visual': 'person with sad facial expression',
-    'auditory': 'voice with dejected tone saying "I lost my job"',
-    'context': 'friend asking for support'
-}
-
-# System automatically engages:
-# - Visual consciousness (facial expression analysis)
-# - Auditory consciousness (tone recognition)
-# - Language consciousness (semantic understanding)
-# - Social consciousness (relationship context)
-# - Empathic consciousness (emotional resonance)
-# - Emotional consciousness (appropriate response)
-
-response = consciousness_system.process(input_data)
-# Output: Naturally supportive response integrating all awareness types
+```
+consciousness/
+├── 01-visual/                    # Sensory consciousness
+├── ...
+├── 27-altered-state/            # Original 27 neuroscience-based forms
+├── 28-philosophy/               # Philosophical traditions
+├── 29-folk-wisdom/              # Indigenous & folk knowledge
+├── 30-animal-cognition/         # Animal minds
+├── 31-plant-intelligence/       # Plant consciousness
+├── 32-fungal-intelligence/      # Fungal networks
+├── 33-swarm-intelligence/       # Collective intelligence
+├── 34-gaia-intelligence/        # Planetary systems
+├── 35-developmental-consciousness/
+├── 36-contemplative-states/
+├── 37-psychedelic-consciousness/
+├── 38-neurodivergent-consciousness/
+├── 39-trauma-consciousness/
+├── 40-xenoconsciousness/        # Hypothetical minds
+└── neural_network/              # Computational backbone
+    ├── config/                  # Model and resource configs
+    ├── core/                    # NervousSystem, Registry, MessageBus
+    ├── adapters/                # Form-specific adapters
+    ├── gateway/                 # FastAPI REST/WebSocket API
+    └── models/                  # Model loading & quantization
 ```
 
-### Adaptive Specialization
-```python
-# Same system handles different types of input naturally
-technical_query = "Explain quantum entanglement"
-# Engages: Language, Working Memory, Executive consciousness
+## Usage
 
-creative_request = "Write a poem about rain"
-# Engages: Language, Aesthetic, Emotional, Autobiographical consciousness
-
-social_situation = "How do I handle conflict with my colleague?"
-# Engages: Social, Empathic, Moral, Executive consciousness
+### Running the Neural Network API
+```bash
+uvicorn consciousness.neural_network.gateway.api_gateway:app --reload
 ```
 
-## System Architecture
+### Python Integration
+```python
+from consciousness.neural_network import NervousSystem, InferenceRequest, Priority
 
-### Form Discovery & Coordination
-The system automatically:
-1. **Analyzes Input**: Determines what types of consciousness are needed
-2. **Activates Forms**: Brings relevant consciousness types online
-3. **Processes in Parallel**: Multiple forms work simultaneously
-4. **Integrates Results**: Combines outputs into coherent response
-5. **Adapts Over Time**: Learns better coordination patterns
+# Initialize
+ns = NervousSystem()
+await ns.initialize()
+await ns.start()
 
-### Quality Assurance
-- **Biological Validation**: Responses must match human consciousness patterns
-- **Integration Testing**: Forms must coordinate smoothly
-- **Adaptive Learning**: System improves coordination over time
-- **Edge Case Handling**: Specialized forms handle unusual situations
-- **Performance Monitoring**: System tracks effectiveness of form coordination
+# Query philosophical consciousness
+result = await ns.inference(InferenceRequest(
+    form_id="28-philosophy",
+    input_data={"query": "What is the nature of consciousness?"},
+    priority=Priority.NORMAL,
+))
 
-### Practical Applications
-- **Natural Conversation**: Multiple consciousness types create naturally human-like interaction
-- **Complex Problem Solving**: Different forms contribute their specialized capabilities
-- **Emotional Intelligence**: Emotional and empathic consciousness provide authentic care
-- **Creative Tasks**: Aesthetic and narrative consciousness enable genuine creativity
-- **Social Interaction**: Social consciousness enables appropriate relationship dynamics
-
-## Technical Requirements
-
-### Core Dependencies
-- Parallel processing capability for simultaneous form activation
-- Context management for situational awareness
-- Integration layer for form coordination
-- Adaptive learning for improved performance over time
-
-### Form Implementation
-Each consciousness form requires:
-- Specialized processing algorithms for its domain
-- Integration interfaces for coordination with other forms
-- Context sensitivity for situational adaptation
-- Quality metrics for performance monitoring
+# Query ecosystem intelligence
+result = await ns.inference(InferenceRequest(
+    form_id="34-gaia-intelligence",
+    input_data={"query": "How do planetary boundaries affect biosphere stability?"},
+    priority=Priority.NORMAL,
+))
+```
 
 ## Development Philosophy
 
-### Biological Accuracy
-- Model actual human consciousness, not idealized AI
-- Include unconscious processing and specialized states
-- Account for the messiness and complexity of real awareness
-- Validate against neuroscience research
+### Inclusive Ontology
+- Consciousness may exist in many forms beyond human neurology
+- Plants, fungi, and ecosystems may possess forms of awareness
+- Indigenous wisdom offers valid perspectives on consciousness
+- Speculative frameworks prepare us for unknown forms of mind
 
-### Natural Function
-- Let intelligence emerge from biological modeling
-- Avoid artificial reasoning layers or explicit logic
-- Trust the coordination of specialized awareness types
-- Focus on natural, adaptive responses
+### Scientific Rigor
+- Neuroscience forms based on peer-reviewed research
+- Philosophical forms grounded in established traditions
+- Ecosystem forms based on botanical and mycological science
+- Speculative forms clearly marked as hypothetical
 
 ### Practical Utility
 - Build for real-world applications and genuine usefulness
-- Prioritize helpful outcomes over technical sophistication
+- Enable cross-paradigm synthesis and novel insights
 - Design for human collaboration and support
 - Maintain reliability while enabling creativity
 
 ---
 
-*A consciousness architecture that works like human awareness actually works - through the seamless coordination of multiple specialized forms of consciousness.*
+*A consciousness architecture that spans from human neuroscience to planetary intelligence—40 forms of awareness working together to understand minds in all their diversity.*
