@@ -66,6 +66,16 @@ priority_tiers:
       - "28-philosophy"
       - "29-folk-wisdom"
       - "30-animal-cognition"
+      - "31-plant-intelligence"
+      - "32-fungal-intelligence"
+      - "33-swarm-intelligence"
+      - "34-gaia-intelligence"
+      - "35-developmental-consciousness"
+      - "36-contemplative-states"
+      - "37-psychedelic-consciousness"
+      - "38-neurodivergent-consciousness"
+      - "39-trauma-consciousness"
+      - "40-xenoconsciousness"
     preemptible: true
     can_preempt: ["low"]
     reserved_vram_mb: 0

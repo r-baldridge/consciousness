@@ -60,6 +60,56 @@ class MessageType(Enum):
     CROSS_FORM_SYNTHESIS = "cross_form_synthesis"
     INDIGENOUS_KNOWLEDGE_LINK = "indigenous_knowledge_link"
 
+    # Plant Intelligence (Form 31)
+    PLANT_INTELLIGENCE_QUERY = "plant_intelligence_query"
+    PLANT_INTELLIGENCE_RESPONSE = "plant_intelligence_response"
+    PLANT_COMMUNICATION_EVENT = "plant_communication_event"
+
+    # Fungal Intelligence (Form 32)
+    FUNGAL_NETWORK_QUERY = "fungal_network_query"
+    FUNGAL_NETWORK_RESPONSE = "fungal_network_response"
+    MYCELIAL_SIGNAL = "mycelial_signal"
+
+    # Swarm Intelligence (Form 33)
+    SWARM_INTELLIGENCE_QUERY = "swarm_intelligence_query"
+    SWARM_INTELLIGENCE_RESPONSE = "swarm_intelligence_response"
+    EMERGENCE_EVENT = "emergence_event"
+
+    # Gaia Intelligence (Form 34)
+    GAIA_SYSTEM_QUERY = "gaia_system_query"
+    GAIA_SYSTEM_RESPONSE = "gaia_system_response"
+    PLANETARY_FEEDBACK = "planetary_feedback"
+
+    # Developmental Consciousness (Form 35)
+    DEVELOPMENTAL_QUERY = "developmental_query"
+    DEVELOPMENTAL_RESPONSE = "developmental_response"
+    LIFESPAN_TRANSITION = "lifespan_transition"
+
+    # Contemplative States (Form 36)
+    CONTEMPLATIVE_STATE_QUERY = "contemplative_state_query"
+    CONTEMPLATIVE_STATE_RESPONSE = "contemplative_state_response"
+    MEDITATION_INSIGHT = "meditation_insight"
+
+    # Psychedelic Consciousness (Form 37)
+    PSYCHEDELIC_QUERY = "psychedelic_query"
+    PSYCHEDELIC_RESPONSE = "psychedelic_response"
+    ENTHEOGENIC_INSIGHT = "entheogenic_insight"
+
+    # Neurodivergent Consciousness (Form 38)
+    NEURODIVERGENT_QUERY = "neurodivergent_query"
+    NEURODIVERGENT_RESPONSE = "neurodivergent_response"
+    COGNITIVE_DIVERSITY_INSIGHT = "cognitive_diversity_insight"
+
+    # Trauma Consciousness (Form 39)
+    TRAUMA_QUERY = "trauma_query"
+    TRAUMA_RESPONSE = "trauma_response"
+    HEALING_INSIGHT = "healing_insight"
+
+    # Xenoconsciousness (Form 40)
+    XENO_CONSCIOUSNESS_QUERY = "xeno_consciousness_query"
+    XENO_CONSCIOUSNESS_RESPONSE = "xeno_consciousness_response"
+    HYPOTHETICAL_MIND_INSIGHT = "hypothetical_mind_insight"
+
 
 @dataclass
 class MessageHeader:

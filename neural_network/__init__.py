@@ -1,7 +1,7 @@
 """
 Neural Network Module - Consciousness System Nervous System
 
-This module coordinates local specialized AI models for each of the 30 consciousness
+This module coordinates local specialized AI models for each of the 40 consciousness
 forms, functioning as the "nervous system" that enables inter-form communication
 and resource management.
 
@@ -70,11 +70,24 @@ from .adapters.base_adapter import (
     SpecializedAdapter,
 )
 
-# Extended Adapters (Forms 28-30)
+# Extended Adapters (Forms 28-40)
 from .adapters.extended import (
+    # Forms 28-30
     PhilosophyAdapter,
     FolkWisdomAdapter,
     AnimalCognitionAdapter,
+    # Forms 31-34 (Ecosystem)
+    PlantIntelligenceAdapter,
+    FungalIntelligenceAdapter,
+    SwarmIntelligenceAdapter,
+    GaiaIntelligenceAdapter,
+    # Forms 35-40 (Expanded)
+    DevelopmentalConsciousnessAdapter,
+    ContemplativeStatesAdapter,
+    PsychedelicConsciousnessAdapter,
+    NeurodivergentConsciousnessAdapter,
+    TraumaConsciousnessAdapter,
+    XenoconsciousnessAdapter,
 )
 
 # Model Utilities
@@ -119,10 +132,22 @@ __all__ = [
     'CognitiveAdapter',
     'TheoreticalAdapter',
     'SpecializedAdapter',
-    # Extended Adapters (Forms 28-30)
+    # Extended Adapters (Forms 28-40)
     'PhilosophyAdapter',
     'FolkWisdomAdapter',
     'AnimalCognitionAdapter',
+    # Ecosystem (31-34)
+    'PlantIntelligenceAdapter',
+    'FungalIntelligenceAdapter',
+    'SwarmIntelligenceAdapter',
+    'GaiaIntelligenceAdapter',
+    # Expanded (35-40)
+    'DevelopmentalConsciousnessAdapter',
+    'ContemplativeStatesAdapter',
+    'PsychedelicConsciousnessAdapter',
+    'NeurodivergentConsciousnessAdapter',
+    'TraumaConsciousnessAdapter',
+    'XenoconsciousnessAdapter',
     # Models
     'ModelLoader',
     'LoadedModelInfo',

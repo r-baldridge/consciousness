@@ -712,3 +712,351 @@ forms:
     priority: "normal"
     preemptible: true
     update_frequency_hz: 1.0
+
+  # ============================================
+  # PLANT INTELLIGENCE (Form 31)
+  # ============================================
+
+  "31-plant-intelligence":
+    name: "Plant Intelligence & Vegetal Consciousness"
+    model_type: "rag_embeddings_enhanced"
+    model_name: "sentence-transformers/all-mpnet-base-v2"
+    fallback_model: "sentence-transformers/all-MiniLM-L6-v2"
+    quantization: "int8"
+    size_mb: 1100
+    vram_mb: 900
+    max_batch_size: 16
+    timeout_ms: 150
+    input_spec:
+      type: "plant_intelligence_query"
+      supports_semantic_search: true
+      supports_taxonomic_filter: true
+      supports_cognition_domain_filter: true
+      cognition_domains:
+        - "chemical_signaling"
+        - "root_communication"
+        - "memory_habituation"
+        - "decision_making"
+        - "defense_coordination"
+    output_spec:
+      type: "plant_intelligence_response"
+      includes_species_profiles: true
+      includes_behavior_insights: true
+      includes_indigenous_wisdom: true
+      embedding_dimensions: 768
+    priority: "normal"
+    preemptible: true
+    update_frequency_hz: 1.0
+
+  # ============================================
+  # FUNGAL INTELLIGENCE (Form 32)
+  # ============================================
+
+  "32-fungal-intelligence":
+    name: "Fungal Networks & Mycorrhizal Intelligence"
+    model_type: "rag_embeddings_enhanced"
+    model_name: "sentence-transformers/all-mpnet-base-v2"
+    fallback_model: "sentence-transformers/all-MiniLM-L6-v2"
+    quantization: "int8"
+    size_mb: 1100
+    vram_mb: 900
+    max_batch_size: 16
+    timeout_ms: 150
+    input_spec:
+      type: "fungal_network_query"
+      supports_semantic_search: true
+      supports_network_analysis: true
+      intelligence_domains:
+        - "network_optimization"
+        - "resource_distribution"
+        - "chemical_communication"
+        - "memory_traces"
+    output_spec:
+      type: "fungal_network_response"
+      includes_network_profiles: true
+      includes_slime_mold_experiments: true
+      includes_indigenous_wisdom: true
+      embedding_dimensions: 768
+    priority: "normal"
+    preemptible: true
+    update_frequency_hz: 1.0
+
+  # ============================================
+  # SWARM INTELLIGENCE (Form 33)
+  # ============================================
+
+  "33-swarm-intelligence":
+    name: "Swarm & Collective Intelligence"
+    model_type: "rag_embeddings_enhanced"
+    model_name: "sentence-transformers/all-mpnet-base-v2"
+    fallback_model: "sentence-transformers/all-MiniLM-L6-v2"
+    quantization: "int8"
+    size_mb: 1100
+    vram_mb: 900
+    max_batch_size: 16
+    timeout_ms: 150
+    input_spec:
+      type: "swarm_intelligence_query"
+      supports_semantic_search: true
+      supports_system_filter: true
+      collective_systems:
+        - "ant_colonies"
+        - "bee_hives"
+        - "bird_flocks"
+        - "fish_schools"
+        - "human_crowds"
+    output_spec:
+      type: "swarm_intelligence_response"
+      includes_system_profiles: true
+      includes_behavior_observations: true
+      includes_emergence_events: true
+      embedding_dimensions: 768
+    priority: "normal"
+    preemptible: true
+    update_frequency_hz: 1.0
+
+  # ============================================
+  # GAIA INTELLIGENCE (Form 34)
+  # ============================================
+
+  "34-gaia-intelligence":
+    name: "Ecological/Planetary Intelligence"
+    model_type: "rag_embeddings_enhanced"
+    model_name: "sentence-transformers/all-mpnet-base-v2"
+    fallback_model: "sentence-transformers/all-MiniLM-L6-v2"
+    quantization: "int8"
+    size_mb: 1200
+    vram_mb: 1000
+    max_batch_size: 16
+    timeout_ms: 150
+    input_spec:
+      type: "gaia_system_query"
+      supports_semantic_search: true
+      supports_boundary_analysis: true
+      gaia_systems:
+        - "atmosphere"
+        - "ocean_circulation"
+        - "carbon_cycle"
+        - "biodiversity_networks"
+    output_spec:
+      type: "gaia_system_response"
+      includes_system_components: true
+      includes_boundary_states: true
+      includes_feedback_analysis: true
+      includes_indigenous_perspectives: true
+      embedding_dimensions: 768
+    priority: "normal"
+    preemptible: true
+    update_frequency_hz: 1.0
+
+  # ============================================
+  # DEVELOPMENTAL CONSCIOUSNESS (Form 35)
+  # ============================================
+
+  "35-developmental-consciousness":
+    name: "Developmental Consciousness"
+    model_type: "rag_embeddings_enhanced"
+    model_name: "sentence-transformers/all-mpnet-base-v2"
+    fallback_model: "sentence-transformers/all-MiniLM-L6-v2"
+    quantization: "int8"
+    size_mb: 1100
+    vram_mb: 900
+    max_batch_size: 16
+    timeout_ms: 150
+    input_spec:
+      type: "developmental_query"
+      supports_semantic_search: true
+      supports_stage_filter: true
+      developmental_stages:
+        - "prenatal"
+        - "infant"
+        - "childhood"
+        - "adolescence"
+        - "adulthood"
+        - "late_life"
+    output_spec:
+      type: "developmental_response"
+      includes_stage_profiles: true
+      includes_capacity_emergence: true
+      includes_transitions: true
+      embedding_dimensions: 768
+    priority: "normal"
+    preemptible: true
+    update_frequency_hz: 1.0
+
+  # ============================================
+  # CONTEMPLATIVE STATES (Form 36)
+  # ============================================
+
+  "36-contemplative-states":
+    name: "Contemplative & Meditative States"
+    model_type: "rag_embeddings_enhanced"
+    model_name: "sentence-transformers/all-mpnet-base-v2"
+    fallback_model: "sentence-transformers/all-MiniLM-L6-v2"
+    quantization: "int8"
+    size_mb: 1100
+    vram_mb: 900
+    max_batch_size: 16
+    timeout_ms: 150
+    input_spec:
+      type: "contemplative_state_query"
+      supports_semantic_search: true
+      supports_tradition_filter: true
+      supports_state_filter: true
+      contemplative_states:
+        - "jhana_states"
+        - "samadhi"
+        - "kensho"
+        - "cessation"
+        - "flow_state"
+    output_spec:
+      type: "contemplative_state_response"
+      includes_state_profiles: true
+      includes_tradition_info: true
+      includes_neural_correlates: true
+      embedding_dimensions: 768
+    priority: "normal"
+    preemptible: true
+    update_frequency_hz: 1.0
+
+  # ============================================
+  # PSYCHEDELIC CONSCIOUSNESS (Form 37)
+  # ============================================
+
+  "37-psychedelic-consciousness":
+    name: "Psychedelic/Entheogenic Consciousness"
+    model_type: "rag_embeddings_enhanced"
+    model_name: "sentence-transformers/all-mpnet-base-v2"
+    fallback_model: "sentence-transformers/all-MiniLM-L6-v2"
+    quantization: "int8"
+    size_mb: 1100
+    vram_mb: 900
+    max_batch_size: 16
+    timeout_ms: 150
+    input_spec:
+      type: "psychedelic_query"
+      supports_semantic_search: true
+      supports_substance_filter: true
+      supports_tradition_filter: true
+      experience_types:
+        - "entity_encounter"
+        - "ego_dissolution"
+        - "mystical_unity"
+        - "healing_vision"
+    output_spec:
+      type: "psychedelic_response"
+      includes_substance_profiles: true
+      includes_experience_types: true
+      includes_entheogenic_traditions: true
+      includes_therapeutic_protocols: true
+      embedding_dimensions: 768
+    priority: "normal"
+    preemptible: true
+    update_frequency_hz: 1.0
+
+  # ============================================
+  # NEURODIVERGENT CONSCIOUSNESS (Form 38)
+  # ============================================
+
+  "38-neurodivergent-consciousness":
+    name: "Neurodivergent Consciousness"
+    model_type: "rag_embeddings_enhanced"
+    model_name: "sentence-transformers/all-mpnet-base-v2"
+    fallback_model: "sentence-transformers/all-MiniLM-L6-v2"
+    quantization: "int8"
+    size_mb: 1100
+    vram_mb: 900
+    max_batch_size: 16
+    timeout_ms: 150
+    input_spec:
+      type: "neurodivergent_query"
+      supports_semantic_search: true
+      supports_neurotype_filter: true
+      supports_strength_filter: true
+      neurotypes:
+        - "autism_spectrum"
+        - "adhd"
+        - "synesthesia"
+        - "dyslexia"
+        - "giftedness"
+    output_spec:
+      type: "neurodivergent_response"
+      includes_profiles: true
+      includes_strengths: true
+      includes_synesthesia_types: true
+      includes_accommodations: true
+      embedding_dimensions: 768
+    priority: "normal"
+    preemptible: true
+    update_frequency_hz: 1.0
+
+  # ============================================
+  # TRAUMA CONSCIOUSNESS (Form 39)
+  # ============================================
+
+  "39-trauma-consciousness":
+    name: "Trauma & Dissociative Consciousness"
+    model_type: "rag_embeddings_enhanced"
+    model_name: "sentence-transformers/all-mpnet-base-v2"
+    fallback_model: "sentence-transformers/all-MiniLM-L6-v2"
+    quantization: "int8"
+    size_mb: 1100
+    vram_mb: 900
+    max_batch_size: 16
+    timeout_ms: 150
+    input_spec:
+      type: "trauma_query"
+      supports_semantic_search: true
+      supports_trauma_type_filter: true
+      supports_modality_filter: true
+      healing_modalities:
+        - "emdr"
+        - "somatic_experiencing"
+        - "ifs_parts_work"
+        - "neurofeedback"
+    output_spec:
+      type: "trauma_response"
+      includes_trauma_profiles: true
+      includes_dissociative_states: true
+      includes_healing_approaches: true
+      includes_nervous_system_info: true
+      embedding_dimensions: 768
+    priority: "normal"
+    preemptible: true
+    update_frequency_hz: 1.0
+
+  # ============================================
+  # XENOCONSCIOUSNESS (Form 40)
+  # ============================================
+
+  "40-xenoconsciousness":
+    name: "Xenoconsciousness (Hypothetical Minds)"
+    model_type: "rag_embeddings_enhanced"
+    model_name: "sentence-transformers/all-mpnet-base-v2"
+    fallback_model: "sentence-transformers/all-MiniLM-L6-v2"
+    quantization: "int8"
+    size_mb: 1100
+    vram_mb: 900
+    max_batch_size: 16
+    timeout_ms: 150
+    input_spec:
+      type: "xeno_consciousness_query"
+      supports_semantic_search: true
+      supports_mind_type_filter: true
+      xeno_mind_types:
+        - "carbon_biological"
+        - "silicon_biological"
+        - "plasma_based"
+        - "quantum_coherent"
+        - "collective_hive"
+        - "digital_substrate"
+    output_spec:
+      type: "xeno_consciousness_response"
+      includes_hypotheses: true
+      includes_sensory_worlds: true
+      includes_seti_protocols: true
+      includes_philosophical_frameworks: true
+      embedding_dimensions: 768
+    priority: "normal"
+    preemptible: true
+    update_frequency_hz: 1.0
