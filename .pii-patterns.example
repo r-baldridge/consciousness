@@ -1,0 +1,37 @@
+# PII Patterns Configuration Template
+# ====================================
+# Copy this file to .pii-patterns and customize with your patterns.
+#
+# Usage:
+#   cp .pii-patterns.example .pii-patterns
+#   # Edit .pii-patterns with your personal patterns
+#
+# Add regex patterns (one per line) to detect in commits.
+# Lines starting with # are comments.
+# Patterns are case-insensitive.
+#
+# These patterns will block commits if found in staged files
+# or in the git author name/email.
+
+# Name patterns (uncomment and adjust)
+# ------------------------------------
+# firstname\.lastname
+# firstname
+# lastname
+
+# Machine/hostname patterns
+# -------------------------
+# myhostname
+# \.local$
+
+# Username patterns
+# -----------------
+# myusername
+
+# Email domain patterns
+# ---------------------
+# @mydomain\.com
+
+# Address patterns (street names, etc.)
+# -------------------------------------
+# 123.*main.*street

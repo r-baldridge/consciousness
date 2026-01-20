@@ -292,6 +292,44 @@ result = orch.run(
 )
 ```
 
+## Security
+
+### PII Protection
+
+This repository includes pre-commit hooks to prevent accidental exposure of personally identifiable information (PII).
+
+**Setup after cloning:**
+```bash
+./scripts/setup-security-hooks.sh
+```
+
+Or manually:
+```bash
+# Configure git to use custom hooks
+git config core.hooksPath .githooks
+
+# Create your personal patterns file
+cp .pii-patterns.example .pii-patterns
+# Edit .pii-patterns with your personal identifiers
+
+# Configure anonymous git identity
+git config user.name "your-github-username"
+git config user.email "your-github-username@users.noreply.github.com"
+```
+
+**What the pre-commit hook checks:**
+- Personal email addresses (gmail, yahoo, etc.)
+- Local file paths with usernames
+- Phone numbers and SSN patterns
+- API keys and secrets
+- Private keys
+- Custom patterns you define in `.pii-patterns`
+
+**To bypass (not recommended):**
+```bash
+git commit --no-verify
+```
+
 ## Development Philosophy
 
 ### Inclusive Ontology
