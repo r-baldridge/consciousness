@@ -1,0 +1,3 @@
+"""
+JEPA Tests Module
+"""

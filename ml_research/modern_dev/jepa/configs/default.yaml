@@ -1,0 +1,182 @@
+# JEPA (Joint Embedding Predictive Architecture) Default Configuration
+# Reference: https://arxiv.org/abs/2301.08243 (I-JEPA)
+# Reference: https://arxiv.org/abs/2402.03192 (V-JEPA)
+
+# Model Architecture
+model:
+  # Encoder configuration
+  image_size: 224
+  patch_size: 16
+  in_channels: 3
+  embed_dim: 768
+  encoder_depth: 12
+  encoder_heads: 12
+
+  # Predictor configuration
+  predictor_embed_dim: 384
+  predictor_depth: 12
+  predictor_heads: 6
+
+  # General
+  mlp_ratio: 4.0
+  dropout: 0.0
+
+# Masking Configuration
+masking:
+  num_targets: 4
+  target_scale_min: 0.15
+  target_scale_max: 0.2
+  target_aspect_ratio_min: 0.75
+  target_aspect_ratio_max: 1.5
+
+# EMA Configuration
+ema:
+  momentum: 0.996
+  momentum_schedule: true
+  momentum_end: 1.0
+  warmup_epochs: 15
+
+# Loss Configuration
+loss:
+  # VICReg regularization
+  use_vicreg: true
+  vicreg_var_weight: 1.0
+  vicreg_inv_weight: 1.0
+  vicreg_cov_weight: 0.04
+
+# Training Configuration
+training:
+  batch_size: 256
+  learning_rate: 1.5e-4
+  weight_decay: 0.04
+  warmup_epochs: 10
+  max_epochs: 300
+  gradient_clip_norm: 3.0
+
+  # Optimizer
+  optimizer: "adamw"
+  adam_beta1: 0.9
+  adam_beta2: 0.95
+  adam_eps: 1.0e-8
+
+  # Learning rate schedule
+  lr_scheduler: "cosine"
+  lr_min_ratio: 0.001
+
+  # Mixed precision
+  fp16: false
+  bf16: true
+
+  # Layer-wise learning rate decay
+  layer_decay: 0.75
+
+# Data Configuration
+data:
+  dataset: "imagenet"
+  data_dir: "./data/imagenet"
+  num_workers: 8
+  pin_memory: true
+
+  # Image preprocessing
+  image_size: 224
+
+  # Training augmentation (minimal for JEPA)
+  random_crop: true
+  horizontal_flip: true
+  color_jitter: null  # JEPA doesn't rely on heavy augmentation
+  auto_augment: null
+
+  # Normalization
+  normalize_mean: [0.485, 0.456, 0.406]
+  normalize_std: [0.229, 0.224, 0.225]
+
+# Evaluation Configuration
+evaluation:
+  eval_interval: 5  # epochs between evaluations
+  eval_batch_size: 256
+
+  # Linear probe settings
+  linear_probe:
+    enabled: true
+    learning_rate: 0.1
+    epochs: 90
+    freeze_encoder: true
+
+  # kNN evaluation
+  knn:
+    enabled: true
+    k: 20
+    temperature: 0.07
+
+# Logging Configuration
+logging:
+  log_interval: 50  # steps between logs
+  log_level: "INFO"
+
+  # Wandb integration
+  use_wandb: false
+  wandb_project: "jepa-experiments"
+  wandb_entity: null
+
+  # Checkpointing
+  checkpoint_dir: "./checkpoints/jepa"
+  save_interval: 10  # epochs between saves
+  keep_last_n: 3
+
+# Hardware Configuration
+hardware:
+  device: "cuda"
+  num_gpus: 1
+  distributed: false
+
+  # Memory optimization
+  activation_checkpointing: true
+  compile_model: true
+
+# JEPA-Specific Configuration
+jepa:
+  # Architecture variant
+  variant: "i_jepa"  # Options: i_jepa, v_jepa
+
+  # For V-JEPA only
+  video:
+    num_frames: 16
+    tubelet_size: 2
+    temporal_stride: 4
+
+  # Feature extraction
+  feature_extraction:
+    layers: [-1, -4, -8, -12]  # Layers to extract features from
+    pool_type: "cls"  # Options: cls, mean, concat
+
+  # Visualization
+  visualize_masking: false
+  viz_interval: 1000
+
+# Downstream Task Configuration
+downstream:
+  # Classification
+  classification:
+    num_classes: 1000
+    head_type: "linear"  # Options: linear, mlp
+
+  # Detection (placeholder)
+  detection:
+    enabled: false
+
+  # Segmentation (placeholder)
+  segmentation:
+    enabled: false
+
+# Experiment Configuration
+experiment:
+  name: "jepa_default"
+  seed: 42
+  deterministic: false
+
+  # Tags for organization
+  tags:
+    - "jepa"
+    - "i-jepa"
+    - "self-supervised"
+    - "baseline"

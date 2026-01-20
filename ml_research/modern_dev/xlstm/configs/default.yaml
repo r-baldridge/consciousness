@@ -1,0 +1,118 @@
+# xLSTM Default Configuration
+# Reference: "xLSTM: Extended Long Short-Term Memory"
+
+# Model Architecture
+model:
+  vocab_size: 50257             # Vocabulary size
+  embedding_dim: 768            # Model embedding dimension
+  num_layers: 12                # Number of xLSTM blocks
+  num_heads: 8                  # Number of attention heads (mLSTM)
+  head_dim: 64                  # Dimension per head
+
+# Layer Configuration
+# layer_types: List of 's' (sLSTM) or 'm' (mLSTM)
+# Default ratio is approximately 7:1 mLSTM to sLSTM
+layer_types: ["m", "m", "m", "s", "m", "m", "m", "s", "m", "m", "m", "s"]
+
+# Alternatively, specify sLSTM layer indices
+# slstm_at_layer_idx: [3, 7, 11]
+
+# Block Configuration
+block:
+  up_proj_factor: 2.0           # Expansion factor for up projection
+  conv_kernel_size: 4           # Kernel size for causal conv (sLSTM)
+  use_conv: true                # Use convolution in sLSTM blocks
+
+# QKV Projection
+qkv:
+  proj_blocksize: 4             # Block size for qkv projection
+
+# Normalization
+normalization:
+  epsilon: 1e-5                 # Epsilon for layer normalization
+
+# Initialization
+initialization:
+  initializer_range: 0.02       # Standard deviation for weight init
+  tie_word_embeddings: true     # Tie input and output embeddings
+
+# Regularization
+regularization:
+  dropout: 0.0                  # Dropout probability
+
+# Training Configuration
+training:
+  learning_rate: 6e-4           # Peak learning rate
+  min_learning_rate: 6e-5       # Minimum learning rate
+  weight_decay: 0.1             # Weight decay coefficient
+  beta1: 0.9                    # Adam beta1
+  beta2: 0.95                   # Adam beta2
+  grad_clip: 1.0                # Gradient clipping norm
+
+  # Learning rate schedule
+  warmup_steps: 2000            # Linear warmup steps
+  lr_decay_style: "cosine"      # LR decay style
+
+  # Batch size
+  batch_size: 32                # Micro batch size
+  gradient_accumulation_steps: 4 # Gradient accumulation
+
+  # Sequence length
+  max_seq_len: 2048             # Maximum sequence length
+
+  # Training duration
+  max_steps: 100000             # Maximum training steps
+
+  # Checkpointing
+  save_interval: 1000           # Save checkpoint every N steps
+  eval_interval: 500            # Evaluate every N steps
+
+# Inference Configuration
+inference:
+  max_new_tokens: 256           # Maximum new tokens to generate
+  temperature: 0.8              # Sampling temperature
+  top_k: 50                     # Top-k sampling
+  top_p: 0.9                    # Top-p (nucleus) sampling
+  repetition_penalty: 1.1       # Repetition penalty
+
+# Hardware Configuration
+hardware:
+  dtype: "bfloat16"             # Data type (float32, float16, bfloat16)
+  compile: false                # Use torch.compile
+  use_triton_kernels: false     # Use Triton kernels for efficiency
+
+# Model Size Presets
+# Uncomment to use a preset configuration
+
+# xlstm_small:  # ~125M params
+#   embedding_dim: 768
+#   num_layers: 12
+#   num_heads: 8
+#   head_dim: 64
+#   up_proj_factor: 2
+
+# xlstm_medium:  # ~350M params
+#   embedding_dim: 1024
+#   num_layers: 24
+#   num_heads: 8
+#   head_dim: 64
+#   up_proj_factor: 2.67
+
+# xlstm_large:  # ~1.3B params
+#   embedding_dim: 2048
+#   num_layers: 36
+#   num_heads: 16
+#   head_dim: 64
+#   up_proj_factor: 4
+
+# Logging
+logging:
+  log_interval: 10              # Log every N steps
+  wandb_project: null           # Weights & Biases project (null to disable)
+  wandb_run_name: null          # W&B run name
+
+# Data
+data:
+  train_data_path: null         # Path to training data
+  val_data_path: null           # Path to validation data
+  tokenizer: "gpt2"             # Tokenizer to use

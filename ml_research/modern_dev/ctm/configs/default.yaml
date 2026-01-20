@@ -1,0 +1,129 @@
+# Continuous Thought Machine (CTM) Default Configuration
+# Reference: https://arxiv.org/abs/2505.05522
+
+# Model Architecture
+model:
+  hidden_dim: 512
+  num_neurons: 1024
+  history_length: 8
+  max_internal_steps: 32
+  sync_window: 4
+  num_sync_heads: 8
+  neuron_activation: "gelu"
+  dropout: 0.1
+  use_adaptive_halt: false
+  halt_threshold: 0.01
+
+# Task-specific dimensions (override per task)
+task:
+  # Image classification (ImageNet)
+  input_dim: 768   # e.g., from ViT patch embeddings
+  output_dim: 1000
+  task_type: "classification"
+
+# Training Configuration
+training:
+  batch_size: 32
+  learning_rate: 1.0e-4
+  weight_decay: 0.01
+  warmup_steps: 1000
+  max_steps: 100000
+  gradient_clip_norm: 1.0
+
+  # Optimizer
+  optimizer: "adamw"
+  adam_beta1: 0.9
+  adam_beta2: 0.999
+  adam_eps: 1.0e-8
+
+  # Learning rate schedule
+  lr_scheduler: "cosine"
+  lr_min_ratio: 0.1  # minimum LR = lr * lr_min_ratio
+
+  # Mixed precision
+  fp16: false
+  bf16: true  # Preferred for modern GPUs
+
+  # Gradient accumulation
+  gradient_accumulation_steps: 1
+
+# Data Configuration
+data:
+  dataset: "imagenet"
+  data_dir: "./data/imagenet"
+  num_workers: 4
+  pin_memory: true
+
+  # Image preprocessing
+  image_size: 224
+  patch_size: 16
+
+  # Augmentation
+  random_crop: true
+  horizontal_flip: true
+  color_jitter: 0.4
+  auto_augment: "randaugment"
+
+# Evaluation Configuration
+evaluation:
+  eval_interval: 1000  # steps between evaluations
+  eval_batch_size: 64
+  num_eval_steps: null  # null = full validation set
+
+  # Metrics to compute
+  metrics:
+    - "accuracy"
+    - "top5_accuracy"
+    - "sync_stability"  # CTM-specific metric
+
+# Logging Configuration
+logging:
+  log_interval: 100  # steps between logs
+  log_level: "INFO"
+
+  # Wandb integration
+  use_wandb: false
+  wandb_project: "ctm-experiments"
+  wandb_entity: null
+
+  # Checkpointing
+  checkpoint_dir: "./checkpoints/ctm"
+  save_interval: 5000  # steps between saves
+  keep_last_n: 3
+
+# Hardware Configuration
+hardware:
+  device: "cuda"
+  num_gpus: 1
+  distributed: false
+
+  # Memory optimization
+  activation_checkpointing: false
+  compile_model: true  # torch.compile for PyTorch 2.0+
+
+# CTM-Specific Configuration
+ctm:
+  # Temporal unrolling
+  min_internal_steps: 4
+  step_warmup: 1000  # steps to warmup from min to max steps
+
+  # Synchronization loss weight
+  sync_loss_weight: 0.1
+
+  # Ponder cost (for adaptive halting)
+  ponder_cost_weight: 0.01
+
+  # Visualization
+  visualize_sync: false
+  sync_viz_interval: 1000
+
+# Experiment Configuration
+experiment:
+  name: "ctm_default"
+  seed: 42
+  deterministic: false  # Set true for reproducibility (slower)
+
+  # Tags for organization
+  tags:
+    - "ctm"
+    - "baseline"

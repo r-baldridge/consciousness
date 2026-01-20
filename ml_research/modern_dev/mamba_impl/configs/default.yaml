@@ -1,0 +1,118 @@
+# Mamba Default Configuration
+# Reference: "Mamba: Linear-Time Sequence Modeling with Selective State Spaces"
+
+# Model Architecture
+model:
+  d_model: 768                  # Model dimension (embedding size)
+  n_layer: 24                   # Number of Mamba blocks
+  vocab_size: 50280             # Vocabulary size
+  d_state: 16                   # SSM state dimension
+  d_conv: 4                     # Convolution kernel size
+  expand: 2                     # Expansion factor for inner dimension
+
+# Selective SSM Parameters
+ssm:
+  dt_rank: "auto"               # Rank for delta projection ("auto" = d_model / 16)
+  dt_min: 0.001                 # Minimum delta value
+  dt_max: 0.1                   # Maximum delta value
+  dt_init: "random"             # Delta initialization ("random" or "constant")
+  dt_scale: 1.0                 # Delta scaling factor
+  dt_init_floor: 1e-4           # Floor for delta initialization
+
+# Layer Configuration
+layers:
+  conv_bias: true               # Use bias in convolution
+  bias: false                   # Use bias in linear projections
+  use_fast_path: true           # Use fused CUDA kernel if available
+
+# Normalization
+normalization:
+  type: "layernorm"             # Normalization type
+  epsilon: 1e-5                 # Epsilon for numerical stability
+  residual_in_fp32: true        # Keep residuals in fp32
+
+# Initialization
+initialization:
+  initializer_range: 0.02       # Standard deviation for weight init
+  pad_vocab_size_multiple: 8    # Pad vocab to this multiple
+
+# Training Configuration
+training:
+  learning_rate: 6e-4           # Peak learning rate
+  min_learning_rate: 6e-5       # Minimum learning rate
+  weight_decay: 0.1             # Weight decay coefficient
+  beta1: 0.9                    # Adam beta1
+  beta2: 0.95                   # Adam beta2
+  grad_clip: 1.0                # Gradient clipping norm
+
+  # Learning rate schedule
+  warmup_steps: 2000            # Linear warmup steps
+  lr_decay_style: "cosine"      # LR decay style
+
+  # Batch size
+  batch_size: 32                # Micro batch size
+  gradient_accumulation_steps: 4 # Gradient accumulation
+
+  # Sequence length
+  max_seq_len: 2048             # Maximum sequence length
+
+  # Training duration
+  max_steps: 100000             # Maximum training steps
+
+  # Checkpointing
+  save_interval: 1000           # Save checkpoint every N steps
+  eval_interval: 500            # Evaluate every N steps
+
+# Inference Configuration
+inference:
+  max_new_tokens: 256           # Maximum new tokens to generate
+  temperature: 0.8              # Sampling temperature
+  top_k: 50                     # Top-k sampling
+  top_p: 0.9                    # Top-p (nucleus) sampling
+  repetition_penalty: 1.1       # Repetition penalty
+
+# Hardware Configuration
+hardware:
+  dtype: "bfloat16"             # Data type (float32, float16, bfloat16)
+  compile: false                # Use torch.compile
+  use_flash_attention: false    # Not applicable for Mamba
+
+# Model Size Presets
+# Uncomment to use a preset configuration
+
+# mamba_130m:
+#   d_model: 768
+#   n_layer: 24
+#   d_state: 16
+
+# mamba_370m:
+#   d_model: 1024
+#   n_layer: 48
+#   d_state: 16
+
+# mamba_790m:
+#   d_model: 1536
+#   n_layer: 48
+#   d_state: 16
+
+# mamba_1_4b:
+#   d_model: 2048
+#   n_layer: 48
+#   d_state: 16
+
+# mamba_2_8b:
+#   d_model: 2560
+#   n_layer: 64
+#   d_state: 16
+
+# Logging
+logging:
+  log_interval: 10              # Log every N steps
+  wandb_project: null           # Weights & Biases project (null to disable)
+  wandb_run_name: null          # W&B run name
+
+# Data
+data:
+  train_data_path: null         # Path to training data
+  val_data_path: null           # Path to validation data
+  tokenizer: "gpt2"             # Tokenizer to use

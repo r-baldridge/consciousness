@@ -1,0 +1,160 @@
+# Ring Attention Default Configuration
+# =====================================
+# Default hyperparameters for ring attention distributed transformer.
+
+# Model Architecture
+model:
+  hidden_dim: 4096
+  num_heads: 32
+  head_dim: 128  # hidden_dim / num_heads
+  num_layers: 32
+  vocab_size: 32000
+  max_seq_len: 1048576  # 1M tokens max
+  dropout: 0.0
+  use_bias: false
+
+# Ring Attention Specific
+ring_attention:
+  block_size: 4096  # Tokens per device
+  causal: true
+  use_flash_attention: true
+  overlap_communication: true
+  ring_impl: "nccl"  # "nccl", "gloo", "custom"
+
+# Distributed Configuration
+distributed:
+  world_size: 8  # Number of GPUs
+  backend: "nccl"
+  init_method: "env://"
+
+  # Parallelism strategy
+  sequence_parallel: true
+  tensor_parallel: false  # Can combine with tensor parallel
+  pipeline_parallel: false
+
+# Communication
+communication:
+  # Overlap settings
+  num_async_ops: 2
+  prefetch_kv: true
+
+  # Buffer settings
+  double_buffer: true
+  kv_cache_dtype: "bfloat16"
+
+# Hardware Configuration
+hardware:
+  # Auto-detect or specify
+  interconnect: "nvlink"  # "nvlink", "pcie", "infiniband"
+
+  # Memory settings
+  max_memory_per_gpu: null  # Auto-detect if null
+  activation_checkpointing: true
+
+# Attention Configuration
+attention:
+  # Mask settings
+  causal: true
+  sliding_window: null  # Set to integer for sliding window attention
+
+  # Numerical precision
+  attention_dtype: "bfloat16"
+  softmax_scale: null  # Auto-compute from head_dim if null
+
+# Position Encoding
+position:
+  type: "rotary"  # "rotary", "alibi", "learned"
+  rotary_base: 10000
+  rotary_scaling: null  # For extended context
+
+# Training Configuration
+training:
+  batch_size: 1  # Per device
+  gradient_accumulation_steps: 1
+  learning_rate: 3.0e-4
+  weight_decay: 0.1
+  warmup_steps: 2000
+  max_steps: 100000
+  grad_clip: 1.0
+
+  # Optimizer
+  optimizer: "adamw"
+  adam_beta1: 0.9
+  adam_beta2: 0.95
+  adam_eps: 1.0e-8
+
+  # Learning rate schedule
+  lr_schedule: "cosine"
+  min_lr: 1.0e-5
+
+  # Mixed precision
+  dtype: "bfloat16"
+  use_amp: true
+
+  # Memory optimization
+  gradient_checkpointing: true
+  cpu_offload: false
+
+# Inference Configuration
+inference:
+  batch_size: 1
+  max_new_tokens: 2048
+  temperature: 1.0
+  top_p: 1.0
+  top_k: 0
+
+  # KV cache
+  kv_cache_dtype: "bfloat16"
+
+# Logging
+logging:
+  log_every: 10
+  eval_every: 1000
+  save_every: 5000
+
+  # Metrics
+  log_communication_time: true
+  log_memory_usage: true
+
+  # Wandb
+  wandb:
+    enabled: false
+    project: "ring-attention"
+    entity: null
+
+# Checkpointing
+checkpoint:
+  dir: "./checkpoints"
+  save_best: true
+  keep_last: 3
+
+  # Distributed checkpoint
+  use_distributed_checkpoint: true
+
+# Context Length Scaling
+# Example configurations for different context lengths
+scaling_configs:
+  64k:
+    world_size: 8
+    block_size: 8192
+    gradient_checkpointing: true
+
+  128k:
+    world_size: 16
+    block_size: 8192
+    gradient_checkpointing: true
+
+  512k:
+    world_size: 64
+    block_size: 8192
+    gradient_checkpointing: true
+    cpu_offload: true
+
+  1m:
+    world_size: 128
+    block_size: 8192
+    gradient_checkpointing: true
+    cpu_offload: true
+
+# Random seed
+seed: 42

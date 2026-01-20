@@ -138,6 +138,38 @@ The `neural_network/` module provides the computational backbone:
 - **MessageBus**: Inter-form communication with priority queues
 - **Adapters**: Specialized adapters for each consciousness form
 
+### ML Research Module
+The `ml_research/` module provides a comprehensive machine learning research library:
+- **200+ Methods Indexed**: From McCulloch-Pitts (1943) to modern architectures (2025)
+- **Historical Taxonomy**: Methods organized by era, category, and lineage
+- **Modern Implementations**: Working code for cutting-edge architectures
+- **ML Techniques**: 29 composable application patterns
+
+#### Modern Architectures (modern_dev/)
+Full implementations with CLI, configs, and tests for:
+
+| Architecture | Organization | Key Innovation |
+|-------------|--------------|----------------|
+| **CTM** | Sakana AI | Neural dynamics with decoupled internal time |
+| **JEPA** | Meta AI | Latent space prediction without pixel reconstruction |
+| **xLSTM** | NXAI Lab | Exponential gating + matrix memory |
+| **RWKV** | RWKV Foundation | RNN efficiency with transformer parallelization |
+| **Griffin** | Google DeepMind | Gated linear recurrence + local attention |
+| **Mamba** | CMU/Princeton | Selective state spaces with hardware-aware scan |
+| **TTT** | Stanford/NVIDIA | Learnable hidden states that adapt at inference |
+| **Hyena** | Hazy Research | Implicit long convolutions for 100x speedup |
+| **Titans** | Google | Meta in-context memory learning |
+| **Flow Matching** | Meta/DeepMind | Optimal transport paths for fast sampling |
+| **Consistency Models** | OpenAI | One-step generation with diffusion quality |
+| **Ring Attention** | UC Berkeley | Distributed attention for infinite context |
+
+#### ML Techniques (ml_techniques/)
+Composable patterns for model deployment:
+- **Prompting**: Chain-of-Thought, Tree-of-Thought, Graph-of-Thought
+- **Agentic**: ReAct, tool calling, multi-agent orchestration
+- **Memory**: RAG, episodic memory, context compression
+- **Verification**: Self-evaluation, Constitutional AI, debate
+
 ## Key Features
 
 ### 🧠 **Multi-Paradigm Foundation**
@@ -179,17 +211,28 @@ consciousness/
 ├── 33-swarm-intelligence/       # Collective intelligence
 ├── 34-gaia-intelligence/        # Planetary systems
 ├── 35-developmental-consciousness/
-├── 36-contemplative-states/
-├── 37-psychedelic-consciousness/
-├── 38-neurodivergent-consciousness/
-├── 39-trauma-consciousness/
-├── 40-xenoconsciousness/        # Hypothetical minds
-└── neural_network/              # Computational backbone
-    ├── config/                  # Model and resource configs
-    ├── core/                    # NervousSystem, Registry, MessageBus
-    ├── adapters/                # Form-specific adapters
-    ├── gateway/                 # FastAPI REST/WebSocket API
-    └── models/                  # Model loading & quantization
+├── 36-contemplative/            # Contemplative states
+├── 37-psychedelic/              # Psychedelic consciousness
+├── 38-neurodivergent/           # Neurodivergent consciousness
+├── 39-trauma/                   # Trauma consciousness
+├── 40-xeno/                     # Hypothetical minds
+├── neural_network/              # Computational backbone
+│   ├── config/                  # Model and resource configs
+│   ├── core/                    # NervousSystem, Registry, MessageBus
+│   ├── adapters/                # Form-specific adapters
+│   ├── gateway/                 # FastAPI REST/WebSocket API
+│   └── models/                  # Model loading & quantization
+└── ml_research/                 # ML research library
+    ├── foundations/             # 1943-1980: Neural network origins
+    ├── classical/               # 1980-2006: MLPs, CNNs, RNNs
+    ├── deep_learning/           # 2006-2017: AlexNet, ResNet, GANs
+    ├── attention/               # 2017+: Transformers, ViT, LLMs
+    ├── novel/                   # 2023+: State-space, MoE, world models
+    ├── reinforcement/           # RL: DQN, PPO, RLHF
+    ├── optimization/            # Training: Adam, schedulers, regularization
+    ├── modern_dev/              # Active implementations with CLI/tests
+    ├── ml_techniques/           # Application patterns (CoT, RAG, etc.)
+    └── core/                    # Registry, taxonomy, lineage tracking
 ```
 
 ## Usage
@@ -221,6 +264,32 @@ result = await ns.inference(InferenceRequest(
     input_data={"query": "How do planetary boundaries affect biosphere stability?"},
     priority=Priority.NORMAL,
 ))
+```
+
+### ML Research Module
+```python
+from consciousness.ml_research import MethodRegistry, Timeline, LineageTracker
+from consciousness.ml_research.modern_dev import Orchestrator, TaskType
+
+# Explore ML method history
+all_methods = MethodRegistry.get_all()
+LineageTracker.show_lineage('transformer')
+Timeline.show_era('attention')
+
+# Use modern architectures via orchestrator
+orch = Orchestrator(device="cuda", max_loaded_models=2)
+result = orch.run(
+    task_type=TaskType.LONG_CONTEXT,
+    input_data={"text": "...long document..."},
+    constraints={"context_length": 100000}
+)
+
+# Or specify architecture directly
+result = orch.run(
+    task_type=TaskType.TEXT_GENERATION,
+    input_data={"prompt": "Hello"},
+    architecture="mamba"
+)
 ```
 
 ## Development Philosophy

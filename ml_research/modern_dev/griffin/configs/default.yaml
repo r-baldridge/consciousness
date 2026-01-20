@@ -1,0 +1,149 @@
+# Griffin Default Configuration
+# Based on "Griffin: Mixing Gated Linear Recurrences with Local Attention"
+
+# Model Architecture
+model:
+  vocab_size: 256000          # Vocabulary size (Gemma tokenizer)
+  hidden_dim: 2048            # Hidden dimension
+  num_layers: 26              # Number of blocks
+  num_heads: 8                # Attention heads (for local attention)
+  head_dim: 256               # Dimension per attention head
+  mlp_expansion: 8            # MLP expansion factor
+  window_size: 2048           # Local attention window size
+  context_length: 8192        # Maximum context length
+  recurrent_state_dim: 2048   # RG-LRU state dimension
+  block_pattern:              # Pattern of block types
+    - "recurrent"
+    - "recurrent"
+    - "attention"
+  dropout: 0.0                # Dropout probability
+  layer_norm_eps: 1.0e-6      # Layer norm epsilon
+  use_bias: true              # Use bias in linear layers
+  tie_embeddings: true        # Tie input/output embeddings
+  initializer_range: 0.02     # Weight initialization std
+
+# Training Configuration
+training:
+  # Optimizer
+  optimizer: "adamw"
+  learning_rate: 3.0e-4
+  weight_decay: 0.1
+  beta1: 0.9
+  beta2: 0.95
+  eps: 1.0e-8
+
+  # Learning rate schedule
+  lr_scheduler: "cosine"
+  warmup_steps: 2000
+  min_lr_ratio: 0.1
+
+  # Batch size
+  batch_size: 32
+  gradient_accumulation_steps: 4
+
+  # Training duration
+  max_steps: 500000
+  eval_interval: 1000
+  save_interval: 5000
+  log_interval: 10
+
+  # Gradient clipping
+  max_grad_norm: 1.0
+
+  # Mixed precision
+  mixed_precision: "bf16"
+
+  # Checkpointing
+  gradient_checkpointing: true
+
+# Data Configuration
+data:
+  dataset: "c4"
+  tokenizer: "google/gemma-tokenizer"
+  max_length: 8192
+  num_workers: 4
+  prefetch_factor: 2
+
+# Evaluation Configuration
+evaluation:
+  batch_size: 16
+  max_eval_samples: 1000
+
+# Logging Configuration
+logging:
+  project: "griffin"
+  entity: null
+  log_to_wandb: false
+  log_dir: "./logs"
+
+# Hardware Configuration
+hardware:
+  seed: 42
+  device: "cuda"
+  num_gpus: 1
+  compile_model: true
+
+# RecurrentGemma-2B Configuration (alternative preset)
+recurrent_gemma_2b:
+  model:
+    vocab_size: 256000
+    hidden_dim: 2048
+    num_layers: 26
+    num_heads: 8
+    head_dim: 256
+    mlp_expansion: 8
+    window_size: 2048
+    context_length: 8192
+    recurrent_state_dim: 2048
+    block_pattern:
+      - "recurrent"
+      - "recurrent"
+      - "attention"
+
+# Small Model Configuration (alternative preset)
+small:
+  model:
+    hidden_dim: 768
+    num_layers: 12
+    num_heads: 6
+    head_dim: 128
+    mlp_expansion: 4
+    window_size: 1024
+    context_length: 4096
+    recurrent_state_dim: 768
+  training:
+    batch_size: 64
+    learning_rate: 6.0e-4
+
+# Large Model Configuration (alternative preset)
+large:
+  model:
+    hidden_dim: 4096
+    num_layers: 42
+    num_heads: 16
+    head_dim: 256
+    mlp_expansion: 8
+    window_size: 2048
+    context_length: 8192
+    recurrent_state_dim: 4096
+  training:
+    batch_size: 8
+    learning_rate: 1.5e-4
+    gradient_accumulation_steps: 8
+
+# Attention-Heavy Pattern (alternative pattern)
+attention_heavy:
+  model:
+    block_pattern:
+      - "recurrent"
+      - "attention"
+      - "attention"
+
+# Recurrent-Heavy Pattern (alternative pattern)
+recurrent_heavy:
+  model:
+    block_pattern:
+      - "recurrent"
+      - "recurrent"
+      - "recurrent"
+      - "attention"

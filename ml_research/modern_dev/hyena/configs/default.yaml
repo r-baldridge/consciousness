@@ -1,0 +1,125 @@
+# Hyena Default Configuration
+# Based on "Hyena Hierarchy: Towards Larger Convolutional Language Models"
+
+# Model Architecture
+model:
+  d_model: 512              # Hidden dimension
+  n_layer: 12               # Number of Hyena blocks
+  vocab_size: 50257         # Vocabulary size (GPT-2 tokenizer)
+  order: 2                  # Hyena hierarchy order
+  filter_order: 64          # Filter MLP hidden dimension
+  emb_dim: 3                # Positional encoding frequencies
+  short_filter_order: 3     # Short convolution kernel size
+  max_seq_len: 2048         # Maximum sequence length
+  dropout: 0.0              # Dropout probability
+  filter_dropout: 0.0       # Filter MLP dropout
+  activation: "gelu"        # Activation function
+  bidirectional: false      # Bidirectional convolutions
+  use_flash_fft: false      # Use optimized FFT kernels
+  tie_embeddings: true      # Tie input/output embeddings
+  layer_norm_eps: 1.0e-5    # Layer norm epsilon
+  initializer_range: 0.02   # Weight initialization std
+
+# Training Configuration
+training:
+  # Optimizer
+  optimizer: "adamw"
+  learning_rate: 6.0e-4
+  weight_decay: 0.1
+  beta1: 0.9
+  beta2: 0.95
+  eps: 1.0e-8
+
+  # Learning rate schedule
+  lr_scheduler: "cosine"
+  warmup_steps: 2000
+  min_lr_ratio: 0.1
+
+  # Batch size
+  batch_size: 32
+  gradient_accumulation_steps: 1
+
+  # Training duration
+  max_steps: 100000
+  eval_interval: 1000
+  save_interval: 5000
+  log_interval: 10
+
+  # Gradient clipping
+  max_grad_norm: 1.0
+
+  # Mixed precision
+  mixed_precision: "bf16"
+
+  # Checkpointing
+  gradient_checkpointing: false
+
+# Data Configuration
+data:
+  dataset: "openwebtext"
+  tokenizer: "gpt2"
+  max_length: 2048
+  num_workers: 4
+  prefetch_factor: 2
+
+# Evaluation Configuration
+evaluation:
+  batch_size: 32
+  max_eval_samples: 1000
+
+# Logging Configuration
+logging:
+  project: "hyena"
+  entity: null
+  log_to_wandb: false
+  log_dir: "./logs"
+
+# Hardware Configuration
+hardware:
+  seed: 42
+  device: "cuda"
+  num_gpus: 1
+  compile_model: false
+
+# Long Context Configuration (alternative preset)
+long_context:
+  model:
+    d_model: 512
+    n_layer: 8
+    order: 2
+    filter_order: 128
+    emb_dim: 5
+    short_filter_order: 5
+    max_seq_len: 65536
+    use_flash_fft: true
+  training:
+    batch_size: 8
+    gradient_accumulation_steps: 4
+    gradient_checkpointing: true
+
+# Small Model Configuration (alternative preset)
+small:
+  model:
+    d_model: 256
+    n_layer: 6
+    order: 2
+    filter_order: 32
+    emb_dim: 3
+    max_seq_len: 1024
+  training:
+    batch_size: 64
+    learning_rate: 1.0e-3
+
+# Large Model Configuration (alternative preset)
+large:
+  model:
+    d_model: 1024
+    n_layer: 24
+    order: 2
+    filter_order: 128
+    emb_dim: 5
+    max_seq_len: 4096
+  training:
+    batch_size: 16
+    learning_rate: 3.0e-4
+    gradient_accumulation_steps: 4

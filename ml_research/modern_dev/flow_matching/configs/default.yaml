@@ -1,0 +1,106 @@
+# Flow Matching Default Configuration
+# ==================================
+# Default hyperparameters for flow matching model training and inference.
+
+# Model Architecture
+model:
+  type: "mlp"  # "mlp" for simple data, "unet" for images
+  input_dim: 784  # For MNIST flattened
+  hidden_dim: 256
+  num_layers: 4
+  time_embed_dim: 128
+  num_heads: 8
+  dropout: 0.0
+  use_attention: false
+
+# UNet-specific settings (when model.type = "unet")
+unet:
+  in_channels: 3
+  out_channels: 3
+  base_channels: 64
+  channel_mult: [1, 2, 4, 8]
+  num_res_blocks: 2
+  attention_resolutions: [16, 8]
+  num_heads: 8
+
+# Flow Path Configuration
+flow:
+  path_type: "ot"  # "ot" (optimal transport), "vp", "ve"
+  sigma_min: 1.0e-5
+  use_ot_coupling: false  # Mini-batch OT coupling
+  ot_epsilon: 0.1  # Sinkhorn regularization
+
+# ODE Solver Configuration
+solver:
+  type: "euler"  # "euler", "heun", "rk4", "dopri5"
+  num_steps: 50  # Number of steps for sampling
+  rtol: 1.0e-5  # Relative tolerance (for adaptive solvers)
+  atol: 1.0e-5  # Absolute tolerance (for adaptive solvers)
+
+# Training Configuration
+training:
+  batch_size: 64
+  learning_rate: 1.0e-4
+  weight_decay: 0.0
+  num_iterations: 100000
+  warmup_steps: 1000
+  grad_clip: 1.0
+
+  # EMA settings
+  use_ema: true
+  ema_decay: 0.9999
+  ema_update_every: 1
+
+  # Logging
+  log_every: 100
+  sample_every: 5000
+  save_every: 10000
+
+  # Mixed precision
+  use_amp: true
+
+# Data Configuration
+data:
+  dataset: "mnist"  # "mnist", "cifar10", "imagenet"
+  image_size: 28
+  num_channels: 1
+  num_workers: 4
+
+# Rectified Flow (Reflow) Configuration
+reflow:
+  enabled: false
+  num_iterations: 1  # Number of reflow iterations
+  pairs_per_iteration: 50000  # Number of (noise, data) pairs to generate
+
+# Evaluation Configuration
+evaluation:
+  num_samples: 10000
+  batch_size: 256
+  fid:
+    enabled: true
+    reference_stats: null  # Path to precomputed stats
+
+# Distributed Training
+distributed:
+  enabled: false
+  backend: "nccl"
+  world_size: 1
+
+# Checkpointing
+checkpoint:
+  dir: "./checkpoints"
+  save_best: true
+  keep_last: 5
+
+# Logging
+logging:
+  wandb:
+    enabled: false
+    project: "flow-matching"
+    entity: null
+  tensorboard:
+    enabled: true
+    log_dir: "./logs"
+
+# Random seed
+seed: 42

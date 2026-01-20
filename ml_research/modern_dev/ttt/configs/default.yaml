@@ -1,0 +1,173 @@
+# Test-Time Training (TTT) Default Configuration
+# Reference: https://arxiv.org/abs/2407.04620
+
+# Model Architecture
+model:
+  hidden_dim: 768
+  num_layers: 12
+  num_heads: 12
+  vocab_size: 50257  # GPT-2 vocab size
+  max_seq_len: 2048
+  ttt_type: "linear"  # Options: linear, mlp
+  mlp_hidden_dim: 2048  # Only used for TTT-MLP
+
+  # TTT-specific parameters
+  ttt_learning_rate: 1.0
+  mini_batch_size: 16
+
+  # Position embeddings
+  use_rope: true
+  rope_base: 10000
+  rope_scaling: null  # For extended context
+
+  # Regularization
+  dropout: 0.0
+  layer_norm_eps: 1.0e-5
+  initializer_range: 0.02
+  tie_word_embeddings: true
+
+# Training Configuration
+training:
+  batch_size: 32
+  learning_rate: 6.0e-4
+  weight_decay: 0.1
+  warmup_steps: 2000
+  max_steps: 100000
+  gradient_clip_norm: 1.0
+
+  # Optimizer
+  optimizer: "adamw"
+  adam_beta1: 0.9
+  adam_beta2: 0.95
+  adam_eps: 1.0e-8
+
+  # Learning rate schedule
+  lr_scheduler: "cosine"
+  lr_min_ratio: 0.1
+
+  # Mixed precision
+  fp16: false
+  bf16: true
+
+  # Gradient accumulation
+  gradient_accumulation_steps: 4
+
+  # Sequence length curriculum
+  sequence_length_warmup: true
+  initial_seq_len: 512
+  seq_len_warmup_steps: 10000
+
+# Data Configuration
+data:
+  dataset: "pile"  # or "openwebtext", "c4"
+  data_dir: "./data/pile"
+  num_workers: 4
+  pin_memory: true
+
+  # Tokenization
+  tokenizer: "gpt2"
+  max_seq_len: 2048
+
+  # Data loading
+  shuffle_buffer_size: 10000
+
+# Evaluation Configuration
+evaluation:
+  eval_interval: 1000  # steps
+  eval_batch_size: 32
+  num_eval_steps: 100
+
+  # Perplexity evaluation datasets
+  eval_datasets:
+    - "pile_val"
+    - "books"
+    - "arxiv"
+    - "code"
+
+  # Long context evaluation
+  long_context_eval:
+    enabled: false
+    context_lengths: [4096, 8192, 16384, 32768]
+
+# Logging Configuration
+logging:
+  log_interval: 50
+  log_level: "INFO"
+
+  # Wandb integration
+  use_wandb: false
+  wandb_project: "ttt-experiments"
+  wandb_entity: null
+
+  # Checkpointing
+  checkpoint_dir: "./checkpoints/ttt"
+  save_interval: 5000
+  keep_last_n: 3
+
+# Hardware Configuration
+hardware:
+  device: "cuda"
+  num_gpus: 1
+  distributed: false
+
+  # Memory optimization
+  activation_checkpointing: true
+  compile_model: true
+
+# TTT-Specific Configuration
+ttt:
+  # Variant selection
+  variant: "ttt_linear"  # Options: ttt_linear, ttt_mlp
+
+  # Mini-batch processing
+  use_mini_batch: true
+  mini_batch_size: 16
+
+  # Hidden state initialization
+  init_type: "identity"  # Options: identity, zeros, random
+
+  # Gradient computation
+  use_parallel_grad: true  # Parallel gradient computation for efficiency
+
+  # Hidden state caching
+  cache_hidden_states: true
+  max_cache_size: 32768  # Max tokens to cache
+
+  # Visualization
+  visualize_hidden_states: false
+  viz_interval: 1000
+
+# Model Size Presets
+presets:
+  ttt_small:
+    hidden_dim: 512
+    num_layers: 8
+    num_heads: 8
+
+  ttt_base:
+    hidden_dim: 768
+    num_layers: 12
+    num_heads: 12
+
+  ttt_large:
+    hidden_dim: 1024
+    num_layers: 24
+    num_heads: 16
+
+  ttt_xl:
+    hidden_dim: 2048
+    num_layers: 24
+    num_heads: 32
+
+# Experiment Configuration
+experiment:
+  name: "ttt_default"
+  seed: 42
+  deterministic: false
+
+  # Tags for organization
+  tags:
+    - "ttt"
+    - "linear"
+    - "language-model"
+    - "baseline"

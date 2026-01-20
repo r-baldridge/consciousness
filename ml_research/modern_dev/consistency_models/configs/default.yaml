@@ -1,0 +1,126 @@
+# Consistency Models Default Configuration
+# ========================================
+# Default hyperparameters for consistency model training and inference.
+
+# Model Architecture
+model:
+  type: "mlp"  # "mlp" for simple data, "unet" for images
+  input_dim: 784  # For MNIST flattened
+  hidden_dim: 256
+  num_layers: 4
+  time_embed_dim: 128
+  num_heads: 8
+  dropout: 0.0
+
+# UNet-specific settings (when model.type = "unet")
+unet:
+  in_channels: 3
+  out_channels: 3
+  base_channels: 128
+  channel_mult: [1, 2, 2, 2]
+  num_res_blocks: 2
+  attention_resolutions: [16, 8]
+  dropout: 0.0
+
+# Noise Schedule (Karras)
+schedule:
+  sigma_min: 0.002  # Minimum noise level (epsilon)
+  sigma_max: 80.0   # Maximum noise level (T)
+  sigma_data: 0.5   # Data standard deviation
+  rho: 7.0          # Schedule exponent
+  num_timesteps: 18 # Number of discretization steps
+
+# Training Mode
+training:
+  mode: "distillation"  # "distillation" or "training"
+
+  # Consistency Distillation specific
+  distillation:
+    teacher_path: null  # Path to pre-trained diffusion model
+    num_heun_steps: 1   # Number of teacher ODE steps
+
+  # Consistency Training specific
+  consistency_training:
+    # Curriculum schedule for N
+    n_start: 2
+    n_end: 150
+    n_schedule: "linear"  # "linear" or "exponential"
+
+  # Common training params
+  batch_size: 64
+  learning_rate: 1.0e-4
+  weight_decay: 0.0
+  num_iterations: 600000
+  warmup_steps: 0
+  grad_clip: 1.0
+
+  # EMA settings
+  ema_decay: 0.9999
+  ema_update_every: 1
+
+  # Logging
+  log_every: 100
+  sample_every: 5000
+  save_every: 10000
+
+  # Mixed precision
+  use_amp: true
+
+# Loss Configuration
+loss:
+  type: "mse"  # "mse" or "lpips"
+  lpips_weight: 0.0  # Weight for LPIPS loss if used
+
+# Data Configuration
+data:
+  dataset: "cifar10"  # "mnist", "cifar10", "imagenet"
+  image_size: 32
+  num_channels: 3
+  num_workers: 4
+  augmentation: true
+
+# Sampling Configuration
+sampling:
+  num_steps: 1  # 1 for one-step, more for multi-step
+  sigma_start: 80.0
+  clip_denoised: true
+
+# Evaluation Configuration
+evaluation:
+  num_samples: 50000
+  batch_size: 256
+  fid:
+    enabled: true
+    reference_stats: null  # Path to precomputed stats
+
+# Distributed Training
+distributed:
+  enabled: false
+  backend: "nccl"
+  world_size: 1
+
+# Checkpointing
+checkpoint:
+  dir: "./checkpoints"
+  save_best: true
+  keep_last: 5
+
+# Logging
+logging:
+  wandb:
+    enabled: false
+    project: "consistency-models"
+    entity: null
+  tensorboard:
+    enabled: true
+    log_dir: "./logs"
+
+# Random seed
+seed: 42
+
+# Skip Scaling Configuration
+skip_scaling:
+  # c_skip(t) = sigma_data^2 / (t^2 + sigma_data^2)
+  # c_out(t) = sigma_data * t / sqrt(t^2 + sigma_data^2)
+  # These ensure f(x, epsilon) = x
+  enforce_boundary: true

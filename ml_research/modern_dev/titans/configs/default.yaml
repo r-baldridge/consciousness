@@ -1,0 +1,160 @@
+# Titans Default Configuration
+# Based on "Titans: Learning to Memorize at Test Time" (Google, 2025)
+
+# Model Architecture
+model:
+  vocab_size: 50257            # Vocabulary size (GPT-2 tokenizer)
+  hidden_dim: 2048             # Hidden dimension
+  num_layers: 24               # Number of Titans blocks
+  num_heads: 16                # Number of attention heads
+  head_dim: 128                # Dimension per attention head
+  mlp_expansion: 4             # MLP expansion factor
+  context_length: 8192         # Maximum context length
+  dropout: 0.0                 # Dropout probability
+  layer_norm_eps: 1.0e-6       # Layer norm epsilon
+  use_bias: true               # Use bias in linear layers
+  tie_embeddings: true         # Tie input/output embeddings
+  initializer_range: 0.02      # Weight initialization std
+
+  # Memory configuration
+  memory_dim: 256              # Memory module hidden dimension
+  memory_layers: 2             # Number of layers in memory MLP
+  memory_lr: 0.01              # Learning rate for test-time updates
+  surprise_threshold: 0.1      # Threshold for memory writes
+  variant: "MAG"               # Integration variant (MAC, MAG, MAL)
+  memory_loss_weight: 0.1      # Weight for memory loss during training
+  gate_init_bias: -2.0         # Initial gate bias (negative = attention-dominant)
+
+# Training Configuration
+training:
+  # Optimizer
+  optimizer: "adamw"
+  learning_rate: 1.0e-4
+  weight_decay: 0.1
+  beta1: 0.9
+  beta2: 0.95
+  eps: 1.0e-8
+
+  # Learning rate schedule
+  lr_scheduler: "cosine"
+  warmup_steps: 2000
+  min_lr_ratio: 0.1
+
+  # Batch size
+  batch_size: 16
+  gradient_accumulation_steps: 4
+
+  # Training duration
+  max_steps: 200000
+  eval_interval: 1000
+  save_interval: 5000
+  log_interval: 10
+
+  # Gradient clipping
+  max_grad_norm: 1.0
+
+  # Mixed precision
+  mixed_precision: "bf16"
+
+  # Checkpointing
+  gradient_checkpointing: true
+
+  # Two-stage training
+  stage1_steps: 100000         # Train core model first
+  stage2_steps: 100000         # Then train with memory
+
+# Data Configuration
+data:
+  dataset: "openwebtext"
+  tokenizer: "gpt2"
+  max_length: 8192
+  num_workers: 4
+  prefetch_factor: 2
+
+# Evaluation Configuration
+evaluation:
+  batch_size: 8
+  max_eval_samples: 1000
+
+# Logging Configuration
+logging:
+  project: "titans"
+  entity: null
+  log_to_wandb: false
+  log_dir: "./logs"
+
+# Hardware Configuration
+hardware:
+  seed: 42
+  device: "cuda"
+  num_gpus: 1
+  compile_model: true
+
+# MAC Variant Configuration
+mac:
+  model:
+    variant: "MAC"
+    memory_key_dim: 64
+    memory_value_dim: 64
+    num_memory_slots: 64
+
+# MAG Variant Configuration (default)
+mag:
+  model:
+    variant: "MAG"
+    gate_init_bias: -2.0
+
+# MAL Variant Configuration
+mal:
+  model:
+    variant: "MAL"
+    memory_ffn_dim: 512
+    residual_memory: true
+
+# Small Model Configuration
+small:
+  model:
+    hidden_dim: 768
+    num_layers: 12
+    num_heads: 12
+    head_dim: 64
+    mlp_expansion: 4
+    memory_dim: 128
+    memory_layers: 1
+  training:
+    batch_size: 32
+    learning_rate: 3.0e-4
+
+# Large Model Configuration
+large:
+  model:
+    hidden_dim: 4096
+    num_layers: 32
+    num_heads: 32
+    head_dim: 128
+    mlp_expansion: 4
+    memory_dim: 512
+    memory_layers: 3
+  training:
+    batch_size: 4
+    learning_rate: 5.0e-5
+    gradient_accumulation_steps: 16
+
+# Long Context Configuration
+long_context:
+  model:
+    context_length: 131072
+    memory_dim: 512
+    memory_layers: 3
+    surprise_threshold: 0.05   # Lower threshold for long context
+  training:
+    batch_size: 2
+    gradient_accumulation_steps: 32
+    gradient_checkpointing: true
+
+# Test-Time Learning Configuration
+test_time:
+  memory_lr: 0.01              # Learning rate for updates
+  max_update_steps: 1          # Steps per token (usually 1)
+  surprise_threshold: 0.1      # When to trigger updates
+  reset_memory_on_new_doc: true  # Reset between documents
