@@ -1,0 +1,658 @@
+# ML Research Benchmarks Database
+# Comprehensive catalog of major benchmarks and their historical progress
+
+benchmarks:
+  # ============================================================================
+  # COMPUTER VISION BENCHMARKS
+  # ============================================================================
+
+  imagenet:
+    id: "imagenet_top1"
+    name: "ImageNet Top-1 Accuracy"
+    domain: "vision"
+    dataset: "ImageNet-1K"
+    dataset_size: "1.2M training, 50K validation"
+    classes: 1000
+    metric: "top1_accuracy"
+    metric_description: "Percentage of images correctly classified (top prediction)"
+    sota_method: "efficientnet_v2_xl"
+    sota_score: 91.1
+    human_baseline: 94.9
+    url: "https://image-net.org/"
+    history:
+      - year: "2010"
+        method: "traditional_cv"
+        score: 52.0
+        notes: "Hand-crafted features"
+      - year: "2012"
+        method: "alexnet"
+        score: 63.3
+        notes: "Deep learning breakthrough"
+      - year: "2013"
+        method: "zfnet"
+        score: 66.0
+        notes: "Visualization insights"
+      - year: "2014"
+        method: "vgg16"
+        score: 74.4
+        notes: "Deeper networks"
+      - year: "2014"
+        method: "googlenet"
+        score: 74.8
+        notes: "Inception modules"
+      - year: "2015"
+        method: "resnet152"
+        score: 78.3
+        notes: "Skip connections"
+      - year: "2016"
+        method: "inception_v4"
+        score: 80.2
+        notes: "Inception + residuals"
+      - year: "2017"
+        method: "senet"
+        score: 82.7
+        notes: "Squeeze-and-excitation"
+      - year: "2019"
+        method: "efficientnet_b7"
+        score: 84.4
+        notes: "Compound scaling"
+      - year: "2020"
+        method: "vit_huge"
+        score: 88.5
+        notes: "Vision Transformer"
+      - year: "2021"
+        method: "coatnet"
+        score: 90.9
+        notes: "CNN + Transformer hybrid"
+      - year: "2022"
+        method: "efficientnet_v2_xl"
+        score: 91.1
+        notes: "Current SOTA"
+
+  imagenet_top5:
+    id: "imagenet_top5"
+    name: "ImageNet Top-5 Accuracy"
+    domain: "vision"
+    dataset: "ImageNet-1K"
+    metric: "top5_accuracy"
+    metric_description: "Percentage of images with correct class in top 5 predictions"
+    sota_method: "efficientnet_v2_xl"
+    sota_score: 98.8
+    human_baseline: 98.0
+    history:
+      - year: "2012"
+        method: "alexnet"
+        score: 83.6
+      - year: "2015"
+        method: "resnet152"
+        score: 93.3
+      - year: "2020"
+        method: "vit_huge"
+        score: 97.3
+      - year: "2022"
+        method: "efficientnet_v2_xl"
+        score: 98.8
+
+  cifar10:
+    id: "cifar10_accuracy"
+    name: "CIFAR-10 Accuracy"
+    domain: "vision"
+    dataset: "CIFAR-10"
+    dataset_size: "50K training, 10K test"
+    classes: 10
+    metric: "accuracy"
+    sota_method: "vit_h14"
+    sota_score: 99.5
+    human_baseline: 94.0
+    url: "https://www.cs.toronto.edu/~kriz/cifar.html"
+    history:
+      - year: "2012"
+        method: "alexnet_style"
+        score: 89.0
+      - year: "2015"
+        method: "resnet110"
+        score: 93.6
+      - year: "2017"
+        method: "densenet"
+        score: 96.5
+      - year: "2020"
+        method: "pyramid_net"
+        score: 98.6
+      - year: "2022"
+        method: "vit_h14"
+        score: 99.5
+
+  cifar100:
+    id: "cifar100_accuracy"
+    name: "CIFAR-100 Accuracy"
+    domain: "vision"
+    dataset: "CIFAR-100"
+    dataset_size: "50K training, 10K test"
+    classes: 100
+    metric: "accuracy"
+    sota_method: "vit_h14"
+    sota_score: 93.7
+    url: "https://www.cs.toronto.edu/~kriz/cifar.html"
+    history:
+      - year: "2015"
+        method: "resnet110"
+        score: 74.8
+      - year: "2018"
+        method: "gpipe"
+        score: 84.3
+      - year: "2022"
+        method: "vit_h14"
+        score: 93.7
+
+  coco_detection:
+    id: "coco_detection_map"
+    name: "COCO Object Detection mAP"
+    domain: "vision"
+    dataset: "MS COCO"
+    dataset_size: "118K training, 5K validation"
+    classes: 80
+    metric: "mAP@[.5:.95]"
+    metric_description: "Mean Average Precision averaged over IoU thresholds"
+    sota_method: "dino_v2"
+    sota_score: 63.3
+    url: "https://cocodataset.org/"
+    history:
+      - year: "2014"
+        method: "rcnn"
+        score: 31.4
+      - year: "2015"
+        method: "faster_rcnn"
+        score: 42.7
+      - year: "2017"
+        method: "retinanet"
+        score: 53.1
+      - year: "2020"
+        method: "detr"
+        score: 58.9
+      - year: "2022"
+        method: "dino_v2"
+        score: 63.3
+
+  coco_segmentation:
+    id: "coco_instance_segmentation"
+    name: "COCO Instance Segmentation"
+    domain: "vision"
+    dataset: "MS COCO"
+    metric: "mask_mAP"
+    sota_method: "mask2former"
+    sota_score: 57.8
+    history:
+      - year: "2017"
+        method: "mask_rcnn"
+        score: 37.1
+      - year: "2020"
+        method: "detectors_rs"
+        score: 48.6
+      - year: "2022"
+        method: "mask2former"
+        score: 57.8
+
+  # ============================================================================
+  # NATURAL LANGUAGE PROCESSING BENCHMARKS
+  # ============================================================================
+
+  glue:
+    id: "glue_avg"
+    name: "GLUE Benchmark Average"
+    domain: "nlp"
+    dataset: "GLUE (General Language Understanding Evaluation)"
+    description: "9 NLU tasks including sentiment, similarity, inference"
+    metric: "average_score"
+    tasks:
+      - "CoLA (linguistic acceptability)"
+      - "SST-2 (sentiment)"
+      - "MRPC (paraphrase)"
+      - "STS-B (similarity)"
+      - "QQP (question pairs)"
+      - "MNLI (NLI)"
+      - "QNLI (QA NLI)"
+      - "RTE (textual entailment)"
+      - "WNLI (coreference)"
+    sota_method: "deberta_v3"
+    sota_score: 91.3
+    human_baseline: 87.1
+    url: "https://gluebenchmark.com/"
+    history:
+      - year: "2018"
+        method: "bert_large"
+        score: 80.4
+        notes: "First pretrained transformer"
+      - year: "2019"
+        method: "xlnet"
+        score: 89.0
+      - year: "2019"
+        method: "roberta"
+        score: 88.5
+      - year: "2020"
+        method: "albert_xxl"
+        score: 89.4
+      - year: "2021"
+        method: "deberta_v3"
+        score: 91.3
+        notes: "Superhuman performance"
+
+  superglue:
+    id: "superglue_avg"
+    name: "SuperGLUE Benchmark Average"
+    domain: "nlp"
+    dataset: "SuperGLUE"
+    description: "Harder successor to GLUE with 8 tasks"
+    metric: "average_score"
+    tasks:
+      - "BoolQ (boolean QA)"
+      - "CB (commitment bank)"
+      - "COPA (causal reasoning)"
+      - "MultiRC (multi-sentence reading)"
+      - "ReCoRD (reading comprehension)"
+      - "RTE (textual entailment)"
+      - "WiC (word sense)"
+      - "WSC (coreference)"
+    sota_method: "st_moe_32b"
+    sota_score: 91.2
+    human_baseline: 89.8
+    url: "https://super.gluebenchmark.com/"
+    history:
+      - year: "2019"
+        method: "bert_large"
+        score: 69.0
+      - year: "2020"
+        method: "t5_11b"
+        score: 89.3
+      - year: "2021"
+        method: "deberta_v3"
+        score: 90.9
+      - year: "2022"
+        method: "st_moe_32b"
+        score: 91.2
+
+  squad:
+    id: "squad_v1"
+    name: "SQuAD v1.1"
+    domain: "nlp"
+    dataset: "Stanford Question Answering Dataset"
+    dataset_size: "100K+ questions"
+    metric: "f1_score"
+    metric_description: "F1 between predicted and ground truth answer"
+    sota_method: "albert_xxl"
+    sota_score: 95.5
+    human_baseline: 91.2
+    url: "https://rajpurkar.github.io/SQuAD-explorer/"
+    history:
+      - year: "2016"
+        method: "bidaf"
+        score: 77.3
+      - year: "2018"
+        method: "bert_large"
+        score: 93.2
+      - year: "2020"
+        method: "albert_xxl"
+        score: 95.5
+
+  squad_v2:
+    id: "squad_v2"
+    name: "SQuAD v2.0"
+    domain: "nlp"
+    dataset: "SQuAD with unanswerable questions"
+    metric: "f1_score"
+    sota_method: "retrospective_reader"
+    sota_score: 93.2
+    human_baseline: 89.5
+    history:
+      - year: "2018"
+        method: "bert_large"
+        score: 83.1
+      - year: "2020"
+        method: "retrospective_reader"
+        score: 93.2
+
+  wmt_translation:
+    id: "wmt_en_de"
+    name: "WMT English-German Translation"
+    domain: "nlp"
+    dataset: "WMT14 En-De"
+    metric: "bleu"
+    sota_method: "moe_translation"
+    sota_score: 46.1
+    url: "http://www.statmt.org/wmt14/"
+    history:
+      - year: "2014"
+        method: "statistical_mt"
+        score: 20.7
+      - year: "2016"
+        method: "gnmt"
+        score: 26.3
+      - year: "2017"
+        method: "transformer"
+        score: 28.4
+      - year: "2019"
+        method: "marian_big"
+        score: 35.2
+      - year: "2022"
+        method: "moe_translation"
+        score: 46.1
+
+  mmlu:
+    id: "mmlu"
+    name: "MMLU (Massive Multitask Language Understanding)"
+    domain: "nlp"
+    dataset: "57 academic subjects"
+    description: "Tests knowledge across STEM, humanities, social sciences"
+    metric: "accuracy"
+    sota_method: "gpt4"
+    sota_score: 86.4
+    human_baseline: 89.8
+    url: "https://paperswithcode.com/dataset/mmlu"
+    history:
+      - year: "2020"
+        method: "gpt3"
+        score: 43.9
+      - year: "2022"
+        method: "chinchilla"
+        score: 67.5
+      - year: "2022"
+        method: "palm"
+        score: 69.3
+      - year: "2023"
+        method: "gpt4"
+        score: 86.4
+
+  hellaswag:
+    id: "hellaswag"
+    name: "HellaSwag"
+    domain: "nlp"
+    dataset: "HellaSwag (commonsense reasoning)"
+    description: "Sentence completion requiring commonsense"
+    metric: "accuracy"
+    sota_method: "gpt4"
+    sota_score: 95.3
+    human_baseline: 95.7
+    history:
+      - year: "2019"
+        method: "bert_large"
+        score: 47.3
+      - year: "2020"
+        method: "gpt3"
+        score: 78.9
+      - year: "2023"
+        method: "gpt4"
+        score: 95.3
+
+  winogrande:
+    id: "winogrande"
+    name: "WinoGrande"
+    domain: "nlp"
+    dataset: "WinoGrande (coreference resolution)"
+    metric: "accuracy"
+    sota_method: "palm_2"
+    sota_score: 87.5
+    human_baseline: 94.0
+    history:
+      - year: "2019"
+        method: "roberta"
+        score: 79.1
+      - year: "2020"
+        method: "gpt3"
+        score: 77.7
+      - year: "2023"
+        method: "palm_2"
+        score: 87.5
+
+  arc:
+    id: "arc_challenge"
+    name: "AI2 Reasoning Challenge"
+    domain: "nlp"
+    dataset: "ARC (science questions)"
+    metric: "accuracy"
+    sota_method: "gpt4"
+    sota_score: 96.3
+    human_baseline: 80.0
+    history:
+      - year: "2018"
+        method: "bert"
+        score: 36.6
+      - year: "2020"
+        method: "unifiedqa"
+        score: 68.4
+      - year: "2023"
+        method: "gpt4"
+        score: 96.3
+
+  # ============================================================================
+  # SPEECH AND AUDIO BENCHMARKS
+  # ============================================================================
+
+  librispeech:
+    id: "librispeech_wer"
+    name: "LibriSpeech Word Error Rate"
+    domain: "speech"
+    dataset: "LibriSpeech"
+    dataset_size: "1000 hours"
+    metric: "wer"
+    metric_description: "Word Error Rate (lower is better)"
+    sota_method: "whisper_large_v3"
+    sota_score: 1.8
+    human_baseline: 5.8
+    url: "https://www.openslr.org/12/"
+    history:
+      - year: "2015"
+        method: "deepspeech"
+        score: 8.6
+      - year: "2019"
+        method: "wav2vec"
+        score: 4.8
+      - year: "2020"
+        method: "conformer"
+        score: 2.1
+      - year: "2023"
+        method: "whisper_large_v3"
+        score: 1.8
+
+  # ============================================================================
+  # REINFORCEMENT LEARNING BENCHMARKS
+  # ============================================================================
+
+  atari:
+    id: "atari_57"
+    name: "Atari-57 Benchmark"
+    domain: "reinforcement_learning"
+    dataset: "57 Atari 2600 games"
+    metric: "human_normalized_score"
+    metric_description: "Score normalized by human performance"
+    sota_method: "agent57"
+    sota_score: 8920
+    human_baseline: 100
+    history:
+      - year: "2015"
+        method: "dqn"
+        score: 228
+      - year: "2016"
+        method: "a3c"
+        score: 623
+      - year: "2018"
+        method: "rainbow"
+        score: 1516
+      - year: "2019"
+        method: "r2d2"
+        score: 4652
+      - year: "2020"
+        method: "agent57"
+        score: 8920
+
+  mujoco:
+    id: "mujoco"
+    name: "MuJoCo Continuous Control"
+    domain: "reinforcement_learning"
+    dataset: "MuJoCo physics simulation"
+    metric: "average_return"
+    sota_method: "sac"
+    sota_score: "varies_by_task"
+    url: "https://mujoco.org/"
+    history:
+      - year: "2015"
+        method: "ddpg"
+        score: "baseline"
+      - year: "2017"
+        method: "ppo"
+        score: "improved"
+      - year: "2018"
+        method: "sac"
+        score: "sota"
+
+  # ============================================================================
+  # MULTIMODAL BENCHMARKS
+  # ============================================================================
+
+  vqa:
+    id: "vqa_v2"
+    name: "Visual Question Answering v2"
+    domain: "multimodal"
+    dataset: "VQA v2.0"
+    dataset_size: "1.1M questions, 200K images"
+    metric: "accuracy"
+    sota_method: "pali_17b"
+    sota_score: 84.3
+    human_baseline: 83.3
+    url: "https://visualqa.org/"
+    history:
+      - year: "2016"
+        method: "san"
+        score: 58.7
+      - year: "2019"
+        method: "vilbert"
+        score: 70.6
+      - year: "2021"
+        method: "florence"
+        score: 80.4
+      - year: "2022"
+        method: "pali_17b"
+        score: 84.3
+
+  flickr30k:
+    id: "flickr30k_retrieval"
+    name: "Flickr30k Image-Text Retrieval"
+    domain: "multimodal"
+    dataset: "Flickr30k"
+    metric: "recall@1"
+    sota_method: "clip"
+    sota_score: 88.0
+    url: "http://shannon.cs.illinois.edu/DenotationGraph/"
+    history:
+      - year: "2015"
+        method: "embedding"
+        score: 29.2
+      - year: "2021"
+        method: "clip"
+        score: 88.0
+
+  # ============================================================================
+  # CODE AND REASONING BENCHMARKS
+  # ============================================================================
+
+  humaneval:
+    id: "humaneval"
+    name: "HumanEval Code Generation"
+    domain: "code"
+    dataset: "164 Python programming problems"
+    metric: "pass@1"
+    metric_description: "Percentage of problems solved on first attempt"
+    sota_method: "gpt4"
+    sota_score: 67.0
+    url: "https://github.com/openai/human-eval"
+    history:
+      - year: "2021"
+        method: "codex_12b"
+        score: 28.8
+      - year: "2022"
+        method: "codegen_16b"
+        score: 29.3
+      - year: "2023"
+        method: "gpt4"
+        score: 67.0
+
+  math:
+    id: "math_benchmark"
+    name: "MATH Benchmark"
+    domain: "reasoning"
+    dataset: "12,500 competition math problems"
+    metric: "accuracy"
+    sota_method: "gpt4"
+    sota_score: 42.5
+    human_baseline: "varies_by_level"
+    url: "https://github.com/hendrycks/math"
+    history:
+      - year: "2021"
+        method: "gpt3"
+        score: 6.9
+      - year: "2022"
+        method: "minerva_540b"
+        score: 33.6
+      - year: "2023"
+        method: "gpt4"
+        score: 42.5
+
+  gsm8k:
+    id: "gsm8k"
+    name: "GSM8K Grade School Math"
+    domain: "reasoning"
+    dataset: "8,500 grade school math problems"
+    metric: "accuracy"
+    sota_method: "gpt4"
+    sota_score: 92.0
+    url: "https://github.com/openai/grade-school-math"
+    history:
+      - year: "2021"
+        method: "gpt3"
+        score: 57.1
+      - year: "2022"
+        method: "palm_cot"
+        score: 74.4
+      - year: "2023"
+        method: "gpt4"
+        score: 92.0
+
+  big_bench:
+    id: "big_bench"
+    name: "BIG-bench"
+    domain: "reasoning"
+    dataset: "204 diverse NLP tasks"
+    metric: "aggregate_score"
+    sota_method: "palm_2"
+    sota_score: "varies"
+    url: "https://github.com/google/BIG-bench"
+    history:
+      - year: "2022"
+        method: "palm"
+        score: "baseline"
+      - year: "2023"
+        method: "palm_2"
+        score: "improved"
+
+# Metadata
+metadata:
+  version: "1.0.0"
+  last_updated: "2024-01-19"
+  total_benchmarks: 22
+  domains:
+    - vision
+    - nlp
+    - speech
+    - reinforcement_learning
+    - multimodal
+    - code
+    - reasoning
+  notes:
+    - "SOTA scores change frequently - check paperswithcode.com for latest"
+    - "Human baselines are often approximations"
+    - "Some benchmarks are now considered 'saturated' (near human/ceiling)"
+  resources:
+    - name: "Papers With Code"
+      url: "https://paperswithcode.com/"
+    - name: "GLUE Leaderboard"
+      url: "https://gluebenchmark.com/leaderboard"
+    - name: "SuperGLUE Leaderboard"
+      url: "https://super.gluebenchmark.com/leaderboard"

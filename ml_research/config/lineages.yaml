@@ -1,0 +1,525 @@
+# ML Research Method Lineages
+# Influence graphs showing the evolution of key ML methodologies
+
+lineages:
+  # ============================================================================
+  # LINEAGE 1: Perceptron to Deep Learning
+  # ============================================================================
+
+  perceptron_line:
+    name: "Perceptron to Deep Learning"
+    description: "The foundational path from biological neuron models to modern deep networks"
+    theme: "Neural network fundamentals and training"
+    color: "#3498db"
+    methods:
+      - id: "mcculloch_pitts_1943"
+        name: "McCulloch-Pitts Neuron"
+        year: 1943
+        contribution: "First mathematical neuron model"
+
+      - id: "perceptron_1958"
+        name: "Perceptron"
+        year: 1958
+        contribution: "First trainable neural network"
+
+      - id: "adaline_1960"
+        name: "ADALINE"
+        year: 1960
+        contribution: "Delta rule and gradient-based learning"
+
+      - id: "mlp_1986"
+        name: "Multi-Layer Perceptron"
+        year: 1986
+        contribution: "Hidden layers and backpropagation"
+
+      - id: "dropout_2012"
+        name: "Dropout"
+        year: 2012
+        contribution: "Regularization technique"
+
+      - id: "alexnet_2012"
+        name: "AlexNet"
+        year: 2012
+        contribution: "Deep learning breakthrough on ImageNet"
+
+      - id: "resnet_2015"
+        name: "ResNet"
+        year: 2015
+        contribution: "Skip connections enabling very deep networks"
+
+    key_transitions:
+      - from: "mcculloch_pitts_1943"
+        to: "perceptron_1958"
+        insight: "From logic gates to learning machines"
+
+      - from: "perceptron_1958"
+        to: "mlp_1986"
+        insight: "Overcoming XOR problem with hidden layers"
+
+      - from: "mlp_1986"
+        to: "alexnet_2012"
+        insight: "GPU computing and large datasets"
+
+      - from: "alexnet_2012"
+        to: "resnet_2015"
+        insight: "Skip connections for gradient flow"
+
+  # ============================================================================
+  # LINEAGE 2: Attention to LLMs
+  # ============================================================================
+
+  attention_line:
+    name: "Attention to Transformers to LLMs"
+    description: "The evolution from attention mechanisms to large language models"
+    theme: "Sequence modeling and language understanding"
+    color: "#9b59b6"
+    methods:
+      - id: "seq2seq_2014"
+        name: "Sequence-to-Sequence"
+        year: 2014
+        contribution: "Encoder-decoder architecture"
+
+      - id: "bahdanau_attention_2014"
+        name: "Bahdanau Attention"
+        year: 2014
+        contribution: "Attention mechanism for alignment"
+
+      - id: "transformer_2017"
+        name: "Transformer"
+        year: 2017
+        contribution: "Self-attention replacing recurrence"
+
+      - id: "bert_2018"
+        name: "BERT"
+        year: 2018
+        contribution: "Bidirectional pretraining"
+
+      - id: "gpt_2018"
+        name: "GPT"
+        year: 2018
+        contribution: "Autoregressive pretraining"
+
+      - id: "gpt2_2019"
+        name: "GPT-2"
+        year: 2019
+        contribution: "Zero-shot learning at scale"
+
+      - id: "gpt3_2020"
+        name: "GPT-3"
+        year: 2020
+        contribution: "Few-shot learning emerges"
+
+      - id: "chatgpt_2022"
+        name: "ChatGPT"
+        year: 2022
+        contribution: "RLHF for instruction following"
+
+      - id: "gpt4_2023"
+        name: "GPT-4"
+        year: 2023
+        contribution: "Multimodal capabilities"
+
+    key_transitions:
+      - from: "seq2seq_2014"
+        to: "bahdanau_attention_2014"
+        insight: "Dynamic alignment over fixed encoding"
+
+      - from: "bahdanau_attention_2014"
+        to: "transformer_2017"
+        insight: "Self-attention enables parallelization"
+
+      - from: "transformer_2017"
+        to: "bert_2018"
+        insight: "Pretraining on unlabeled text"
+
+      - from: "gpt2_2019"
+        to: "gpt3_2020"
+        insight: "Emergent abilities at scale"
+
+      - from: "gpt3_2020"
+        to: "chatgpt_2022"
+        insight: "Alignment through human feedback"
+
+  # ============================================================================
+  # LINEAGE 3: CNN Evolution
+  # ============================================================================
+
+  cnn_line:
+    name: "Convolutional Neural Network Evolution"
+    description: "From biological inspiration to modern efficient architectures"
+    theme: "Visual recognition and hierarchical features"
+    color: "#2ecc71"
+    methods:
+      - id: "neocognitron_1980"
+        name: "Neocognitron"
+        year: 1980
+        contribution: "Hierarchical visual processing"
+
+      - id: "lenet_1989"
+        name: "LeNet-5"
+        year: 1989
+        contribution: "First practical CNN"
+
+      - id: "alexnet_2012"
+        name: "AlexNet"
+        year: 2012
+        contribution: "Deep CNN with ReLU and dropout"
+
+      - id: "vgg_2014"
+        name: "VGGNet"
+        year: 2014
+        contribution: "Very deep networks with small filters"
+
+      - id: "googlenet_2014"
+        name: "GoogLeNet/Inception"
+        year: 2014
+        contribution: "Multi-scale feature extraction"
+
+      - id: "resnet_2015"
+        name: "ResNet"
+        year: 2015
+        contribution: "Residual connections"
+
+      - id: "efficientnet_2019"
+        name: "EfficientNet"
+        year: 2019
+        contribution: "Compound scaling"
+
+      - id: "vit_2020"
+        name: "Vision Transformer"
+        year: 2020
+        contribution: "Pure attention for vision"
+
+    key_transitions:
+      - from: "neocognitron_1980"
+        to: "lenet_1989"
+        insight: "Adding trainable convolutions"
+
+      - from: "lenet_1989"
+        to: "alexnet_2012"
+        insight: "GPU acceleration and data scale"
+
+      - from: "vgg_2014"
+        to: "resnet_2015"
+        insight: "Skip connections for very deep networks"
+
+      - from: "efficientnet_2019"
+        to: "vit_2020"
+        insight: "From convolutions to pure attention"
+
+  # ============================================================================
+  # LINEAGE 4: Recurrent to State Space Models
+  # ============================================================================
+
+  sequence_line:
+    name: "Sequence Modeling Evolution"
+    description: "From simple RNNs to efficient alternatives"
+    theme: "Sequential data and temporal dependencies"
+    color: "#e74c3c"
+    methods:
+      - id: "hopfield_1982"
+        name: "Hopfield Network"
+        year: 1982
+        contribution: "Recurrent connections"
+
+      - id: "lstm_1997"
+        name: "LSTM"
+        year: 1997
+        contribution: "Gated memory cells"
+
+      - id: "gru_2014"
+        name: "GRU"
+        year: 2014
+        contribution: "Simplified gating"
+
+      - id: "seq2seq_2014"
+        name: "Seq2Seq"
+        year: 2014
+        contribution: "Encoder-decoder for sequences"
+
+      - id: "transformer_xl_2019"
+        name: "Transformer-XL"
+        year: 2019
+        contribution: "Long-range dependencies"
+
+      - id: "mamba_2023"
+        name: "Mamba"
+        year: 2023
+        contribution: "Linear-time sequence modeling"
+
+    key_transitions:
+      - from: "hopfield_1982"
+        to: "lstm_1997"
+        insight: "Gating to solve vanishing gradients"
+
+      - from: "lstm_1997"
+        to: "gru_2014"
+        insight: "Simplified architecture, similar performance"
+
+      - from: "gru_2014"
+        to: "transformer_xl_2019"
+        insight: "Attention for long-range dependencies"
+
+      - from: "transformer_xl_2019"
+        to: "mamba_2023"
+        insight: "State spaces for linear complexity"
+
+  # ============================================================================
+  # LINEAGE 5: Generative Models
+  # ============================================================================
+
+  generative_line:
+    name: "Generative Model Evolution"
+    description: "From energy-based models to diffusion"
+    theme: "Learning to generate data"
+    color: "#f39c12"
+    methods:
+      - id: "boltzmann_1985"
+        name: "Boltzmann Machine"
+        year: 1985
+        contribution: "Probabilistic generative model"
+
+      - id: "rbm_2002"
+        name: "Restricted Boltzmann Machine"
+        year: 2002
+        contribution: "Efficient training via CD"
+
+      - id: "deep_belief_network_2006"
+        name: "Deep Belief Network"
+        year: 2006
+        contribution: "Stacked RBMs for depth"
+
+      - id: "vae_2013"
+        name: "Variational Autoencoder"
+        year: 2013
+        contribution: "Variational inference for generation"
+
+      - id: "gan_2014"
+        name: "GAN"
+        year: 2014
+        contribution: "Adversarial training"
+
+      - id: "diffusion_2020"
+        name: "Diffusion Models"
+        year: 2020
+        contribution: "Iterative denoising"
+
+      - id: "stable_diffusion_2022"
+        name: "Stable Diffusion"
+        year: 2022
+        contribution: "Latent space diffusion"
+
+      - id: "dalle_2021"
+        name: "DALL-E"
+        year: 2021
+        contribution: "Text-to-image generation"
+
+    key_transitions:
+      - from: "boltzmann_1985"
+        to: "rbm_2002"
+        insight: "Bipartite structure for tractable training"
+
+      - from: "rbm_2002"
+        to: "vae_2013"
+        insight: "Continuous latent space with gradients"
+
+      - from: "vae_2013"
+        to: "gan_2014"
+        insight: "Adversarial training for sharp images"
+
+      - from: "gan_2014"
+        to: "diffusion_2020"
+        insight: "Stable training through denoising"
+
+  # ============================================================================
+  # LINEAGE 6: Representation Learning
+  # ============================================================================
+
+  representation_line:
+    name: "Representation Learning Evolution"
+    description: "From hand-crafted features to learned embeddings"
+    theme: "Learning useful representations"
+    color: "#1abc9c"
+    methods:
+      - id: "autoencoder_2006"
+        name: "Autoencoder"
+        year: 2006
+        contribution: "Unsupervised feature learning"
+
+      - id: "word2vec_2013"
+        name: "Word2Vec"
+        year: 2013
+        contribution: "Dense word embeddings"
+
+      - id: "bert_2018"
+        name: "BERT"
+        year: 2018
+        contribution: "Contextual embeddings"
+
+      - id: "clip_2021"
+        name: "CLIP"
+        year: 2021
+        contribution: "Vision-language alignment"
+
+      - id: "lora_2021"
+        name: "LoRA"
+        year: 2021
+        contribution: "Efficient adaptation"
+
+    key_transitions:
+      - from: "autoencoder_2006"
+        to: "word2vec_2013"
+        insight: "From reconstruction to prediction"
+
+      - from: "word2vec_2013"
+        to: "bert_2018"
+        insight: "Context-dependent representations"
+
+      - from: "bert_2018"
+        to: "clip_2021"
+        insight: "Cross-modal alignment"
+
+  # ============================================================================
+  # LINEAGE 7: Learning Algorithms
+  # ============================================================================
+
+  learning_line:
+    name: "Learning Algorithm Evolution"
+    description: "How networks learn: from Hebb to modern optimizers"
+    theme: "Training and optimization"
+    color: "#95a5a6"
+    methods:
+      - id: "hebbian_1949"
+        name: "Hebbian Learning"
+        year: 1949
+        contribution: "Biological learning rule"
+
+      - id: "adaline_1960"
+        name: "Delta Rule (ADALINE)"
+        year: 1960
+        contribution: "Gradient-based updates"
+
+      - id: "backprop_1986"
+        name: "Backpropagation"
+        year: 1986
+        contribution: "Credit assignment via chain rule"
+
+      - id: "adam_2014"
+        name: "Adam"
+        year: 2014
+        contribution: "Adaptive learning rates"
+
+      - id: "batchnorm_2015"
+        name: "Batch Normalization"
+        year: 2015
+        contribution: "Stabilized training"
+
+    key_transitions:
+      - from: "hebbian_1949"
+        to: "adaline_1960"
+        insight: "From correlation to gradient descent"
+
+      - from: "adaline_1960"
+        to: "backprop_1986"
+        insight: "Efficient gradients for deep networks"
+
+      - from: "backprop_1986"
+        to: "adam_2014"
+        insight: "Adaptive per-parameter learning rates"
+
+  # ============================================================================
+  # LINEAGE 8: Scaling and Efficiency
+  # ============================================================================
+
+  scaling_line:
+    name: "Scaling and Efficiency"
+    description: "Making models bigger and more efficient"
+    theme: "Computational efficiency at scale"
+    color: "#8e44ad"
+    methods:
+      - id: "mixture_of_experts_2017"
+        name: "Mixture of Experts"
+        year: 2017
+        contribution: "Conditional computation"
+
+      - id: "efficientnet_2019"
+        name: "EfficientNet"
+        year: 2019
+        contribution: "Compound scaling"
+
+      - id: "gpt3_2020"
+        name: "GPT-3"
+        year: 2020
+        contribution: "175B parameters"
+
+      - id: "lora_2021"
+        name: "LoRA"
+        year: 2021
+        contribution: "Parameter-efficient fine-tuning"
+
+      - id: "mamba_2023"
+        name: "Mamba"
+        year: 2023
+        contribution: "Linear-time alternative to transformers"
+
+    key_transitions:
+      - from: "mixture_of_experts_2017"
+        to: "gpt3_2020"
+        insight: "Scale brings emergent capabilities"
+
+      - from: "gpt3_2020"
+        to: "lora_2021"
+        insight: "Efficient adaptation of large models"
+
+      - from: "lora_2021"
+        to: "mamba_2023"
+        insight: "Architectural efficiency improvements"
+
+# Summary statistics
+summary:
+  total_lineages: 8
+  total_methods_covered: 45
+  earliest_method: "mcculloch_pitts_1943"
+  latest_method: "mamba_2023"
+
+  themes:
+    - "Neural network fundamentals"
+    - "Language and attention"
+    - "Visual recognition"
+    - "Sequence modeling"
+    - "Generative modeling"
+    - "Representation learning"
+    - "Training and optimization"
+    - "Scaling and efficiency"
+
+# Cross-lineage connections (methods appearing in multiple lineages)
+crossovers:
+  - method: "transformer_2017"
+    appears_in: ["attention_line", "cnn_line"]
+    reason: "Foundation for both NLP and Vision Transformers"
+
+  - method: "bert_2018"
+    appears_in: ["attention_line", "representation_line"]
+    reason: "Key for both LLMs and learned representations"
+
+  - method: "resnet_2015"
+    appears_in: ["perceptron_line", "cnn_line"]
+    reason: "Foundational deep learning and CNN architecture"
+
+  - method: "alexnet_2012"
+    appears_in: ["perceptron_line", "cnn_line"]
+    reason: "Deep learning breakthrough in both fundamental and CNN contexts"
+
+  - method: "gpt3_2020"
+    appears_in: ["attention_line", "scaling_line"]
+    reason: "Represents both transformer evolution and scaling laws"
+
+# Metadata
+metadata:
+  version: "1.0.0"
+  last_updated: "2024-01-19"
+  visualization_ready: true
+  notes:
+    - "Lineages represent primary influence paths, not exhaustive connections"
+    - "Some methods appear in multiple lineages due to their broad impact"
+    - "Years represent publication date, not first implementation"

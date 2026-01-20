@@ -1,0 +1,657 @@
+# ML Research Methods Metadata
+# Comprehensive catalog of foundational and modern machine learning methods
+
+methods:
+  # ============================================================================
+  # FOUNDATIONAL ERA (1940s-1960s)
+  # ============================================================================
+
+  mcculloch_pitts:
+    id: "mcculloch_pitts_1943"
+    name: "McCulloch-Pitts Neuron"
+    year: 1943
+    era: "foundational"
+    category: "neuron_model"
+    authors: ["Warren McCulloch", "Walter Pitts"]
+    paper: "A Logical Calculus of Ideas Immanent in Nervous Activity"
+    key_innovation: "First mathematical model of artificial neuron"
+    tags: ["binary", "threshold", "logic", "boolean"]
+    dependencies: []
+
+  hebbian_learning:
+    id: "hebbian_1949"
+    name: "Hebbian Learning"
+    year: 1949
+    era: "foundational"
+    category: "learning_rule"
+    authors: ["Donald Hebb"]
+    paper: "The Organization of Behavior"
+    key_innovation: "Cells that fire together wire together - associative learning"
+    tags: ["unsupervised", "synaptic", "associative", "biological"]
+    dependencies: []
+
+  perceptron:
+    id: "perceptron_1958"
+    name: "Perceptron"
+    year: 1958
+    era: "foundational"
+    category: "classifier"
+    authors: ["Frank Rosenblatt"]
+    paper: "The Perceptron: A Probabilistic Model for Information Storage and Organization in the Brain"
+    key_innovation: "First trainable neural network with learning algorithm"
+    tags: ["supervised", "linear", "classifier", "single_layer"]
+    dependencies: ["mcculloch_pitts_1943"]
+
+  adaline:
+    id: "adaline_1960"
+    name: "ADALINE (Adaptive Linear Neuron)"
+    year: 1960
+    era: "foundational"
+    category: "neuron_model"
+    authors: ["Bernard Widrow", "Marcian Hoff"]
+    paper: "Adaptive Switching Circuits"
+    key_innovation: "Delta rule / LMS algorithm for gradient-based learning"
+    tags: ["supervised", "linear", "gradient_descent", "delta_rule"]
+    dependencies: ["perceptron_1958"]
+
+  # ============================================================================
+  # CLASSICAL ERA (1970s-1990s)
+  # ============================================================================
+
+  backpropagation:
+    id: "backprop_1986"
+    name: "Backpropagation"
+    year: 1986
+    era: "classical"
+    category: "learning_algorithm"
+    authors: ["David Rumelhart", "Geoffrey Hinton", "Ronald Williams"]
+    paper: "Learning Representations by Back-propagating Errors"
+    key_innovation: "Efficient gradient computation for multi-layer networks"
+    tags: ["gradient_descent", "chain_rule", "supervised", "multilayer"]
+    dependencies: ["perceptron_1958", "adaline_1960"]
+
+  mlp:
+    id: "mlp_1986"
+    name: "Multi-Layer Perceptron"
+    year: 1986
+    era: "classical"
+    category: "architecture"
+    authors: ["David Rumelhart", "Geoffrey Hinton", "Ronald Williams"]
+    paper: "Learning Internal Representations by Error Propagation"
+    key_innovation: "Hidden layers enabling non-linear decision boundaries"
+    tags: ["feedforward", "hidden_layers", "universal_approximator"]
+    dependencies: ["perceptron_1958", "backprop_1986"]
+
+  neocognitron:
+    id: "neocognitron_1980"
+    name: "Neocognitron"
+    year: 1980
+    era: "classical"
+    category: "architecture"
+    authors: ["Kunihiko Fukushima"]
+    paper: "Neocognitron: A Self-organizing Neural Network Model"
+    key_innovation: "Hierarchical feature extraction inspired by visual cortex"
+    tags: ["vision", "hierarchical", "feature_extraction", "biological"]
+    dependencies: ["mcculloch_pitts_1943"]
+
+  lenet:
+    id: "lenet_1989"
+    name: "LeNet-5"
+    year: 1989
+    era: "classical"
+    category: "architecture"
+    authors: ["Yann LeCun", "Leon Bottou", "Yoshua Bengio", "Patrick Haffner"]
+    paper: "Gradient-Based Learning Applied to Document Recognition"
+    key_innovation: "First successful CNN with convolution and pooling"
+    tags: ["cnn", "convolution", "pooling", "vision", "handwriting"]
+    dependencies: ["neocognitron_1980", "backprop_1986"]
+
+  hopfield_network:
+    id: "hopfield_1982"
+    name: "Hopfield Network"
+    year: 1982
+    era: "classical"
+    category: "architecture"
+    authors: ["John Hopfield"]
+    paper: "Neural Networks and Physical Systems with Emergent Collective Computational Abilities"
+    key_innovation: "Associative memory with energy-based formulation"
+    tags: ["recurrent", "associative_memory", "energy_based", "attractor"]
+    dependencies: ["hebbian_1949"]
+
+  boltzmann_machine:
+    id: "boltzmann_1985"
+    name: "Boltzmann Machine"
+    year: 1985
+    era: "classical"
+    category: "architecture"
+    authors: ["Geoffrey Hinton", "Terrence Sejnowski"]
+    paper: "A Learning Algorithm for Boltzmann Machines"
+    key_innovation: "Stochastic neural network with probabilistic sampling"
+    tags: ["generative", "probabilistic", "energy_based", "stochastic"]
+    dependencies: ["hopfield_1982"]
+
+  rbm:
+    id: "rbm_2002"
+    name: "Restricted Boltzmann Machine"
+    year: 2002
+    era: "classical"
+    category: "architecture"
+    authors: ["Geoffrey Hinton"]
+    paper: "Training Products of Experts by Minimizing Contrastive Divergence"
+    key_innovation: "Efficient training via contrastive divergence"
+    tags: ["generative", "unsupervised", "pretraining", "bipartite"]
+    dependencies: ["boltzmann_1985"]
+
+  svm:
+    id: "svm_1995"
+    name: "Support Vector Machine"
+    year: 1995
+    era: "classical"
+    category: "classifier"
+    authors: ["Vladimir Vapnik", "Corinna Cortes"]
+    paper: "Support-Vector Networks"
+    key_innovation: "Maximum margin classification with kernel trick"
+    tags: ["kernel", "margin", "classification", "convex_optimization"]
+    dependencies: []
+
+  lstm:
+    id: "lstm_1997"
+    name: "Long Short-Term Memory"
+    year: 1997
+    era: "classical"
+    category: "architecture"
+    authors: ["Sepp Hochreiter", "Jurgen Schmidhuber"]
+    paper: "Long Short-Term Memory"
+    key_innovation: "Gated memory cells solving vanishing gradient problem"
+    tags: ["recurrent", "sequence", "memory", "gates", "time_series"]
+    dependencies: ["backprop_1986"]
+
+  random_forest:
+    id: "random_forest_2001"
+    name: "Random Forest"
+    year: 2001
+    era: "classical"
+    category: "ensemble"
+    authors: ["Leo Breiman"]
+    paper: "Random Forests"
+    key_innovation: "Ensemble of decision trees with bagging and feature randomization"
+    tags: ["ensemble", "decision_tree", "bagging", "classification", "regression"]
+    dependencies: []
+
+  # ============================================================================
+  # DEEP LEARNING ERA (2006-2014)
+  # ============================================================================
+
+  deep_belief_network:
+    id: "dbn_2006"
+    name: "Deep Belief Network"
+    year: 2006
+    era: "deep_learning"
+    category: "architecture"
+    authors: ["Geoffrey Hinton", "Simon Osindero", "Yee-Whye Teh"]
+    paper: "A Fast Learning Algorithm for Deep Belief Nets"
+    key_innovation: "Greedy layer-wise pretraining for deep networks"
+    tags: ["generative", "pretraining", "unsupervised", "hierarchical"]
+    dependencies: ["rbm_2002", "backprop_1986"]
+
+  autoencoder:
+    id: "autoencoder_2006"
+    name: "Autoencoder"
+    year: 2006
+    era: "deep_learning"
+    category: "architecture"
+    authors: ["Geoffrey Hinton", "Ruslan Salakhutdinov"]
+    paper: "Reducing the Dimensionality of Data with Neural Networks"
+    key_innovation: "Unsupervised representation learning via reconstruction"
+    tags: ["unsupervised", "representation_learning", "compression", "encoder_decoder"]
+    dependencies: ["mlp_1986", "backprop_1986"]
+
+  dropout:
+    id: "dropout_2012"
+    name: "Dropout"
+    year: 2012
+    era: "deep_learning"
+    category: "regularization"
+    authors: ["Geoffrey Hinton", "Nitish Srivastava", "Alex Krizhevsky", "Ilya Sutskever", "Ruslan Salakhutdinov"]
+    paper: "Improving Neural Networks by Preventing Co-adaptation of Feature Detectors"
+    key_innovation: "Stochastic regularization preventing overfitting"
+    tags: ["regularization", "ensemble", "stochastic", "training"]
+    dependencies: []
+
+  alexnet:
+    id: "alexnet_2012"
+    name: "AlexNet"
+    year: 2012
+    era: "deep_learning"
+    category: "architecture"
+    authors: ["Alex Krizhevsky", "Ilya Sutskever", "Geoffrey Hinton"]
+    paper: "ImageNet Classification with Deep Convolutional Neural Networks"
+    key_innovation: "Deep CNN with ReLU, dropout, GPU training winning ImageNet"
+    tags: ["cnn", "vision", "relu", "gpu", "imagenet"]
+    dependencies: ["lenet_1989", "dropout_2012"]
+
+  batch_normalization:
+    id: "batchnorm_2015"
+    name: "Batch Normalization"
+    year: 2015
+    era: "deep_learning"
+    category: "technique"
+    authors: ["Sergey Ioffe", "Christian Szegedy"]
+    paper: "Batch Normalization: Accelerating Deep Network Training"
+    key_innovation: "Normalizing layer inputs for faster, stable training"
+    tags: ["normalization", "training", "regularization", "acceleration"]
+    dependencies: []
+
+  vgg:
+    id: "vgg_2014"
+    name: "VGGNet"
+    year: 2014
+    era: "deep_learning"
+    category: "architecture"
+    authors: ["Karen Simonyan", "Andrew Zisserman"]
+    paper: "Very Deep Convolutional Networks for Large-Scale Image Recognition"
+    key_innovation: "Very deep networks with small 3x3 filters throughout"
+    tags: ["cnn", "vision", "deep", "imagenet", "transfer_learning"]
+    dependencies: ["alexnet_2012"]
+
+  googlenet:
+    id: "googlenet_2014"
+    name: "GoogLeNet/Inception"
+    year: 2014
+    era: "deep_learning"
+    category: "architecture"
+    authors: ["Christian Szegedy", "Wei Liu", "Yangqing Jia", "Pierre Sermanet", "Scott Reed", "Dragomir Anguelov", "Dumitru Erhan", "Vincent Vanhoucke", "Andrew Rabinovich"]
+    paper: "Going Deeper with Convolutions"
+    key_innovation: "Inception modules with parallel multi-scale convolutions"
+    tags: ["cnn", "vision", "inception", "multi_scale", "efficient"]
+    dependencies: ["alexnet_2012"]
+
+  resnet:
+    id: "resnet_2015"
+    name: "ResNet (Residual Network)"
+    year: 2015
+    era: "deep_learning"
+    category: "architecture"
+    authors: ["Kaiming He", "Xiangyu Zhang", "Shaoqing Ren", "Jian Sun"]
+    paper: "Deep Residual Learning for Image Recognition"
+    key_innovation: "Skip connections enabling very deep networks (100+ layers)"
+    tags: ["cnn", "vision", "residual", "skip_connections", "deep"]
+    dependencies: ["vgg_2014", "batchnorm_2015"]
+
+  word2vec:
+    id: "word2vec_2013"
+    name: "Word2Vec"
+    year: 2013
+    era: "deep_learning"
+    category: "embedding"
+    authors: ["Tomas Mikolov", "Kai Chen", "Greg Corrado", "Jeffrey Dean"]
+    paper: "Efficient Estimation of Word Representations in Vector Space"
+    key_innovation: "Efficient word embeddings capturing semantic relationships"
+    tags: ["nlp", "embedding", "unsupervised", "skip_gram", "cbow"]
+    dependencies: []
+
+  seq2seq:
+    id: "seq2seq_2014"
+    name: "Sequence-to-Sequence"
+    year: 2014
+    era: "deep_learning"
+    category: "architecture"
+    authors: ["Ilya Sutskever", "Oriol Vinyals", "Quoc V. Le"]
+    paper: "Sequence to Sequence Learning with Neural Networks"
+    key_innovation: "Encoder-decoder architecture for variable-length sequences"
+    tags: ["nlp", "encoder_decoder", "translation", "sequence"]
+    dependencies: ["lstm_1997"]
+
+  bahdanau_attention:
+    id: "bahdanau_attention_2014"
+    name: "Bahdanau Attention"
+    year: 2014
+    era: "deep_learning"
+    category: "mechanism"
+    authors: ["Dzmitry Bahdanau", "Kyunghyun Cho", "Yoshua Bengio"]
+    paper: "Neural Machine Translation by Jointly Learning to Align and Translate"
+    key_innovation: "Attention mechanism for neural machine translation"
+    tags: ["attention", "nlp", "translation", "alignment"]
+    dependencies: ["seq2seq_2014"]
+
+  gru:
+    id: "gru_2014"
+    name: "Gated Recurrent Unit"
+    year: 2014
+    era: "deep_learning"
+    category: "architecture"
+    authors: ["Kyunghyun Cho", "Bart van Merrienboer", "Caglar Gulcehre", "Dzmitry Bahdanau", "Fethi Bougares", "Holger Schwenk", "Yoshua Bengio"]
+    paper: "Learning Phrase Representations using RNN Encoder-Decoder"
+    key_innovation: "Simplified gated RNN with fewer parameters than LSTM"
+    tags: ["recurrent", "sequence", "gated", "efficient"]
+    dependencies: ["lstm_1997"]
+
+  gan:
+    id: "gan_2014"
+    name: "Generative Adversarial Network"
+    year: 2014
+    era: "deep_learning"
+    category: "architecture"
+    authors: ["Ian Goodfellow", "Jean Pouget-Abadie", "Mehdi Mirza", "Bing Xu", "David Warde-Farley", "Sherjil Ozair", "Aaron Courville", "Yoshua Bengio"]
+    paper: "Generative Adversarial Nets"
+    key_innovation: "Adversarial training of generator and discriminator"
+    tags: ["generative", "adversarial", "unsupervised", "game_theory"]
+    dependencies: ["mlp_1986"]
+
+  vae:
+    id: "vae_2013"
+    name: "Variational Autoencoder"
+    year: 2013
+    era: "deep_learning"
+    category: "architecture"
+    authors: ["Diederik Kingma", "Max Welling"]
+    paper: "Auto-Encoding Variational Bayes"
+    key_innovation: "Probabilistic latent space with reparameterization trick"
+    tags: ["generative", "variational", "latent", "probabilistic"]
+    dependencies: ["autoencoder_2006"]
+
+  adam:
+    id: "adam_2014"
+    name: "Adam Optimizer"
+    year: 2014
+    era: "deep_learning"
+    category: "optimizer"
+    authors: ["Diederik Kingma", "Jimmy Ba"]
+    paper: "Adam: A Method for Stochastic Optimization"
+    key_innovation: "Adaptive learning rates with momentum and RMSprop"
+    tags: ["optimizer", "adaptive", "momentum", "training"]
+    dependencies: []
+
+  # ============================================================================
+  # ATTENTION ERA (2017-2020)
+  # ============================================================================
+
+  transformer:
+    id: "transformer_2017"
+    name: "Transformer"
+    year: 2017
+    era: "attention"
+    category: "architecture"
+    authors: ["Ashish Vaswani", "Noam Shazeer", "Niki Parmar", "Jakob Uszkoreit", "Llion Jones", "Aidan N. Gomez", "Lukasz Kaiser", "Illia Polosukhin"]
+    paper: "Attention Is All You Need"
+    key_innovation: "Self-attention mechanism replacing recurrence entirely"
+    tags: ["attention", "encoder_decoder", "parallelizable", "nlp"]
+    dependencies: ["bahdanau_attention_2014"]
+
+  self_attention:
+    id: "self_attention_2017"
+    name: "Self-Attention"
+    year: 2017
+    era: "attention"
+    category: "mechanism"
+    authors: ["Ashish Vaswani", "Noam Shazeer", "Niki Parmar", "Jakob Uszkoreit", "Llion Jones", "Aidan N. Gomez", "Lukasz Kaiser", "Illia Polosukhin"]
+    paper: "Attention Is All You Need"
+    key_innovation: "Query-key-value attention within same sequence"
+    tags: ["attention", "parallel", "global_context"]
+    dependencies: ["bahdanau_attention_2014"]
+
+  multi_head_attention:
+    id: "multi_head_attention_2017"
+    name: "Multi-Head Attention"
+    year: 2017
+    era: "attention"
+    category: "mechanism"
+    authors: ["Ashish Vaswani", "Noam Shazeer", "Niki Parmar", "Jakob Uszkoreit", "Llion Jones", "Aidan N. Gomez", "Lukasz Kaiser", "Illia Polosukhin"]
+    paper: "Attention Is All You Need"
+    key_innovation: "Parallel attention heads for diverse representations"
+    tags: ["attention", "multi_head", "parallel", "ensemble"]
+    dependencies: ["self_attention_2017"]
+
+  bert:
+    id: "bert_2018"
+    name: "BERT"
+    year: 2018
+    era: "attention"
+    category: "architecture"
+    authors: ["Jacob Devlin", "Ming-Wei Chang", "Kenton Lee", "Kristina Toutanova"]
+    paper: "BERT: Pre-training of Deep Bidirectional Transformers"
+    key_innovation: "Bidirectional pretraining with masked language modeling"
+    tags: ["nlp", "pretraining", "bidirectional", "masked_lm", "encoder"]
+    dependencies: ["transformer_2017"]
+
+  gpt:
+    id: "gpt_2018"
+    name: "GPT (Generative Pre-trained Transformer)"
+    year: 2018
+    era: "attention"
+    category: "architecture"
+    authors: ["Alec Radford", "Karthik Narasimhan", "Tim Salimans", "Ilya Sutskever"]
+    paper: "Improving Language Understanding by Generative Pre-Training"
+    key_innovation: "Autoregressive language model pretraining"
+    tags: ["nlp", "pretraining", "autoregressive", "decoder", "generative"]
+    dependencies: ["transformer_2017"]
+
+  gpt2:
+    id: "gpt2_2019"
+    name: "GPT-2"
+    year: 2019
+    era: "attention"
+    category: "architecture"
+    authors: ["Alec Radford", "Jeffrey Wu", "Rewon Child", "David Luan", "Dario Amodei", "Ilya Sutskever"]
+    paper: "Language Models are Unsupervised Multitask Learners"
+    key_innovation: "Scaled language model demonstrating zero-shot capabilities"
+    tags: ["nlp", "large_scale", "zero_shot", "generative"]
+    dependencies: ["gpt_2018"]
+
+  xlnet:
+    id: "xlnet_2019"
+    name: "XLNet"
+    year: 2019
+    era: "attention"
+    category: "architecture"
+    authors: ["Zhilin Yang", "Zihang Dai", "Yiming Yang", "Jaime Carbonell", "Ruslan Salakhutdinov", "Quoc V. Le"]
+    paper: "XLNet: Generalized Autoregressive Pretraining"
+    key_innovation: "Permutation language modeling combining AR and AE benefits"
+    tags: ["nlp", "pretraining", "permutation", "autoregressive"]
+    dependencies: ["bert_2018", "transformer_xl_2019"]
+
+  transformer_xl:
+    id: "transformer_xl_2019"
+    name: "Transformer-XL"
+    year: 2019
+    era: "attention"
+    category: "architecture"
+    authors: ["Zihang Dai", "Zhilin Yang", "Yiming Yang", "Jaime Carbonell", "Quoc V. Le", "Ruslan Salakhutdinov"]
+    paper: "Transformer-XL: Attentive Language Models Beyond a Fixed-Length Context"
+    key_innovation: "Segment-level recurrence for longer context"
+    tags: ["nlp", "long_context", "recurrence", "memory"]
+    dependencies: ["transformer_2017"]
+
+  efficientnet:
+    id: "efficientnet_2019"
+    name: "EfficientNet"
+    year: 2019
+    era: "attention"
+    category: "architecture"
+    authors: ["Mingxing Tan", "Quoc V. Le"]
+    paper: "EfficientNet: Rethinking Model Scaling for CNNs"
+    key_innovation: "Compound scaling of depth, width, and resolution"
+    tags: ["cnn", "vision", "efficient", "scaling", "nas"]
+    dependencies: ["resnet_2015"]
+
+  gpt3:
+    id: "gpt3_2020"
+    name: "GPT-3"
+    year: 2020
+    era: "attention"
+    category: "architecture"
+    authors: ["Tom Brown", "Benjamin Mann", "Nick Ryder", "et al."]
+    paper: "Language Models are Few-Shot Learners"
+    key_innovation: "175B parameter model with emergent few-shot learning"
+    tags: ["nlp", "large_scale", "few_shot", "emergent", "in_context_learning"]
+    dependencies: ["gpt2_2019"]
+
+  vit:
+    id: "vit_2020"
+    name: "Vision Transformer (ViT)"
+    year: 2020
+    era: "attention"
+    category: "architecture"
+    authors: ["Alexey Dosovitskiy", "Lucas Beyer", "Alexander Kolesnikov", "Dirk Weissenborn", "Xiaohua Zhai", "Thomas Unterthiner", "Mostafa Dehghani", "Matthias Minderer", "Georg Heigold", "Sylvain Gelly", "Jakob Uszkoreit", "Neil Houlsby"]
+    paper: "An Image is Worth 16x16 Words: Transformers for Image Recognition"
+    key_innovation: "Pure transformer architecture for image classification"
+    tags: ["vision", "transformer", "patches", "attention"]
+    dependencies: ["transformer_2017", "bert_2018"]
+
+  # ============================================================================
+  # FOUNDATION MODEL ERA (2021-Present)
+  # ============================================================================
+
+  clip:
+    id: "clip_2021"
+    name: "CLIP"
+    year: 2021
+    era: "foundation"
+    category: "architecture"
+    authors: ["Alec Radford", "Jong Wook Kim", "Chris Hallacy", "Aditya Ramesh", "Gabriel Goh", "Sandhini Agarwal", "Girish Sastry", "Amanda Askell", "Pamela Mishkin", "Jack Clark", "Gretchen Krueger", "Ilya Sutskever"]
+    paper: "Learning Transferable Visual Models From Natural Language Supervision"
+    key_innovation: "Contrastive image-text pretraining for zero-shot transfer"
+    tags: ["multimodal", "vision_language", "contrastive", "zero_shot"]
+    dependencies: ["transformer_2017", "vit_2020"]
+
+  dalle:
+    id: "dalle_2021"
+    name: "DALL-E"
+    year: 2021
+    era: "foundation"
+    category: "architecture"
+    authors: ["Aditya Ramesh", "Mikhail Pavlov", "Gabriel Goh", "Scott Gray", "Chelsea Voss", "Alec Radford", "Mark Chen", "Ilya Sutskever"]
+    paper: "Zero-Shot Text-to-Image Generation"
+    key_innovation: "Text-to-image generation with discrete VAE and transformer"
+    tags: ["multimodal", "generative", "text_to_image", "creativity"]
+    dependencies: ["gpt3_2020", "vae_2013"]
+
+  diffusion:
+    id: "diffusion_2020"
+    name: "Denoising Diffusion Probabilistic Models"
+    year: 2020
+    era: "foundation"
+    category: "architecture"
+    authors: ["Jonathan Ho", "Ajay Jain", "Pieter Abbeel"]
+    paper: "Denoising Diffusion Probabilistic Models"
+    key_innovation: "Iterative denoising for high-quality generation"
+    tags: ["generative", "diffusion", "denoising", "probabilistic"]
+    dependencies: ["vae_2013"]
+
+  stable_diffusion:
+    id: "stable_diffusion_2022"
+    name: "Stable Diffusion"
+    year: 2022
+    era: "foundation"
+    category: "architecture"
+    authors: ["Robin Rombach", "Andreas Blattmann", "Dominik Lorenz", "Patrick Esser", "Bjorn Ommer"]
+    paper: "High-Resolution Image Synthesis with Latent Diffusion Models"
+    key_innovation: "Latent space diffusion for efficient high-res generation"
+    tags: ["generative", "diffusion", "latent", "text_to_image"]
+    dependencies: ["diffusion_2020", "clip_2021"]
+
+  chatgpt:
+    id: "chatgpt_2022"
+    name: "ChatGPT / InstructGPT"
+    year: 2022
+    era: "foundation"
+    category: "architecture"
+    authors: ["OpenAI"]
+    paper: "Training language models to follow instructions with human feedback"
+    key_innovation: "RLHF for helpful, harmless, honest dialogue"
+    tags: ["nlp", "rlhf", "instruction_following", "dialogue", "alignment"]
+    dependencies: ["gpt3_2020"]
+
+  gpt4:
+    id: "gpt4_2023"
+    name: "GPT-4"
+    year: 2023
+    era: "foundation"
+    category: "architecture"
+    authors: ["OpenAI"]
+    paper: "GPT-4 Technical Report"
+    key_innovation: "Multimodal large language model with unprecedented capabilities"
+    tags: ["nlp", "multimodal", "large_scale", "reasoning", "vision"]
+    dependencies: ["gpt3_2020", "chatgpt_2022"]
+
+  llama:
+    id: "llama_2023"
+    name: "LLaMA"
+    year: 2023
+    era: "foundation"
+    category: "architecture"
+    authors: ["Hugo Touvron", "Thibaut Lavril", "Gautier Izacard", "Xavier Martinet", "Marie-Anne Lachaux", "Timothee Lacroix", "Baptiste Roziere", "Naman Goyal", "Eric Hambro", "Faisal Azhar", "Aurelien Rodriguez", "Armand Joulin", "Edouard Grave", "Guillaume Lample"]
+    paper: "LLaMA: Open and Efficient Foundation Language Models"
+    key_innovation: "Efficient open-source foundation models"
+    tags: ["nlp", "open_source", "efficient", "foundation"]
+    dependencies: ["transformer_2017"]
+
+  mamba:
+    id: "mamba_2023"
+    name: "Mamba"
+    year: 2023
+    era: "foundation"
+    category: "architecture"
+    authors: ["Albert Gu", "Tri Dao"]
+    paper: "Mamba: Linear-Time Sequence Modeling with Selective State Spaces"
+    key_innovation: "Selective state space model rivaling transformers"
+    tags: ["ssm", "linear_time", "sequence", "efficient"]
+    dependencies: ["lstm_1997", "transformer_2017"]
+
+  mixture_of_experts:
+    id: "moe_2017"
+    name: "Mixture of Experts"
+    year: 2017
+    era: "attention"
+    category: "architecture"
+    authors: ["Noam Shazeer", "Azalia Mirhoseini", "Krzysztof Maziarz", "Andy Davis", "Quoc Le", "Geoffrey Hinton", "Jeff Dean"]
+    paper: "Outrageously Large Neural Networks: The Sparsely-Gated Mixture-of-Experts Layer"
+    key_innovation: "Conditional computation with expert routing"
+    tags: ["sparse", "conditional", "scaling", "efficient"]
+    dependencies: ["mlp_1986"]
+
+  lora:
+    id: "lora_2021"
+    name: "LoRA (Low-Rank Adaptation)"
+    year: 2021
+    era: "foundation"
+    category: "technique"
+    authors: ["Edward Hu", "Yelong Shen", "Phillip Wallis", "Zeyuan Allen-Zhu", "Yuanzhi Li", "Shean Wang", "Lu Wang", "Weizhu Chen"]
+    paper: "LoRA: Low-Rank Adaptation of Large Language Models"
+    key_innovation: "Parameter-efficient fine-tuning via low-rank decomposition"
+    tags: ["fine_tuning", "efficient", "adaptation", "low_rank"]
+    dependencies: ["transformer_2017"]
+
+# Metadata
+metadata:
+  version: "1.0.0"
+  last_updated: "2024-01-19"
+  total_methods: 50
+  eras:
+    - id: "foundational"
+      name: "Foundational Era"
+      years: "1943-1969"
+    - id: "classical"
+      name: "Classical Era"
+      years: "1970-2005"
+    - id: "deep_learning"
+      name: "Deep Learning Era"
+      years: "2006-2016"
+    - id: "attention"
+      name: "Attention Era"
+      years: "2017-2020"
+    - id: "foundation"
+      name: "Foundation Model Era"
+      years: "2021-present"
+  categories:
+    - neuron_model
+    - learning_rule
+    - learning_algorithm
+    - classifier
+    - architecture
+    - mechanism
+    - technique
+    - regularization
+    - optimizer
+    - embedding
+    - ensemble
