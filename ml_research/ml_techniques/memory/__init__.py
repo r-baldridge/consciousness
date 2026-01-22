@@ -52,13 +52,24 @@ MEMORY ARCHITECTURE
 """
 
 from dataclasses import dataclass, field
-from typing import Any, Callable, Dict, List, Optional, Tuple, Union
+from typing import Any, Callable, Dict, List, Optional, Tuple, Union, TYPE_CHECKING
 from enum import Enum
 from abc import abstractmethod
 import time
 import hashlib
 
 from .. import TechniqueBase, TechniqueResult, TechniqueConfig, TechniqueCategory
+
+# Backend imports
+if TYPE_CHECKING:
+    from ...backends import LLMBackend
+
+try:
+    from ...backends import get_backend, LLMBackend as LLMBackendClass
+    BACKENDS_AVAILABLE = True
+except ImportError:
+    BACKENDS_AVAILABLE = False
+    LLMBackendClass = None
 
 
 # =============================================================================
@@ -116,9 +127,11 @@ class RAG(TechniqueBase):
     Components:
         - Document store: Vector DB, BM25 index, or hybrid
         - Retriever: Finds relevant documents
-        - Generator: LLM that uses retrieved context
+        - Generator: LLM backend that uses retrieved context
 
     Configuration:
+        backend: LLMBackend instance or name for generation
+        embedding_backend: Optional separate backend for embeddings
         retriever_type: dense, sparse, or hybrid
         top_k: Number of documents to retrieve (default: 5)
         chunk_size: Size of document chunks (default: 512)
@@ -127,8 +140,10 @@ class RAG(TechniqueBase):
         context_template: Template for including context
 
     Usage:
+        from ml_research.backends import MockBackend
+
         rag = RAG(
-            model=my_model,
+            backend=MockBackend(),
             documents=my_documents,
             retriever_type=RetrieverType.HYBRID,
             top_k=5,
@@ -141,7 +156,9 @@ class RAG(TechniqueBase):
 
     def __init__(
         self,
-        model: Optional[Any] = None,
+        backend: Optional[Any] = None,
+        model: Optional[Any] = None,  # Deprecated, use backend
+        embedding_backend: Optional[Any] = None,
         documents: Optional[List[Document]] = None,
         retriever_type: RetrieverType = RetrieverType.DENSE,
         top_k: int = 5,
@@ -152,7 +169,12 @@ class RAG(TechniqueBase):
         **kwargs,
     ):
         super().__init__(**kwargs)
-        self.model = model
+
+        # Resolve backends
+        self.backend = self._resolve_backend(backend, model)
+        self.embedding_backend = embedding_backend or self.backend
+        self.model = model  # Keep for backward compatibility
+
         self.documents = documents or []
         self.retriever_type = retriever_type
         self.top_k = top_k
@@ -165,6 +187,27 @@ class RAG(TechniqueBase):
         self._chunks: List[DocumentChunk] = []
         self._chunk_embeddings: Dict[str, List[float]] = {}
         self._index_documents()
+
+    def _resolve_backend(self, backend: Optional[Any], model: Optional[Any]) -> Optional[Any]:
+        """Resolve backend from various input types."""
+        if backend is not None:
+            if isinstance(backend, str):
+                if BACKENDS_AVAILABLE:
+                    return get_backend(backend)
+                else:
+                    raise ImportError("Backends module not available")
+            return backend
+
+        if model is not None:
+            return model
+
+        if BACKENDS_AVAILABLE:
+            try:
+                return get_backend()
+            except (ValueError, KeyError):
+                pass
+
+        return None
 
     def _index_documents(self) -> None:
         """Index all documents into chunks."""
@@ -208,18 +251,33 @@ class RAG(TechniqueBase):
         return chunks
 
     def _embed_query(self, query: str) -> List[float]:
-        """Get embedding for query (placeholder)."""
-        # Real implementation uses embedding model
-        # Simple hash-based pseudo-embedding for demo
+        """Get embedding for query using backend or fallback."""
+        # Try to use embedding backend if available
+        if self.embedding_backend is not None and hasattr(self.embedding_backend, 'embed'):
+            try:
+                return self.embedding_backend.embed(query)
+            except (NotImplementedError, Exception):
+                pass
+
+        # Fallback: Simple hash-based pseudo-embedding
         h = hashlib.md5(query.encode()).hexdigest()
         return [int(h[i:i+2], 16) / 255.0 for i in range(0, 32, 2)]
 
     def _embed_chunk(self, chunk: DocumentChunk) -> List[float]:
-        """Get embedding for chunk (placeholder)."""
+        """Get embedding for chunk using backend or fallback."""
         if chunk.chunk_id in self._chunk_embeddings:
             return self._chunk_embeddings[chunk.chunk_id]
 
-        # Real implementation uses embedding model
+        # Try to use embedding backend if available
+        if self.embedding_backend is not None and hasattr(self.embedding_backend, 'embed'):
+            try:
+                embedding = self.embedding_backend.embed(chunk.content)
+                self._chunk_embeddings[chunk.chunk_id] = embedding
+                return embedding
+            except (NotImplementedError, Exception):
+                pass
+
+        # Fallback: Simple hash-based pseudo-embedding
         h = hashlib.md5(chunk.content.encode()).hexdigest()
         embedding = [int(h[i:i+2], 16) / 255.0 for i in range(0, 32, 2)]
         self._chunk_embeddings[chunk.chunk_id] = embedding
@@ -310,8 +368,19 @@ class RAG(TechniqueBase):
         return "\n\n".join(context_parts)
 
     def _generate_response(self, prompt: str) -> str:
-        """Generate response from model (placeholder)."""
-        # Real implementation calls the LLM
+        """Generate response from backend or fallback to placeholder."""
+        # Try to use backend if available
+        if self.backend is not None:
+            if hasattr(self.backend, 'generate'):
+                return self.backend.generate(
+                    prompt,
+                    max_tokens=1024,
+                    temperature=0.7,
+                )
+            elif callable(self.backend):
+                return self.backend(prompt)
+
+        # Placeholder response
         return "[Generated response based on retrieved context]"
 
     def add_documents(self, documents: List[Document]) -> None:

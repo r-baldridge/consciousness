@@ -185,12 +185,24 @@ result = orch.run(
 
 | Component | Status |
 |-----------|--------|
-| Architecture index | Complete |
-| Orchestrator base | Complete |
-| Architecture scaffolding | Complete |
-| CTM implementation | In progress |
-| JEPA implementation | Indexed |
-| Other implementations | Indexed (scaffolding ready) |
+| Architecture index (12) | ✅ Complete |
+| Orchestrator with dynamic loading | ✅ Complete |
+| Architecture scaffolding (all 12) | ✅ Complete |
+| Model presets (tiny/small/medium/large) | ✅ Complete |
+| LLM Backend interface | ✅ Complete |
+| Integration tests | ✅ Complete |
+| Full implementations | 🔄 Stubs ready (requires PyTorch) |
+
+### Architecture Scaffolding
+
+Each architecture now includes:
+- `src/model.py` - Core model with config dataclass
+- `src/layers.py` - Architecture-specific layers
+- `configs/default.yaml` - Default hyperparameters
+- `cli/train.py` - Training CLI
+- `cli/infer.py` - Inference CLI
+- `tests/test_model.py` - Basic tests
+- `README.md` - Implementation status and requirements
 
 ---
 
@@ -203,15 +215,15 @@ The `ml_techniques/` module provides composable **application patterns** for usi
 | Category | Techniques | Description |
 |----------|------------|-------------|
 | **Decomposition** | 3 | Breaking complex tasks into manageable parts (recursive, least-to-most, hierarchical) |
-| **Prompting** | 5 | Structured input formulation (CoT, ToT, GoT, self-consistency, few-shot) |
-| **Agentic** | 5 | Autonomous execution patterns (ReAct, tool calling, multi-agent, reflexion, planning) |
+| **Prompting** | 10 | Structured input formulation (CoT, ToT, GoT, SoT, Step-Back, Analogical, CoS, self-consistency, few-shot) |
+| **Agentic** | 10 | Autonomous execution patterns (ReAct, LATS, ReWOO, tool calling, Toolformer, CRITIC, multi-agent, reflexion, planning, inner monologue) |
 | **Memory** | 3 | Context and knowledge management (RAG, episodic memory, compression) |
-| **Code Synthesis** | 4 | Code generation patterns (RLM, program synthesis, self-debugging, code-as-policy) |
+| **Code Synthesis** | 7 | Code generation patterns (RLM, PoT, PAL, Scratchpad, program synthesis, self-debugging, code-as-policy) |
 | **Orchestration** | 3 | Multi-component coordination (routing, ensembles, hooks) |
-| **Verification** | 4 | Output validation (self-eval, CoVe, constitutional, debate) |
-| **Optimization** | 2 | Technique improvement (DSPy, automatic prompt engineering) |
+| **Verification** | 6 | Output validation (self-eval, Self-Refine, RCI, CoVe, constitutional, debate) |
+| **Optimization** | 7 | Technique improvement (DSPy, OPRO, Meta-Prompting, Active Prompting, PromptBreeder, EvoPrompt, APE) |
 
-**Total: 29 indexed techniques**
+**Total: 49 indexed techniques**
 
 ### Composable Pipeline System
 
@@ -353,12 +365,44 @@ prompting_techniques = list_techniques(category=TechniqueCategory.PROMPTING)
 from consciousness.ml_research.ml_techniques import get_composable_with
 compatible = get_composable_with('react')
 
-# Build a custom pipeline (when implementations are complete)
-# pipeline = compose([
-#     ChainOfThought(),
-#     ToolCalling(tools=[...]),
-#     SelfConsistency(samples=5),
-# ])
+# Build a custom pipeline
+from consciousness.ml_research.ml_techniques.prompting import ChainOfThought
+from consciousness.ml_research.ml_techniques.verification import SelfRefine
+from consciousness.ml_research.backends import MockBackend
+
+backend = MockBackend()
+cot = ChainOfThought(backend=backend)
+result = cot.run("Solve this step by step: What is 15% of 80?")
+print(result.output)
+```
+
+### Using the LLM Backend Interface
+
+```python
+from consciousness.ml_research.backends import (
+    MockBackend,
+    LocalModelBackend,
+    get_backend,
+    register_backend,
+    list_backends,
+)
+
+# Use mock backend for testing (default)
+mock = MockBackend()
+response = mock.generate("Hello world", temperature=0.7)
+embedding = mock.embed("test text")  # Returns 384-dim vector
+
+# Register a custom backend
+register_backend("my_mock", mock, set_as_default=True)
+
+# All techniques use the backend interface
+from consciousness.ml_research.ml_techniques.prompting import ChainOfThought
+from consciousness.ml_research.ml_techniques.memory import RAG
+from consciousness.ml_research.ml_techniques.agentic import ReAct
+
+cot = ChainOfThought(backend=mock)
+rag = RAG(backend=mock, embedding_backend=mock)
+react = ReAct(backend=mock, tools=[...])
 ```
 
 ---
@@ -369,24 +413,25 @@ compatible = get_composable_with('react')
 - [x] Research index structure (foundations through novel)
 - [x] Core registry system (method_registry, taxonomy, lineage, timeline)
 - [x] Modern dev architecture index (12 architectures catalogued)
-- [x] Orchestrator base implementation
-- [x] ML techniques index (29 techniques across 8 categories)
+- [x] Orchestrator with dynamic architecture loading
+- [x] ML techniques index (49 techniques across 8 categories)
 - [x] Technique base classes and composition system
 - [x] Architecture scaffolding for all modern_dev modules
+- [x] LLM Backend interface (Mock, Local, Anthropic, OpenAI)
+- [x] Integration tests for end-to-end validation
+- [x] Model presets (tiny/small/medium/large)
+- [x] README documentation for all 12 architectures
 
 ### In Progress
-- [ ] CTM (Continuous Thought Machine) implementation
-- [ ] JEPA family implementation
-- [ ] Technique implementations (ChainOfThought, RAG, etc.)
+- [ ] Connect real LLM APIs (Anthropic/OpenAI) for technique backends
+- [ ] Parallel scan implementation for Mamba performance
+- [ ] CUDA/Triton kernels for production speed
 
 ### Planned
-- [ ] Mamba implementation with hardware-aware kernels
-- [ ] xLSTM with parallelizable training
-- [ ] Ring Attention for distributed inference
-- [ ] Full technique implementations with model backends
-- [ ] Configuration-driven pipeline loading
+- [ ] Pretrained model weight loading
 - [ ] Benchmark integration for architecture comparison
-- [ ] CLI tools for each architecture
+- [ ] Configuration-driven pipeline loading from YAML
+- [ ] Web UI for technique composition
 
 ---
 
@@ -427,6 +472,15 @@ from consciousness.ml_research.ml_techniques import (
     TechniqueResult,     # Execution result
     Pipeline,            # Sequential composition
     ParallelComposition, # Parallel execution
+)
+
+# LLM backends
+from consciousness.ml_research.backends import (
+    LLMBackend,          # Abstract base class
+    MockBackend,         # Testing backend
+    LocalModelBackend,   # PyTorch model wrapper
+    BackendRegistry,     # Backend management
+    get_backend,         # Get backend by name
 )
 ```
 

@@ -870,6 +870,362 @@ class Debate(TechniqueBase):
 
 
 # =============================================================================
+# SELF-REFINE
+# =============================================================================
+
+class StopCondition(Enum):
+    """Conditions for stopping the self-refine loop."""
+    MAX_ITERATIONS = "max_iterations"      # Stop after N iterations
+    NO_CHANGES = "no_changes"              # Stop when refinement produces same output
+    QUALITY_THRESHOLD = "quality_threshold"  # Stop when quality score exceeds threshold
+    FEEDBACK_EMPTY = "feedback_empty"      # Stop when no more feedback
+
+
+class SelfRefine(TechniqueBase):
+    """
+    Self-Refine: Iterative self-refinement without external feedback.
+
+    Paper: "Self-Refine: Iterative Refinement with Self-Feedback"
+           (Madaan et al., 2023)
+    https://arxiv.org/abs/2303.17651
+
+    The model iteratively improves its own output through a feedback loop:
+        1. Generate initial output
+        2. Generate feedback on the output
+        3. Refine the output based on feedback
+        4. Repeat until stopping condition is met
+
+    Unlike methods requiring external feedback or reward models, Self-Refine
+    uses the same model for generation, feedback, and refinement.
+
+    Configuration:
+        max_iterations: Maximum refinement iterations (default: 3)
+        feedback_prompt: Template for generating feedback
+        refine_prompt: Template for refinement based on feedback
+        stop_condition: When to stop iterating
+
+    Usage:
+        refiner = SelfRefine(
+            model=my_model,
+            max_iterations=5,
+            stop_condition=StopCondition.QUALITY_THRESHOLD,
+        )
+        result = refiner.run({
+            "task": "Write a poem about the ocean",
+            "initial_output": "The ocean is blue and vast...",
+        })
+    """
+
+    TECHNIQUE_ID = "self_refine"
+    CATEGORY = TechniqueCategory.VERIFICATION
+
+    DEFAULT_FEEDBACK_PROMPT = """
+Review the following output and provide specific, actionable feedback for improvement.
+Focus on clarity, accuracy, completeness, and quality.
+
+Task: {task}
+Output: {output}
+
+Provide feedback on what can be improved:
+"""
+
+    DEFAULT_REFINE_PROMPT = """
+Refine the following output based on the feedback provided.
+Make specific improvements while maintaining the original intent.
+
+Task: {task}
+Current Output: {output}
+Feedback: {feedback}
+
+Provide an improved version:
+"""
+
+    def __init__(
+        self,
+        model: Optional[Any] = None,
+        backend: Optional[Any] = None,
+        max_iterations: int = 3,
+        feedback_prompt: Optional[str] = None,
+        refine_prompt: Optional[str] = None,
+        stop_condition: StopCondition = StopCondition.MAX_ITERATIONS,
+        quality_threshold: float = 0.9,
+        **kwargs,
+    ):
+        super().__init__(**kwargs)
+        self.model = model
+        self.backend = backend or model
+        self.max_iterations = max_iterations
+        self.feedback_prompt = feedback_prompt or self.DEFAULT_FEEDBACK_PROMPT
+        self.refine_prompt = refine_prompt or self.DEFAULT_REFINE_PROMPT
+        self.stop_condition = stop_condition
+        self.quality_threshold = quality_threshold
+
+    def _generate_feedback(self, task: str, output: str) -> str:
+        """Generate feedback on the current output (placeholder)."""
+        # Real implementation uses LLM with feedback_prompt
+        return f"Feedback: Consider improving clarity and adding more detail to '{output[:50]}...'"
+
+    def _refine_output(self, task: str, output: str, feedback: str) -> str:
+        """Refine output based on feedback (placeholder)."""
+        # Real implementation uses LLM with refine_prompt
+        return f"{output}\n[Refined based on: {feedback[:100]}]"
+
+    def _evaluate_quality(self, task: str, output: str) -> float:
+        """Evaluate quality of output (placeholder)."""
+        # Real implementation uses LLM or quality metrics
+        import random
+        return random.uniform(0.6, 1.0)
+
+    def _check_stop_condition(
+        self,
+        iteration: int,
+        current_output: str,
+        previous_output: str,
+        feedback: str,
+        quality: float,
+    ) -> bool:
+        """Check if refinement should stop."""
+        if self.stop_condition == StopCondition.MAX_ITERATIONS:
+            return iteration >= self.max_iterations
+        elif self.stop_condition == StopCondition.NO_CHANGES:
+            return current_output == previous_output
+        elif self.stop_condition == StopCondition.QUALITY_THRESHOLD:
+            return quality >= self.quality_threshold
+        elif self.stop_condition == StopCondition.FEEDBACK_EMPTY:
+            return not feedback or feedback.strip() == ""
+        return iteration >= self.max_iterations
+
+    def run(self, input_data: Any, context: Optional[Dict] = None) -> TechniqueResult:
+        start = time.time()
+        trace: List[Dict] = []
+
+        # Parse input
+        if isinstance(input_data, dict):
+            task = input_data.get("task", "")
+            current_output = input_data.get("initial_output", "")
+            if not current_output:
+                current_output = input_data.get("output", str(input_data))
+        else:
+            task = ""
+            current_output = str(input_data)
+
+        previous_output = ""
+        all_feedback = []
+        all_versions = [current_output]
+
+        for iteration in range(self.max_iterations):
+            # Generate feedback
+            feedback = self._generate_feedback(task, current_output)
+            all_feedback.append(feedback)
+            trace.append({
+                "action": "generate_feedback",
+                "iteration": iteration + 1,
+                "feedback": feedback[:200],
+            })
+
+            # Evaluate quality
+            quality = self._evaluate_quality(task, current_output)
+            trace.append({
+                "action": "evaluate_quality",
+                "iteration": iteration + 1,
+                "quality": quality,
+            })
+
+            # Check stop condition
+            if self._check_stop_condition(
+                iteration + 1, current_output, previous_output, feedback, quality
+            ):
+                trace.append({
+                    "action": "stop",
+                    "iteration": iteration + 1,
+                    "reason": self.stop_condition.value,
+                })
+                break
+
+            # Refine output
+            previous_output = current_output
+            current_output = self._refine_output(task, current_output, feedback)
+            all_versions.append(current_output)
+            trace.append({
+                "action": "refine",
+                "iteration": iteration + 1,
+            })
+
+        final_quality = self._evaluate_quality(task, current_output)
+
+        return TechniqueResult(
+            success=True,
+            output={
+                "final_output": current_output,
+                "iterations": len(all_versions) - 1,
+                "final_quality": final_quality,
+                "all_versions": all_versions,
+                "all_feedback": all_feedback,
+            },
+            technique_id=self.TECHNIQUE_ID,
+            execution_time_ms=(time.time() - start) * 1000,
+            intermediate_steps=trace,
+        )
+
+
+# =============================================================================
+# RECURSIVE CRITICISM AND IMPROVEMENT (RCI)
+# =============================================================================
+
+class RCI(TechniqueBase):
+    """
+    Recursive Criticism and Improvement (RCI).
+
+    Related to Self-Refine but with recursive critique at multiple levels.
+    The model critiques its output at progressively deeper levels, then
+    applies improvements from the deepest level back up.
+
+    Process:
+        1. Generate initial output
+        2. Critique at level 1 (surface issues)
+        3. Critique at level 2 (deeper structural issues)
+        4. ... continue to max depth
+        5. Apply improvements from deepest to shallowest
+        6. Optionally repeat the entire process
+
+    Configuration:
+        critique_depth: Number of critique levels (default: 3)
+        improvement_prompt: Template for generating improvements
+
+    Usage:
+        rci = RCI(
+            model=my_model,
+            critique_depth=3,
+        )
+        result = rci.run({
+            "task": "Write a business proposal",
+            "output": "Our proposal is to...",
+        })
+    """
+
+    TECHNIQUE_ID = "rci"
+    CATEGORY = TechniqueCategory.VERIFICATION
+
+    CRITIQUE_LEVELS = [
+        ("surface", "Check for basic errors: grammar, spelling, formatting, clarity"),
+        ("structural", "Check for logical structure: organization, flow, completeness"),
+        ("semantic", "Check for deeper issues: accuracy, coherence, argumentation"),
+        ("meta", "Check for high-level concerns: alignment with goals, audience fit, overall quality"),
+    ]
+
+    DEFAULT_IMPROVEMENT_PROMPT = """
+Based on the following critiques at multiple levels, improve the output.
+Address issues from the deepest level first, then work toward surface-level fixes.
+
+Original Output: {output}
+
+Critiques:
+{critiques}
+
+Provide an improved version that addresses all identified issues:
+"""
+
+    def __init__(
+        self,
+        model: Optional[Any] = None,
+        backend: Optional[Any] = None,
+        critique_depth: int = 3,
+        improvement_prompt: Optional[str] = None,
+        max_iterations: int = 2,
+        **kwargs,
+    ):
+        super().__init__(**kwargs)
+        self.model = model
+        self.backend = backend or model
+        self.critique_depth = min(critique_depth, len(self.CRITIQUE_LEVELS))
+        self.improvement_prompt = improvement_prompt or self.DEFAULT_IMPROVEMENT_PROMPT
+        self.max_iterations = max_iterations
+
+    def _critique_at_level(
+        self,
+        level: int,
+        output: str,
+        previous_critiques: List[str],
+    ) -> str:
+        """Generate critique at a specific level (placeholder)."""
+        # Real implementation uses LLM
+        level_name, level_desc = self.CRITIQUE_LEVELS[level]
+        return f"[Level {level + 1} - {level_name}]: Critique of '{output[:50]}...' - {level_desc}"
+
+    def _apply_improvements(
+        self,
+        output: str,
+        critiques: List[Tuple[str, str]],
+    ) -> str:
+        """Apply improvements based on all critiques (placeholder)."""
+        # Real implementation uses LLM
+        critique_summary = "; ".join(f"{name}: {critique[:50]}" for name, critique in critiques)
+        return f"{output}\n[Improved based on: {critique_summary}]"
+
+    def run(self, input_data: Any, context: Optional[Dict] = None) -> TechniqueResult:
+        start = time.time()
+        trace: List[Dict] = []
+
+        # Parse input
+        if isinstance(input_data, dict):
+            task = input_data.get("task", "")
+            current_output = input_data.get("output", str(input_data))
+        else:
+            task = ""
+            current_output = str(input_data)
+
+        all_iterations = []
+
+        for iteration in range(self.max_iterations):
+            critiques: List[Tuple[str, str]] = []
+            previous_critique_texts: List[str] = []
+
+            # Generate critiques at each level
+            for level in range(self.critique_depth):
+                level_name = self.CRITIQUE_LEVELS[level][0]
+                critique = self._critique_at_level(level, current_output, previous_critique_texts)
+                critiques.append((level_name, critique))
+                previous_critique_texts.append(critique)
+
+                trace.append({
+                    "action": "critique",
+                    "iteration": iteration + 1,
+                    "level": level + 1,
+                    "level_name": level_name,
+                    "critique": critique[:200],
+                })
+
+            # Apply improvements (from deepest to shallowest)
+            improved_output = self._apply_improvements(current_output, list(reversed(critiques)))
+            trace.append({
+                "action": "improve",
+                "iteration": iteration + 1,
+            })
+
+            all_iterations.append({
+                "iteration": iteration + 1,
+                "input": current_output,
+                "critiques": critiques,
+                "output": improved_output,
+            })
+
+            current_output = improved_output
+
+        return TechniqueResult(
+            success=True,
+            output={
+                "final_output": current_output,
+                "total_iterations": len(all_iterations),
+                "critique_depth": self.critique_depth,
+                "iterations": all_iterations,
+            },
+            technique_id=self.TECHNIQUE_ID,
+            execution_time_ms=(time.time() - start) * 1000,
+            intermediate_steps=trace,
+        )
+
+
+# =============================================================================
 # EXPORTS
 # =============================================================================
 
@@ -879,6 +1235,7 @@ __all__ = [
     "ScoringScale",
     "EnforcementMode",
     "DebateFormat",
+    "StopCondition",
     # Data classes
     "EvaluationResult",
     "VerificationQuestion",
@@ -889,4 +1246,6 @@ __all__ = [
     "ChainOfVerification",
     "Constitutional",
     "Debate",
+    "SelfRefine",
+    "RCI",
 ]

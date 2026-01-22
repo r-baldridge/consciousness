@@ -71,6 +71,7 @@ Example:
 from dataclasses import dataclass, field
 from typing import Any, Callable, Dict, List, Optional, Tuple, Union
 from enum import Enum
+import time
 
 from .. import TechniqueBase, TechniqueResult, TechniqueConfig, TechniqueCategory
 
@@ -596,18 +597,538 @@ class ProgramSynthesis(TechniqueBase):
 
 
 # =============================================================================
+# PROGRAM OF THOUGHTS (PoT)
+# =============================================================================
+
+class ProgramOfThoughts(TechniqueBase):
+    """
+    Program-of-Thoughts (PoT): Generate code to solve reasoning problems.
+
+    Paper: "Program of Thoughts Prompting: Disentangling Computation from
+           Reasoning for Numerical Reasoning Tasks" (Chen et al., 2022)
+    https://arxiv.org/abs/2211.12588
+
+    Instead of reasoning in natural language (like Chain-of-Thought), PoT
+    generates executable code that computes the answer. This is particularly
+    effective for:
+        - Mathematical reasoning
+        - Logical reasoning
+        - Multi-step calculations
+        - Problems requiring precise computation
+
+    Process:
+        1. Parse the problem statement
+        2. Generate code that solves the problem
+        3. Execute the code
+        4. Return the computed answer
+
+    Advantages over CoT:
+        - More accurate for numerical computations
+        - Explicit variable tracking
+        - Verifiable intermediate steps
+        - Can leverage external libraries (math, numpy, etc.)
+
+    Configuration:
+        language: Target language for code generation (default: python)
+        execution_timeout: Max time for code execution in seconds
+        code_prompt: Template for code generation
+        allowed_imports: List of allowed module imports
+
+    Usage:
+        pot = ProgramOfThoughts(
+            model=my_model,
+            language="python",
+            execution_timeout=10,
+        )
+        result = pot.run(
+            "A train travels at 60 mph for 2.5 hours, then at 80 mph for "
+            "1.5 hours. What is the total distance traveled?"
+        )
+    """
+
+    TECHNIQUE_ID = "program_of_thoughts"
+    CATEGORY = TechniqueCategory.CODE_SYNTHESIS
+
+    DEFAULT_CODE_PROMPT = """
+Solve the following problem by writing Python code.
+Write clean, well-commented code that computes the answer step by step.
+The final answer should be stored in a variable called 'answer'.
+
+Problem: {problem}
+
+Python code:
+```python
+"""
+
+    def __init__(
+        self,
+        model: Optional[Any] = None,
+        backend: Optional[Any] = None,
+        language: str = "python",
+        execution_timeout: int = 10,
+        code_prompt: Optional[str] = None,
+        allowed_imports: Optional[List[str]] = None,
+        **kwargs,
+    ):
+        super().__init__(**kwargs)
+        self.model = model
+        self.backend = backend or model
+        self.language = language
+        self.execution_timeout = execution_timeout
+        self.code_prompt = code_prompt or self.DEFAULT_CODE_PROMPT
+        self.allowed_imports = allowed_imports or ["math", "statistics", "fractions", "decimal"]
+
+    def _generate_code(self, problem: str) -> str:
+        """Generate code to solve the problem (placeholder)."""
+        # Real implementation uses LLM
+        return f'''# Problem: {problem[:100]}
+# Generated code to solve the problem
+
+# Step 1: Parse the problem
+# Step 2: Set up variables
+# Step 3: Compute the answer
+
+answer = 0  # Placeholder
+'''
+
+    def _execute_code(self, code: str) -> Tuple[bool, Any, Optional[str]]:
+        """Execute generated code safely."""
+        try:
+            # Create restricted namespace with allowed imports
+            namespace: Dict[str, Any] = {"__builtins__": {}}
+
+            # Add allowed imports
+            import importlib
+            for module_name in self.allowed_imports:
+                try:
+                    namespace[module_name] = importlib.import_module(module_name)
+                except ImportError:
+                    pass
+
+            # Add safe builtins
+            safe_builtins = [
+                'abs', 'all', 'any', 'bool', 'dict', 'enumerate', 'filter',
+                'float', 'int', 'len', 'list', 'map', 'max', 'min', 'pow',
+                'range', 'round', 'set', 'sorted', 'str', 'sum', 'tuple', 'zip',
+            ]
+            import builtins
+            for name in safe_builtins:
+                namespace[name] = getattr(builtins, name)
+
+            # Execute code
+            exec(code, namespace)
+
+            # Get answer
+            answer = namespace.get('answer', None)
+            return True, answer, None
+
+        except Exception as e:
+            import traceback
+            return False, None, traceback.format_exc()
+
+    def run(self, input_data: Any, context: Optional[Dict] = None) -> TechniqueResult:
+        import time
+        start = time.time()
+        trace: List[Dict] = []
+
+        problem = input_data if isinstance(input_data, str) else str(input_data)
+
+        # Generate code
+        code = self._generate_code(problem)
+        trace.append({
+            "action": "generate_code",
+            "code_lines": len(code.split('\n')),
+        })
+
+        # Execute code
+        success, answer, error = self._execute_code(code)
+        trace.append({
+            "action": "execute",
+            "success": success,
+            "error": error[:200] if error else None,
+        })
+
+        return TechniqueResult(
+            success=success,
+            output={
+                "answer": answer,
+                "code": code,
+                "execution_success": success,
+                "error": error,
+            },
+            technique_id=self.TECHNIQUE_ID,
+            execution_time_ms=(time.time() - start) * 1000,
+            intermediate_steps=trace,
+            error=error if not success else None,
+        )
+
+
+# =============================================================================
+# SCRATCHPAD
+# =============================================================================
+
+@dataclass
+class ScratchpadEntry:
+    """An entry in the scratchpad."""
+    key: str
+    value: Any
+    description: str = ""
+    timestamp: float = field(default_factory=time.time)
+    step: int = 0
+
+
+class ScratchpadFormat(Enum):
+    """Formats for scratchpad representation."""
+    TEXT = "text"          # Plain text key-value pairs
+    JSON = "json"          # JSON format
+    CODE = "code"          # Code-like variable assignments
+    MARKDOWN = "markdown"  # Markdown formatted
+
+
+class Scratchpad(TechniqueBase):
+    """
+    Scratchpad: Working memory for intermediate computations.
+
+    Provides a structured way to store and retrieve intermediate results
+    during multi-step reasoning or computation. Acts as external working
+    memory that the model can read from and write to.
+
+    Used in various papers for:
+        - Algorithmic reasoning (tracking state)
+        - Multi-step math (storing intermediate values)
+        - Program execution traces
+        - Chain-of-thought with explicit state
+
+    Configuration:
+        scratchpad_format: How to format the scratchpad (text/json/code/markdown)
+        max_entries: Maximum number of entries to maintain
+
+    Usage:
+        scratchpad = Scratchpad(
+            model=my_model,
+            scratchpad_format=ScratchpadFormat.CODE,
+            max_entries=20,
+        )
+        result = scratchpad.run({
+            "task": "Calculate compound interest over 5 years",
+            "initial_values": {"principal": 1000, "rate": 0.05},
+        })
+    """
+
+    TECHNIQUE_ID = "scratchpad"
+    CATEGORY = TechniqueCategory.CODE_SYNTHESIS
+
+    def __init__(
+        self,
+        model: Optional[Any] = None,
+        backend: Optional[Any] = None,
+        scratchpad_format: ScratchpadFormat = ScratchpadFormat.TEXT,
+        max_entries: int = 50,
+        **kwargs,
+    ):
+        super().__init__(**kwargs)
+        self.model = model
+        self.backend = backend or model
+        self.scratchpad_format = scratchpad_format
+        self.max_entries = max_entries
+        self._entries: List[ScratchpadEntry] = []
+        self._step_counter = 0
+
+    def write(self, key: str, value: Any, description: str = "") -> None:
+        """Write a value to the scratchpad."""
+        self._step_counter += 1
+        entry = ScratchpadEntry(
+            key=key,
+            value=value,
+            description=description,
+            step=self._step_counter,
+        )
+        self._entries.append(entry)
+
+        # Enforce max entries
+        if len(self._entries) > self.max_entries:
+            self._entries = self._entries[-self.max_entries:]
+
+    def read(self, key: str) -> Optional[Any]:
+        """Read the most recent value for a key."""
+        for entry in reversed(self._entries):
+            if entry.key == key:
+                return entry.value
+        return None
+
+    def get_all(self, key: str) -> List[Any]:
+        """Get all values for a key (history)."""
+        return [e.value for e in self._entries if e.key == key]
+
+    def clear(self) -> None:
+        """Clear all entries."""
+        self._entries = []
+        self._step_counter = 0
+
+    def format_scratchpad(self) -> str:
+        """Format the scratchpad for inclusion in prompts."""
+        if not self._entries:
+            return "[Scratchpad is empty]"
+
+        if self.scratchpad_format == ScratchpadFormat.TEXT:
+            lines = []
+            for e in self._entries:
+                desc = f" # {e.description}" if e.description else ""
+                lines.append(f"Step {e.step}: {e.key} = {e.value}{desc}")
+            return "\n".join(lines)
+
+        elif self.scratchpad_format == ScratchpadFormat.JSON:
+            import json
+            return json.dumps([
+                {"step": e.step, "key": e.key, "value": e.value, "description": e.description}
+                for e in self._entries
+            ], indent=2)
+
+        elif self.scratchpad_format == ScratchpadFormat.CODE:
+            lines = []
+            for e in self._entries:
+                desc = f"  # {e.description}" if e.description else ""
+                lines.append(f"{e.key} = {repr(e.value)}{desc}")
+            return "\n".join(lines)
+
+        elif self.scratchpad_format == ScratchpadFormat.MARKDOWN:
+            lines = ["| Step | Variable | Value | Description |", "|------|----------|-------|-------------|"]
+            for e in self._entries:
+                lines.append(f"| {e.step} | `{e.key}` | `{e.value}` | {e.description} |")
+            return "\n".join(lines)
+
+        return str(self._entries)
+
+    def _process_task(self, task: str, initial_values: Dict[str, Any]) -> Any:
+        """Process task using scratchpad (placeholder)."""
+        # Real implementation uses LLM with scratchpad context
+        # Initialize with provided values
+        for key, value in initial_values.items():
+            self.write(key, value, "initial value")
+
+        # Placeholder: just return initial values
+        return {"result": "Processed", "steps": len(self._entries)}
+
+    def run(self, input_data: Any, context: Optional[Dict] = None) -> TechniqueResult:
+        import time
+        start = time.time()
+        trace: List[Dict] = []
+
+        # Clear previous state
+        self.clear()
+
+        # Parse input
+        if isinstance(input_data, dict):
+            task = input_data.get("task", "")
+            initial_values = input_data.get("initial_values", {})
+        else:
+            task = str(input_data)
+            initial_values = {}
+
+        trace.append({
+            "action": "initialize",
+            "initial_values": list(initial_values.keys()),
+        })
+
+        # Process task
+        result = self._process_task(task, initial_values)
+        trace.append({
+            "action": "process",
+            "entries_created": len(self._entries),
+        })
+
+        return TechniqueResult(
+            success=True,
+            output={
+                "result": result,
+                "scratchpad": self.format_scratchpad(),
+                "entries": [
+                    {"key": e.key, "value": e.value, "step": e.step}
+                    for e in self._entries
+                ],
+            },
+            technique_id=self.TECHNIQUE_ID,
+            execution_time_ms=(time.time() - start) * 1000,
+            intermediate_steps=trace,
+        )
+
+
+# =============================================================================
+# PAL (PROGRAM-AIDED LANGUAGE)
+# =============================================================================
+
+class PAL(TechniqueBase):
+    """
+    PAL: Program-Aided Language Models.
+
+    Paper: "PAL: Program-aided Language Models" (Gao et al., 2022)
+    https://arxiv.org/abs/2211.10435
+
+    Similar to Program-of-Thoughts, PAL uses code as a reasoning medium.
+    The key insight is that LLMs are better at generating programs that
+    compute answers than computing answers directly in natural language.
+
+    Process:
+        1. Read natural language problem
+        2. Generate Python program that solves it
+        3. Execute the program
+        4. Return the result
+
+    PAL is particularly effective for:
+        - Math word problems
+        - Symbolic reasoning
+        - Algorithmic tasks
+        - Problems requiring precise computation
+
+    Configuration:
+        runtime: Execution runtime (python/javascript/etc.)
+        allowed_imports: Modules the generated code can import
+
+    Usage:
+        pal = PAL(
+            model=my_model,
+            runtime="python",
+            allowed_imports=["math", "datetime"],
+        )
+        result = pal.run(
+            "If John has 3 apples and buys 2 more bags with 6 apples each, "
+            "how many apples does he have in total?"
+        )
+    """
+
+    TECHNIQUE_ID = "pal"
+    CATEGORY = TechniqueCategory.CODE_SYNTHESIS
+
+    DEFAULT_PROMPT = """
+Read the following problem and write a Python program that computes the answer.
+Use clear variable names that match the problem description.
+Store the final answer in a variable called 'answer'.
+
+Problem: {problem}
+
+Python program:
+```python
+"""
+
+    def __init__(
+        self,
+        model: Optional[Any] = None,
+        backend: Optional[Any] = None,
+        runtime: str = "python",
+        allowed_imports: Optional[List[str]] = None,
+        execution_timeout: int = 10,
+        **kwargs,
+    ):
+        super().__init__(**kwargs)
+        self.model = model
+        self.backend = backend or model
+        self.runtime = runtime
+        self.allowed_imports = allowed_imports or ["math", "datetime", "collections", "itertools"]
+        self.execution_timeout = execution_timeout
+
+    def _generate_program(self, problem: str) -> str:
+        """Generate a program to solve the problem (placeholder)."""
+        # Real implementation uses LLM
+        return f'''# Problem: {problem[:100]}
+# PAL-generated solution
+
+# Define variables from the problem
+initial_amount = 0
+additional_amount = 0
+
+# Compute the answer
+answer = initial_amount + additional_amount
+'''
+
+    def _execute_program(self, program: str) -> Tuple[bool, Any, Optional[str]]:
+        """Execute the generated program."""
+        try:
+            namespace: Dict[str, Any] = {}
+
+            # Add allowed imports
+            import importlib
+            for module_name in self.allowed_imports:
+                try:
+                    namespace[module_name] = importlib.import_module(module_name)
+                except ImportError:
+                    pass
+
+            # Add safe builtins
+            import builtins
+            safe_builtins = [
+                'abs', 'all', 'any', 'bool', 'dict', 'enumerate', 'filter',
+                'float', 'int', 'len', 'list', 'map', 'max', 'min', 'pow',
+                'range', 'round', 'set', 'sorted', 'str', 'sum', 'tuple', 'zip',
+                'print',
+            ]
+            for name in safe_builtins:
+                if hasattr(builtins, name):
+                    namespace[name] = getattr(builtins, name)
+
+            exec(program, namespace)
+            answer = namespace.get('answer', None)
+            return True, answer, None
+
+        except Exception as e:
+            import traceback
+            return False, None, traceback.format_exc()
+
+    def run(self, input_data: Any, context: Optional[Dict] = None) -> TechniqueResult:
+        import time
+        start = time.time()
+        trace: List[Dict] = []
+
+        problem = input_data if isinstance(input_data, str) else str(input_data)
+
+        # Generate program
+        program = self._generate_program(problem)
+        trace.append({
+            "action": "generate_program",
+            "lines": len(program.split('\n')),
+        })
+
+        # Execute program
+        success, answer, error = self._execute_program(program)
+        trace.append({
+            "action": "execute",
+            "success": success,
+        })
+
+        return TechniqueResult(
+            success=success,
+            output={
+                "answer": answer,
+                "program": program,
+                "runtime": self.runtime,
+                "execution_success": success,
+                "error": error,
+            },
+            technique_id=self.TECHNIQUE_ID,
+            execution_time_ms=(time.time() - start) * 1000,
+            intermediate_steps=trace,
+            error=error if not success else None,
+        )
+
+
+# =============================================================================
 # EXPORTS
 # =============================================================================
 
 __all__ = [
-    # Data classes
+    # Enums
     "VariableType",
+    "ScratchpadFormat",
+    # Data classes
     "ExtractedVariable",
     "CodeBlock",
     "RLMResult",
+    "ScratchpadEntry",
     # Techniques
     "RLM",
     "SelfDebugging",
     "CodeAsPolicy",
     "ProgramSynthesis",
+    "ProgramOfThoughts",
+    "Scratchpad",
+    "PAL",
 ]

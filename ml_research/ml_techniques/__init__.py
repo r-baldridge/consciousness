@@ -556,6 +556,118 @@ TECHNIQUES: List[TechniqueIndex] = [
         },
         tags=["prompting", "in-context-learning"],
     ),
+    TechniqueIndex(
+        id="skeleton_of_thought",
+        name="Skeleton-of-Thought",
+        category=TechniqueCategory.PROMPTING,
+        description="""
+        Two-stage prompting that first generates a skeleton outline of the
+        answer, then expands each point in parallel. Enables faster response
+        generation through parallelization while maintaining coherent structure.
+
+        Process:
+            1. Generate skeleton (bullet points/outline)
+            2. Expand each point independently (parallelizable)
+            3. Combine expanded points into final answer
+
+        Paper: "Skeleton-of-Thought: Large Language Models Can Do Parallel
+               Decoding" (Ning et al., 2023)
+        """,
+        paper_url="https://arxiv.org/abs/2307.15337",
+        year=2023,
+        composable_with=["chain_of_thought", "self_consistency", "parallel"],
+        tags=["prompting", "parallelization", "efficiency", "skeleton"],
+    ),
+    TechniqueIndex(
+        id="chain_of_abstraction",
+        name="Chain-of-Abstraction",
+        category=TechniqueCategory.PROMPTING,
+        description="""
+        Prompts the model to first reason at an abstract level using
+        placeholders for concrete details, then grounds the abstract
+        reasoning with specific knowledge. Separates reasoning from
+        knowledge retrieval.
+
+        Process:
+            1. Generate abstract reasoning chain with placeholders
+            2. Fill in placeholders with concrete knowledge
+            3. Verify grounded reasoning
+
+        Paper: "Chain-of-Abstraction Reasoning for Multi-hop Question
+               Answering" (Sun et al., 2024)
+        """,
+        paper_url="https://arxiv.org/abs/2401.17464",
+        year=2024,
+        composable_with=["chain_of_thought", "rag", "verification"],
+        tags=["prompting", "reasoning", "abstraction", "multi-hop"],
+    ),
+    TechniqueIndex(
+        id="step_back_prompting",
+        name="Step-Back Prompting",
+        category=TechniqueCategory.PROMPTING,
+        description="""
+        Before answering a specific question, prompts the model to first
+        answer a more general "step-back" question about high-level
+        concepts or principles. Uses the abstracted understanding to
+        inform the specific answer.
+
+        Process:
+            1. Identify high-level concepts relevant to the question
+            2. Answer step-back question about principles
+            3. Use principles to guide specific answer
+
+        Paper: "Take a Step Back: Evoking Reasoning via Abstraction in
+               Large Language Models" (Zheng et al., 2023)
+        """,
+        paper_url="https://arxiv.org/abs/2310.06117",
+        year=2023,
+        composable_with=["chain_of_thought", "few_shot", "rag"],
+        tags=["prompting", "reasoning", "abstraction", "step-back"],
+    ),
+    TechniqueIndex(
+        id="analogical_prompting",
+        name="Analogical Prompting",
+        category=TechniqueCategory.PROMPTING,
+        description="""
+        Prompts the model to self-generate relevant examples and knowledge
+        before solving a problem, rather than relying on provided few-shot
+        examples. Leverages the model's ability to recall analogous problems.
+
+        Process:
+            1. Prompt model to recall similar problems it knows
+            2. Generate solutions for analogous problems
+            3. Apply analogical reasoning to target problem
+
+        Paper: "Large Language Models as Analogical Reasoners"
+               (Yasunaga et al., 2023)
+        """,
+        paper_url="https://arxiv.org/abs/2310.01714",
+        year=2023,
+        composable_with=["chain_of_thought", "few_shot", "self_consistency"],
+        tags=["prompting", "reasoning", "analogical", "self-generated-examples"],
+    ),
+    TechniqueIndex(
+        id="chain_of_symbol",
+        name="Chain-of-Symbol",
+        category=TechniqueCategory.PROMPTING,
+        description="""
+        Represents spatial and structural relationships using symbols
+        rather than natural language descriptions. Particularly effective
+        for spatial reasoning tasks where language can be ambiguous.
+
+        Process:
+            1. Convert spatial/structural information to symbolic form
+            2. Reason over symbolic representation
+            3. Convert back to natural language answer
+
+        Paper: "Chain-of-Symbol Prompting Elicits Planning in Large
+               Language Models" (Hu et al., 2023)
+        """,
+        paper_url="https://arxiv.org/abs/2305.10276",
+        year=2023,
+        composable_with=["chain_of_thought", "planning", "few_shot"],
+        tags=["prompting", "reasoning", "symbolic", "spatial"],
+    ),
 
     # =========================================================================
     # AGENTIC TECHNIQUES
@@ -673,6 +785,144 @@ TECHNIQUES: List[TechniqueIndex] = [
             "communication_protocol": {"type": "str"},
         },
         tags=["agentic", "multi-agent", "collaboration"],
+    ),
+    TechniqueIndex(
+        id="lats",
+        name="LATS (Language Agent Tree Search)",
+        category=TechniqueCategory.AGENTIC,
+        description="""
+        Combines LLM agents with Monte Carlo Tree Search (MCTS) for
+        deliberate planning. Uses the LLM as a value function, policy,
+        and world model within a tree search framework.
+
+        Components:
+            - Selection: UCB-based tree traversal
+            - Expansion: LLM generates candidate actions
+            - Evaluation: LLM evaluates states
+            - Backpropagation: Update value estimates
+
+        Paper: "Language Agent Tree Search Unifies Reasoning Acting
+               and Planning in Language Models" (Zhou et al., 2023)
+        """,
+        paper_url="https://arxiv.org/abs/2310.04406",
+        year=2023,
+        composable_with=["react", "tool_calling", "self_evaluation", "tree_of_thought"],
+        config_schema={
+            "num_simulations": {"type": "int", "default": 50},
+            "exploration_weight": {"type": "float", "default": 1.0},
+            "max_depth": {"type": "int", "default": 10},
+        },
+        tags=["agentic", "planning", "search", "mcts", "tree-search"],
+    ),
+    TechniqueIndex(
+        id="rewoo",
+        name="ReWOO (Reasoning WithOut Observation)",
+        category=TechniqueCategory.AGENTIC,
+        description="""
+        Decouples reasoning from observations by generating a complete
+        plan with anticipated tool calls upfront, then executing all
+        tools, and finally synthesizing results. Reduces token usage
+        compared to ReAct's interleaved approach.
+
+        Process:
+            1. Planner: Generate full plan with tool call placeholders
+            2. Worker: Execute all tool calls
+            3. Solver: Synthesize final answer from plan + results
+
+        Paper: "ReWOO: Decoupling Reasoning from Observations for
+               Efficient Augmented Language Models" (Xu et al., 2023)
+        """,
+        paper_url="https://arxiv.org/abs/2305.18323",
+        year=2023,
+        composable_with=["planning", "tool_calling", "chain_of_thought"],
+        config_schema={
+            "max_plan_steps": {"type": "int", "default": 10},
+            "parallel_execution": {"type": "bool", "default": True},
+        },
+        tags=["agentic", "planning", "efficiency", "tool-use"],
+    ),
+    TechniqueIndex(
+        id="inner_monologue",
+        name="Inner Monologue",
+        category=TechniqueCategory.AGENTIC,
+        description="""
+        Enables embodied agents to reason about feedback from the
+        environment through an internal dialogue. Processes success
+        detection, scene description, and human feedback to decide
+        next actions.
+
+        Feedback sources:
+            - Success detection (did the action work?)
+            - Scene description (what changed?)
+            - Human feedback (corrections/guidance)
+
+        Paper: "Inner Monologue: Embodied Reasoning through Planning
+               with Language Models" (Huang et al., 2022)
+        """,
+        paper_url="https://arxiv.org/abs/2207.05608",
+        year=2022,
+        composable_with=["react", "planning", "tool_calling", "reflexion"],
+        config_schema={
+            "feedback_types": {"type": "list", "items": "str"},
+            "retry_on_failure": {"type": "bool", "default": True},
+            "max_retries": {"type": "int", "default": 3},
+        },
+        tags=["agentic", "embodied", "feedback", "robotics"],
+    ),
+    TechniqueIndex(
+        id="toolformer",
+        name="Toolformer",
+        category=TechniqueCategory.AGENTIC,
+        description="""
+        Self-supervised approach for teaching LLMs to use tools.
+        The model learns to insert API calls into text and use
+        returned results to improve predictions.
+
+        Key insight: Model decides WHEN and HOW to use tools based
+        on whether tool use improves prediction quality.
+
+        Tools demonstrated:
+            - Calculator, Q&A, Search, Translation, Calendar
+
+        Paper: "Toolformer: Language Models Can Teach Themselves
+               to Use Tools" (Schick et al., 2023)
+        """,
+        paper_url="https://arxiv.org/abs/2302.04761",
+        year=2023,
+        composable_with=["tool_calling", "few_shot", "chain_of_thought"],
+        config_schema={
+            "tools": {"type": "list", "items": "tool_spec"},
+            "insertion_threshold": {"type": "float", "default": 0.5},
+        },
+        tags=["agentic", "tool-use", "self-supervised", "api"],
+    ),
+    TechniqueIndex(
+        id="critic",
+        name="CRITIC",
+        category=TechniqueCategory.AGENTIC,
+        description="""
+        Enables LLMs to self-correct by interacting with external
+        tools to verify and critique their own outputs. Uses tools
+        to gather evidence for self-verification.
+
+        Process:
+            1. Generate initial response
+            2. Use tools to verify claims/calculations
+            3. Critique response based on tool feedback
+            4. Generate corrected response
+
+        Paper: "CRITIC: Large Language Models Can Self-Correct with
+               Tool-Interactive Critiquing" (Gou et al., 2023)
+        """,
+        paper_url="https://arxiv.org/abs/2305.11738",
+        year=2023,
+        composable_with=["tool_calling", "self_evaluation", "chain_of_verification", "reflexion"],
+        config_schema={
+            "verification_tools": {"type": "list", "items": "tool_spec"},
+            "max_iterations": {"type": "int", "default": 3},
+            "critique_prompt": {"type": "str"},
+        },
+        tags=["agentic", "self-correction", "verification", "tool-use"],
     ),
 
     # =========================================================================
@@ -830,6 +1080,84 @@ TECHNIQUES: List[TechniqueIndex] = [
         composable_with=["tool_calling", "planning"],
         tags=["code", "policy", "actions", "robotics"],
     ),
+    TechniqueIndex(
+        id="program_of_thoughts",
+        name="Program-of-Thoughts (PoT)",
+        category=TechniqueCategory.CODE_SYNTHESIS,
+        description="""
+        Generates code (typically Python) to solve reasoning problems,
+        then executes the code to get the answer. Separates computation
+        from reasoning, delegating calculations to an interpreter.
+
+        Advantages over Chain-of-Thought:
+            - More accurate for numerical/symbolic computation
+            - Handles complex math without arithmetic errors
+            - Explicit, verifiable reasoning steps
+
+        Paper: "Program of Thoughts Prompting: Disentangling Computation
+               from Reasoning for Numerical Reasoning Tasks" (Chen et al., 2022)
+        """,
+        paper_url="https://arxiv.org/abs/2211.12588",
+        year=2022,
+        composable_with=["chain_of_thought", "self_debugging", "tool_calling"],
+        config_schema={
+            "language": {"type": "str", "default": "python"},
+            "execution_timeout": {"type": "int", "default": 30},
+            "safe_execution": {"type": "bool", "default": True},
+        },
+        tags=["code", "reasoning", "numerical", "program"],
+    ),
+    TechniqueIndex(
+        id="scratchpad",
+        name="Scratchpad",
+        category=TechniqueCategory.CODE_SYNTHESIS,
+        description="""
+        Provides an explicit scratchpad/workspace for the model to
+        perform intermediate computations during code generation or
+        reasoning. The scratchpad shows step-by-step execution state.
+
+        Applications:
+            - Tracing code execution step by step
+            - Multi-digit arithmetic
+            - Algorithm simulation
+            - State tracking in complex procedures
+
+        The scratchpad serves as external working memory, reducing
+        the cognitive load on the model's implicit reasoning.
+        """,
+        composable_with=["chain_of_thought", "program_of_thoughts", "self_debugging"],
+        config_schema={
+            "scratchpad_format": {"type": "str", "enum": ["structured", "freeform"]},
+            "max_steps": {"type": "int", "default": 50},
+        },
+        tags=["code", "reasoning", "working-memory", "execution-trace"],
+    ),
+    TechniqueIndex(
+        id="pal",
+        name="PAL (Program-Aided Language)",
+        category=TechniqueCategory.CODE_SYNTHESIS,
+        description="""
+        Uses the LLM to read natural language problems and generate
+        programs as reasoning steps, offloading computation to a
+        runtime like Python interpreter.
+
+        Key insight: LLMs are better at generating code than executing
+        arithmetic, so delegate computation to reliable interpreters.
+
+        Similar to PoT but emphasizes using programs to aid language
+        understanding rather than purely computational tasks.
+
+        Paper: "PAL: Program-aided Language Models" (Gao et al., 2022)
+        """,
+        paper_url="https://arxiv.org/abs/2211.10435",
+        year=2022,
+        composable_with=["chain_of_thought", "program_of_thoughts", "self_debugging"],
+        config_schema={
+            "runtime": {"type": "str", "default": "python"},
+            "include_comments": {"type": "bool", "default": True},
+        },
+        tags=["code", "reasoning", "program-aided", "mathematical"],
+    ),
 
     # =========================================================================
     # ORCHESTRATION TECHNIQUES
@@ -974,6 +1302,59 @@ TECHNIQUES: List[TechniqueIndex] = [
         composable_with=["multi_agent", "self_evaluation"],
         tags=["verification", "debate", "adversarial"],
     ),
+    TechniqueIndex(
+        id="self_refine",
+        name="Self-Refine",
+        category=TechniqueCategory.VERIFICATION,
+        description="""
+        Iterative refinement where the model generates output, provides
+        feedback on its own output, and refines based on that feedback.
+        Continues until quality threshold met or max iterations reached.
+
+        Process:
+            1. Generate initial output
+            2. Self-critique: identify issues and improvements
+            3. Refine output based on critique
+            4. Repeat until satisfactory
+
+        Paper: "Self-Refine: Iterative Refinement with Self-Feedback"
+               (Madaan et al., 2023)
+        """,
+        paper_url="https://arxiv.org/abs/2303.17651",
+        year=2023,
+        composable_with=["self_evaluation", "chain_of_thought", "reflexion"],
+        config_schema={
+            "max_iterations": {"type": "int", "default": 3},
+            "feedback_prompt": {"type": "str"},
+            "quality_threshold": {"type": "float", "default": 0.8},
+        },
+        tags=["verification", "self-improvement", "iterative", "refinement"],
+    ),
+    TechniqueIndex(
+        id="rci",
+        name="RCI (Recursive Criticism and Improvement)",
+        category=TechniqueCategory.VERIFICATION,
+        description="""
+        Recursively applies criticism and improvement cycles to refine
+        outputs. Each iteration identifies specific issues and generates
+        targeted improvements.
+
+        Process:
+            1. Generate initial response
+            2. Criticize: identify specific flaws
+            3. Improve: address each identified flaw
+            4. Recursively repeat on improved version
+
+        Differs from Self-Refine by emphasizing structured, recursive
+        application and explicit flaw identification.
+        """,
+        composable_with=["self_evaluation", "chain_of_thought", "self_refine"],
+        config_schema={
+            "max_depth": {"type": "int", "default": 3},
+            "criticism_categories": {"type": "list", "items": "str"},
+        },
+        tags=["verification", "criticism", "recursive", "improvement"],
+    ),
 
     # =========================================================================
     # OPTIMIZATION TECHNIQUES
@@ -1024,6 +1405,147 @@ TECHNIQUES: List[TechniqueIndex] = [
             "num_iterations": {"type": "int", "default": 50},
         },
         tags=["optimization", "prompts", "automatic"],
+    ),
+    TechniqueIndex(
+        id="opro",
+        name="OPRO (Optimization by PROmpting)",
+        category=TechniqueCategory.OPTIMIZATION,
+        description="""
+        Uses LLMs as optimizers by describing the optimization problem
+        in natural language. The LLM iteratively generates new solutions
+        based on previously evaluated solutions and their scores.
+
+        Process:
+            1. Describe optimization objective in prompt
+            2. Show previously tried solutions with scores
+            3. LLM generates new candidate solutions
+            4. Evaluate and add to history
+            5. Repeat
+
+        Paper: "Large Language Models as Optimizers" (Yang et al., 2023)
+        """,
+        paper_url="https://arxiv.org/abs/2309.03409",
+        year=2023,
+        composable_with=["automatic_prompt_engineering", "few_shot"],
+        config_schema={
+            "max_iterations": {"type": "int", "default": 100},
+            "population_size": {"type": "int", "default": 20},
+            "meta_prompt": {"type": "str"},
+        },
+        tags=["optimization", "meta-optimization", "prompt-optimization"],
+    ),
+    TechniqueIndex(
+        id="meta_prompting",
+        name="Meta-Prompting",
+        category=TechniqueCategory.OPTIMIZATION,
+        description="""
+        A scaffolding technique where a meta-model orchestrates multiple
+        independent LLM queries, each handled by specialized "expert"
+        instances. The meta-model coordinates, synthesizes, and verifies
+        outputs from experts.
+
+        Components:
+            - Meta-model: Coordinates task decomposition and synthesis
+            - Expert models: Specialized instances for subtasks
+            - Verification: Cross-checks expert outputs
+
+        Paper: "Meta-Prompting: Enhancing Language Models with
+               Task-Agnostic Scaffolding" (Suzgun & Kalai, 2024)
+        """,
+        paper_url="https://arxiv.org/abs/2401.12954",
+        year=2024,
+        composable_with=["multi_agent", "task_routing", "verification"],
+        config_schema={
+            "expert_types": {"type": "list", "items": "str"},
+            "coordination_strategy": {"type": "str", "enum": ["sequential", "parallel"]},
+        },
+        tags=["optimization", "meta", "scaffolding", "orchestration"],
+    ),
+    TechniqueIndex(
+        id="active_prompting",
+        name="Active Prompting",
+        category=TechniqueCategory.OPTIMIZATION,
+        description="""
+        Selects the most informative examples for few-shot prompting
+        using uncertainty-based active learning. Identifies questions
+        where the model is most uncertain and annotates those first.
+
+        Process:
+            1. Generate multiple answers per question (with CoT)
+            2. Compute uncertainty (disagreement among answers)
+            3. Select most uncertain examples for annotation
+            4. Use annotated examples for few-shot prompting
+
+        Paper: "Active Prompting with Chain-of-Thought for Large
+               Language Models" (Diao et al., 2023)
+        """,
+        paper_url="https://arxiv.org/abs/2302.12246",
+        year=2023,
+        composable_with=["few_shot", "chain_of_thought", "self_consistency"],
+        config_schema={
+            "num_samples": {"type": "int", "default": 5},
+            "selection_size": {"type": "int", "default": 8},
+            "uncertainty_metric": {"type": "str", "enum": ["disagreement", "entropy"]},
+        },
+        tags=["optimization", "active-learning", "example-selection", "few-shot"],
+    ),
+    TechniqueIndex(
+        id="promptbreeder",
+        name="PromptBreeder",
+        category=TechniqueCategory.OPTIMIZATION,
+        description="""
+        Self-referential self-improvement system that evolves both
+        task prompts AND the mutation prompts used to generate new
+        prompts. Uses evolutionary algorithms for prompt optimization.
+
+        Key innovation: Mutates mutation operators themselves,
+        enabling open-ended prompt evolution.
+
+        Components:
+            - Task prompts: Prompts for the actual task
+            - Mutation prompts: Prompts that generate new task prompts
+            - Fitness evaluation: Task performance metric
+
+        Paper: "PromptBreeder: Self-Referential Self-Improvement via
+               Prompt Evolution" (Fernando et al., 2023)
+        """,
+        paper_url="https://arxiv.org/abs/2309.16797",
+        year=2023,
+        composable_with=["automatic_prompt_engineering", "few_shot", "evoprompt"],
+        config_schema={
+            "population_size": {"type": "int", "default": 50},
+            "generations": {"type": "int", "default": 20},
+            "mutation_types": {"type": "list", "items": "str"},
+        },
+        tags=["optimization", "evolutionary", "self-referential", "meta-evolution"],
+    ),
+    TechniqueIndex(
+        id="evoprompt",
+        name="EvoPrompt",
+        category=TechniqueCategory.OPTIMIZATION,
+        description="""
+        Applies evolutionary algorithms (genetic algorithms, differential
+        evolution) to discrete prompt optimization. Treats prompts as
+        individuals in a population that evolve over generations.
+
+        Evolutionary operators:
+            - Selection: Tournament or fitness-proportional
+            - Crossover: Combine parts of different prompts
+            - Mutation: LLM-based prompt modification
+
+        Paper: "Connecting Large Language Models with Evolutionary
+               Algorithms Yields Powerful Prompt Optimizers" (Guo et al., 2023)
+        """,
+        paper_url="https://arxiv.org/abs/2309.08532",
+        year=2023,
+        composable_with=["automatic_prompt_engineering", "promptbreeder", "few_shot"],
+        config_schema={
+            "algorithm": {"type": "str", "enum": ["ga", "de"]},
+            "population_size": {"type": "int", "default": 30},
+            "generations": {"type": "int", "default": 10},
+            "mutation_rate": {"type": "float", "default": 0.1},
+        },
+        tags=["optimization", "evolutionary", "genetic-algorithm", "prompt-optimization"],
     ),
 ]
 
