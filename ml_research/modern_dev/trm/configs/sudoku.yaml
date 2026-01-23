@@ -1,0 +1,48 @@
+# TRM Configuration for Sudoku
+# Optimized for 9x9 Sudoku solving
+# Expected accuracy: 87.4% on Sudoku-Extreme (5M params)
+
+# Task Configuration
+task:
+  name: sudoku
+  grid_size: 9
+  vocab_size: 10       # 0-9 digits
+  max_seq_len: 81      # 9x9 grid
+
+# Model Architecture
+model:
+  embed_dim: 512
+  n_layers: 2
+  n_heads: 8
+  mlp_ratio: 4.0
+  dropout: 0.0
+  use_attention: false  # MLP-only better for small grids
+  use_rotary: false
+  use_swiglu: true
+  use_stable_max: true
+
+# Recursion Parameters
+recursion:
+  T_cycles: 3
+  n_cycles: 6
+  max_supervision_steps: 16
+
+# Training
+training:
+  learning_rate: 1.0e-4
+  warmup_steps: 1000
+  weight_decay: 0.01
+  max_epochs: 100
+  batch_size: 64
+  gradient_clip: 1.0
+  ema_decay: 0.999
+
+# Data Augmentation (1000x augmentation as per paper)
+augmentation:
+  enable: true
+  digit_permutation: true
+  rotation: true
+  reflection: true
+  row_swap: true
+  col_swap: true
+  block_swap: true

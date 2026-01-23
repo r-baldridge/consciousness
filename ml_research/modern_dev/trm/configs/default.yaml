@@ -1,0 +1,42 @@
+# TRM Default Configuration
+# Tiny Recursive Model - Samsung SAIT Montreal
+# Paper: https://arxiv.org/abs/2510.04871
+
+# Model Architecture
+model:
+  embed_dim: 512
+  n_layers: 2          # More layers DECREASE generalization
+  n_heads: 8
+  mlp_ratio: 4.0
+  dropout: 0.0
+  use_attention: true
+  use_rotary: true
+  use_swiglu: true
+  use_stable_max: true
+
+# Recursion Parameters
+recursion:
+  T_cycles: 3          # High-level cycles
+  n_cycles: 6          # Low-level cycles per T
+  max_supervision_steps: 16
+
+# Training
+training:
+  learning_rate: 1.0e-4
+  warmup_steps: 1000
+  weight_decay: 0.01
+  max_epochs: 100
+  batch_size: 32
+  gradient_clip: 1.0
+  ema_decay: 0.999
+
+# Inference
+inference:
+  q_threshold: 0.0     # Halt when q_hat > threshold
+  max_steps: 16
+
+# Logging
+logging:
+  log_interval: 100
+  eval_interval: 1000
+  save_interval: 5000

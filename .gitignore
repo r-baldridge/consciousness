@@ -60,3 +60,4 @@ FORMS_31-40_EXPANSION_PLAN.md
 
 # PII patterns (contains personal identifiers)
 .pii-patterns
+logs/

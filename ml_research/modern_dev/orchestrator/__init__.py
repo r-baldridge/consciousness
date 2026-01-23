@@ -282,6 +282,15 @@ ARCHITECTURE_CAPABILITIES = {
         "context_length": 2000000,
         "memory_gb": 24.0,
     },
+    "trm": {
+        "tasks": [
+            TaskType.REASONING,
+            TaskType.PLANNING,
+        ],
+        "strengths": ["recursive reasoning", "tiny network", "puzzle solving", "ARC-AGI"],
+        "context_length": 900,  # Max grid 30x30
+        "memory_gb": 0.5,  # Only 7M parameters
+    },
 }
 
 
@@ -299,6 +308,7 @@ ARCHITECTURE_MODULE_PATHS = {
     "flow_matching": "consciousness.ml_research.modern_dev.flow_matching.src.model",
     "consistency_models": "consciousness.ml_research.modern_dev.consistency_models.src.model",
     "titans": "consciousness.ml_research.modern_dev.titans.src.model",
+    "trm": "consciousness.ml_research.modern_dev.trm.src.model",
 }
 
 # Architecture class name registry - maps architecture IDs to their main model class names
@@ -315,6 +325,7 @@ ARCHITECTURE_CLASS_NAMES = {
     "flow_matching": "FlowMatching",
     "consistency_models": "ConsistencyModel",
     "titans": "Titans",
+    "trm": "TRM",
 }
 
 # Config class name registry - maps architecture IDs to their config class names
@@ -331,6 +342,7 @@ ARCHITECTURE_CONFIG_NAMES = {
     "flow_matching": "FlowMatchingConfig",
     "consistency_models": "ConsistencyModelConfig",
     "titans": "TitansConfig",
+    "trm": "TRMConfig",
 }
 
 

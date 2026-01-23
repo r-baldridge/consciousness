@@ -1,0 +1,74 @@
+# TRM Code Repair - Environment Configuration
+# Copy this file to .env and fill in your values
+# NEVER commit .env to version control
+
+# =============================================================================
+# REQUIRED: Core API Keys
+# =============================================================================
+
+# GitHub Personal Access Token
+# Generate at: https://github.com/settings/tokens
+# Required scopes: repo, read:org, read:user
+GITHUB_TOKEN=ghp_YOUR_TOKEN_HERE
+
+# Stack Exchange API Key (optional but recommended)
+# Register at: https://stackapps.com/apps/oauth/register
+STACKEXCHANGE_API_KEY=
+
+# =============================================================================
+# REQUIRED: Cloud Provider (choose one)
+# =============================================================================
+
+# AWS Credentials
+# Create IAM user with EC2, S3, ECR permissions
+AWS_ACCESS_KEY_ID=
+AWS_SECRET_ACCESS_KEY=
+AWS_DEFAULT_REGION=us-west-2
+S3_BUCKET=trm-code-repair-data
+
+# GCP Credentials (alternative to AWS)
+# Download service account JSON from GCP Console
+# GOOGLE_APPLICATION_CREDENTIALS=/path/to/service-account.json
+# GCP_PROJECT_ID=
+
+# =============================================================================
+# RECOMMENDED: Experiment Tracking
+# =============================================================================
+
+# Weights & Biases
+# Get key at: https://wandb.ai/settings
+WANDB_API_KEY=
+WANDB_PROJECT=trm-code-repair
+WANDB_ENTITY=
+
+# =============================================================================
+# OPTIONAL: Model Hosting
+# =============================================================================
+
+# HuggingFace Hub
+# Get token at: https://huggingface.co/settings/tokens
+HF_TOKEN=
+
+# =============================================================================
+# LOCAL: Development Settings
+# =============================================================================
+
+# Database (for metadata tracking)
+DATABASE_URL=postgresql://trm:devpassword@localhost:5432/trm
+
+# Data paths
+DATA_DIR=/path/to/data
+CACHE_DIR=/path/to/cache
+
+# Logging
+LOG_LEVEL=INFO
+
+# =============================================================================
+# OPTIONAL: Additional Services
+# =============================================================================
+
+# Docker Registry (for deployment)
+DOCKER_REGISTRY=
+
+# Slack Webhook (for notifications)
+SLACK_WEBHOOK_URL=

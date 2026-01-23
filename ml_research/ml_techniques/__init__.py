@@ -1547,6 +1547,53 @@ TECHNIQUES: List[TechniqueIndex] = [
         },
         tags=["optimization", "evolutionary", "genetic-algorithm", "prompt-optimization"],
     ),
+
+    # =========================================================================
+    # MODEL-BASED REASONING TECHNIQUES
+    # =========================================================================
+    TechniqueIndex(
+        id="tiny_recursive_model",
+        name="Tiny Recursive Model (TRM)",
+        category=TechniqueCategory.DECOMPOSITION,
+        description="""
+        A recursive reasoning approach using a single tiny network (7M params)
+        that achieves significantly higher generalization than larger models
+        on reasoning tasks like ARC-AGI, Sudoku, and maze solving.
+
+        Key innovations:
+            - Recursion substitutes for depth (2-layer network, 42+ effective depth)
+            - Deep supervision through ALL recursive steps (full backprop)
+            - Dual semantic states: y (solution), z (reasoning/chain-of-thought)
+            - Halting mechanism via Q-head prediction
+
+        Recursion structure:
+            For t in 1..T:
+                For i in 1..n:
+                    z <- net(x, y, z)    # Latent reasoning update
+                y <- net(y, z)           # Solution update
+
+        Benchmarks:
+            - ARC-AGI-1: 45% (beats o3-mini ~30%, Gemini 2.5 Pro ~25%)
+            - Sudoku-Extreme: 87.4% (DeepSeek-R1: 0%)
+            - Maze-Hard: 85.3%
+
+        Paper: "Less is More: Recursive Reasoning with Tiny Networks"
+               (Jolicoeur-Martineau, Samsung SAIT Montreal, 2025)
+        """,
+        paper_url="https://arxiv.org/abs/2510.04871",
+        year=2025,
+        authors=["Alexia Jolicoeur-Martineau"],
+        composable_with=["recursive_decomposition", "self_evaluation", "verification"],
+        config_schema={
+            "T_cycles": {"type": "int", "default": 3, "description": "High-level recursion cycles"},
+            "n_cycles": {"type": "int", "default": 6, "description": "Low-level cycles per T"},
+            "max_supervision_steps": {"type": "int", "default": 16},
+            "use_attention": {"type": "bool", "default": True},
+            "grid_size": {"type": "int", "default": 30},
+            "q_threshold": {"type": "float", "default": 0.0, "description": "Halting threshold"},
+        },
+        tags=["recursive", "reasoning", "puzzle-solving", "arc-agi", "tiny-model", "deep-supervision"],
+    ),
 ]
 
 # Create lookup dictionaries

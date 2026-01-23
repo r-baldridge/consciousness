@@ -1,0 +1,47 @@
+# TRM Configuration for ARC-AGI
+# Optimized for ARC-AGI reasoning tasks
+# Expected accuracy: 45% on ARC-AGI-1, 8% on ARC-AGI-2 (7M params)
+
+# Task Configuration
+task:
+  name: arc_agi
+  grid_size: 30        # Max grid size
+  vocab_size: 11       # 0-9 colors + background
+  max_seq_len: 900     # 30x30 grid
+
+# Model Architecture
+model:
+  embed_dim: 512
+  n_layers: 2
+  n_heads: 8
+  mlp_ratio: 4.0
+  dropout: 0.0
+  use_attention: true  # Attention needed for larger grids
+  use_rotary: true
+  use_swiglu: true
+  use_stable_max: true
+
+# Recursion Parameters
+recursion:
+  T_cycles: 3
+  n_cycles: 6
+  max_supervision_steps: 16
+
+# Training
+training:
+  learning_rate: 1.0e-4
+  warmup_steps: 2000
+  weight_decay: 0.01
+  max_epochs: 200
+  batch_size: 16       # Smaller batch for larger grids
+  gradient_clip: 1.0
+  ema_decay: 0.999
+
+# Data Augmentation (heavy augmentation as per paper)
+augmentation:
+  enable: true
+  color_permutation: true
+  rotation: true
+  reflection: true
+  translation: true
+  scaling: false       # Optional

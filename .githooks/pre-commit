@@ -155,12 +155,14 @@ check_git_author() {
     local author_name=$(git config user.name)
     local author_email=$(git config user.email)
 
-    # Check if using noreply email
-    if [[ ! "$author_email" =~ noreply ]]; then
-        echo -e "${YELLOW}⚠ Git email does not use noreply format: $author_email${NC}"
-        echo "  Consider using: git config user.email 'username@users.noreply.github.com'"
-        WARNINGS=$((WARNINGS + 1))
+    # Check if using noreply email - if so, skip pattern checks (already anonymized)
+    if [[ "$author_email" =~ noreply ]]; then
+        return 0
     fi
+
+    echo -e "${YELLOW}⚠ Git email does not use noreply format: $author_email${NC}"
+    echo "  Consider using: git config user.email 'username@users.noreply.github.com'"
+    WARNINGS=$((WARNINGS + 1))
 
     # Check against custom patterns
     if [ -f ".pii-patterns" ]; then
