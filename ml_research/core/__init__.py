@@ -77,6 +77,19 @@ from .benchmark_tracker import (
     BenchmarkTracker,
 )
 
+# Unified Index (cross-references all components)
+from .unified_index import (
+    UnifiedIndex,
+    ComponentType,
+    CrossReference,
+    UnifiedEntry,
+    get_modern_implementations,
+    get_compatible_techniques,
+    get_architectures_for_technique,
+    is_compatible,
+    trace_lineage,
+)
+
 __all__ = [
     # Taxonomy
     "MethodEra",
@@ -99,6 +112,16 @@ __all__ = [
     "PaperIndex",
     # Benchmark Tracker
     "BenchmarkTracker",
+    # Unified Index
+    "UnifiedIndex",
+    "ComponentType",
+    "CrossReference",
+    "UnifiedEntry",
+    "get_modern_implementations",
+    "get_compatible_techniques",
+    "get_architectures_for_technique",
+    "is_compatible",
+    "trace_lineage",
 ]
 
 __version__ = "0.1.0"
