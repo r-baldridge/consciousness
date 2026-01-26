@@ -9,6 +9,13 @@ This module implements the layer components for TRM:
 - GridEmbedding: 2D positional embedding for grid tasks
 - MLPSequence: MLP-only variant for small grids
 
+Code Repair Extensions (64x48 grid):
+- GridPositionalEncoding: 2D learned positional encodings for rectangular grids
+- GridAttention: 2D attention with relative position encoding
+- RecursiveBlock: Weight-shared recursive transformer block
+- FeedForward: SwiGLU feed-forward network
+- IterationController: Early stopping based on confidence threshold
+
 Reference:
     "Less is More: Recursive Reasoning with Tiny Networks"
     https://arxiv.org/abs/2510.04871
@@ -570,3 +577,394 @@ class DeepRecursion(nn.Module):
         y = self._update_y(y, z)
 
         return y, z
+
+
+# =============================================================================
+# Code Repair Extensions (64x48 Grid Architecture)
+# =============================================================================
+
+
+class GridPositionalEncoding(nn.Module):
+    """2D learned positional encodings for rectangular grids.
+
+    Supports arbitrary grid dimensions (e.g., 64x48 for code repair).
+    Uses separate row and column embeddings that are added together.
+    """
+
+    def __init__(
+        self,
+        embed_dim: int,
+        max_height: int = 64,
+        max_width: int = 48,
+        dropout: float = 0.0,
+    ):
+        super().__init__()
+        self.embed_dim = embed_dim
+        self.max_height = max_height
+        self.max_width = max_width
+
+        # Learned row and column embeddings
+        self.row_embed = nn.Embedding(max_height, embed_dim)
+        self.col_embed = nn.Embedding(max_width, embed_dim)
+        self.dropout = nn.Dropout(dropout)
+
+        # Initialize
+        nn.init.normal_(self.row_embed.weight, std=0.02)
+        nn.init.normal_(self.col_embed.weight, std=0.02)
+
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        """
+        Generate positional encodings for grid input.
+
+        Args:
+            x: Input tensor of shape (batch, height, width) or (batch, height, width, embed_dim)
+
+        Returns:
+            Positional encoding of shape (batch, height, width, embed_dim)
+        """
+        if x.dim() == 3:
+            batch_size, height, width = x.shape
+        else:
+            batch_size, height, width, _ = x.shape
+
+        device = x.device
+
+        # Create position indices
+        row_pos = torch.arange(height, device=device)
+        col_pos = torch.arange(width, device=device)
+
+        # Get embeddings
+        row_emb = self.row_embed(row_pos)  # (height, embed_dim)
+        col_emb = self.col_embed(col_pos)  # (width, embed_dim)
+
+        # Broadcast and add: (height, 1, dim) + (1, width, dim) -> (height, width, dim)
+        pos_encoding = row_emb.unsqueeze(1) + col_emb.unsqueeze(0)
+
+        # Expand for batch
+        pos_encoding = pos_encoding.unsqueeze(0).expand(batch_size, -1, -1, -1)
+
+        return self.dropout(pos_encoding)
+
+
+class FeedForward(nn.Module):
+    """Feed-forward network with SwiGLU activation.
+
+    Implements: FFN(x) = W2 * (SiLU(W1 * x) * W3 * x)
+    """
+
+    def __init__(
+        self,
+        embed_dim: int,
+        hidden_dim: Optional[int] = None,
+        dropout: float = 0.0,
+        use_swiglu: bool = True,
+    ):
+        super().__init__()
+        hidden_dim = hidden_dim or int(embed_dim * 4)
+        self.use_swiglu = use_swiglu
+
+        if use_swiglu:
+            self.w1 = nn.Linear(embed_dim, hidden_dim, bias=False)
+            self.w2 = nn.Linear(hidden_dim, embed_dim, bias=False)
+            self.w3 = nn.Linear(embed_dim, hidden_dim, bias=False)
+        else:
+            self.net = nn.Sequential(
+                nn.Linear(embed_dim, hidden_dim),
+                nn.GELU(),
+                nn.Dropout(dropout),
+                nn.Linear(hidden_dim, embed_dim),
+                nn.Dropout(dropout),
+            )
+        self.dropout = nn.Dropout(dropout)
+
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        if self.use_swiglu:
+            return self.dropout(self.w2(F.silu(self.w1(x)) * self.w3(x)))
+        return self.net(x)
+
+
+class GridAttention(nn.Module):
+    """2D attention that operates over rectangular grids.
+
+    Flattens the grid to a sequence for attention computation,
+    using relative position encoding for grid structure awareness.
+    Supports causal masking for autoregressive generation.
+    """
+
+    def __init__(
+        self,
+        embed_dim: int,
+        n_heads: int = 8,
+        dropout: float = 0.0,
+        max_height: int = 64,
+        max_width: int = 48,
+        use_relative_pos: bool = True,
+    ):
+        super().__init__()
+        self.embed_dim = embed_dim
+        self.n_heads = n_heads
+        self.head_dim = embed_dim // n_heads
+        self.scale = self.head_dim ** -0.5
+        self.use_relative_pos = use_relative_pos
+        self.max_height = max_height
+        self.max_width = max_width
+
+        assert embed_dim % n_heads == 0, "embed_dim must be divisible by n_heads"
+
+        # QKV projection
+        self.qkv = nn.Linear(embed_dim, 3 * embed_dim, bias=False)
+        self.out_proj = nn.Linear(embed_dim, embed_dim, bias=False)
+        self.dropout = nn.Dropout(dropout)
+
+        # Relative position bias (2D)
+        if use_relative_pos:
+            # Range: [-(max_height-1), max_height-1] and [-(max_width-1), max_width-1]
+            self.rel_row_bias = nn.Embedding(2 * max_height - 1, n_heads)
+            self.rel_col_bias = nn.Embedding(2 * max_width - 1, n_heads)
+            nn.init.normal_(self.rel_row_bias.weight, std=0.02)
+            nn.init.normal_(self.rel_col_bias.weight, std=0.02)
+
+    def _compute_relative_position_bias(
+        self,
+        height: int,
+        width: int,
+        device: torch.device
+    ) -> torch.Tensor:
+        """Compute 2D relative position bias for attention."""
+        # Create position indices for rows and columns
+        seq_len = height * width
+
+        # Row and column indices for each position
+        row_idx = torch.arange(height, device=device).unsqueeze(1).expand(-1, width).reshape(-1)
+        col_idx = torch.arange(width, device=device).unsqueeze(0).expand(height, -1).reshape(-1)
+
+        # Relative positions: (seq_len, seq_len)
+        rel_row = row_idx.unsqueeze(1) - row_idx.unsqueeze(0)  # (seq_len, seq_len)
+        rel_col = col_idx.unsqueeze(1) - col_idx.unsqueeze(0)  # (seq_len, seq_len)
+
+        # Shift to non-negative indices
+        rel_row = rel_row + self.max_height - 1
+        rel_col = rel_col + self.max_width - 1
+
+        # Clamp to valid range
+        rel_row = rel_row.clamp(0, 2 * self.max_height - 2)
+        rel_col = rel_col.clamp(0, 2 * self.max_width - 2)
+
+        # Get bias values: (seq_len, seq_len, n_heads)
+        row_bias = self.rel_row_bias(rel_row)
+        col_bias = self.rel_col_bias(rel_col)
+
+        # Combine and transpose to (n_heads, seq_len, seq_len)
+        bias = (row_bias + col_bias).permute(2, 0, 1)
+
+        return bias
+
+    def forward(
+        self,
+        x: torch.Tensor,
+        mask: Optional[torch.Tensor] = None,
+        causal: bool = False,
+    ) -> torch.Tensor:
+        """
+        Forward pass with grid-aware attention.
+
+        Args:
+            x: Input tensor of shape (batch, height, width, embed_dim)
+            mask: Optional attention mask (batch, height, width)
+            causal: Whether to use causal masking
+
+        Returns:
+            Output tensor of shape (batch, height, width, embed_dim)
+        """
+        batch_size, height, width, _ = x.shape
+        seq_len = height * width
+
+        # Flatten spatial dimensions: (batch, seq_len, embed_dim)
+        x_flat = x.view(batch_size, seq_len, self.embed_dim)
+
+        # QKV projection
+        qkv = self.qkv(x_flat)
+        qkv = qkv.reshape(batch_size, seq_len, 3, self.n_heads, self.head_dim)
+        qkv = qkv.permute(2, 0, 3, 1, 4)  # (3, batch, heads, seq, head_dim)
+        q, k, v = qkv[0], qkv[1], qkv[2]
+
+        # Attention scores
+        attn = torch.matmul(q, k.transpose(-2, -1)) * self.scale
+
+        # Add relative position bias
+        if self.use_relative_pos:
+            rel_bias = self._compute_relative_position_bias(height, width, x.device)
+            attn = attn + rel_bias.unsqueeze(0)  # (1, heads, seq, seq)
+
+        # Apply mask if provided
+        if mask is not None:
+            # Flatten mask: (batch, seq_len)
+            mask_flat = mask.view(batch_size, seq_len)
+            # Expand for attention: (batch, 1, 1, seq_len)
+            mask_expanded = mask_flat.unsqueeze(1).unsqueeze(2)
+            attn = attn.masked_fill(mask_expanded == 0, float('-inf'))
+
+        # Causal mask
+        if causal:
+            causal_mask = torch.triu(
+                torch.ones(seq_len, seq_len, device=x.device, dtype=torch.bool),
+                diagonal=1
+            )
+            attn = attn.masked_fill(causal_mask, float('-inf'))
+
+        # Softmax and dropout
+        attn = F.softmax(attn, dim=-1)
+        attn = self.dropout(attn)
+
+        # Apply attention to values
+        out = torch.matmul(attn, v)  # (batch, heads, seq, head_dim)
+
+        # Reshape back
+        out = out.transpose(1, 2).contiguous().view(batch_size, seq_len, self.embed_dim)
+        out = self.out_proj(out)
+
+        # Restore grid shape
+        out = out.view(batch_size, height, width, self.embed_dim)
+
+        return out
+
+
+class RecursiveBlock(nn.Module):
+    """Single recursive transformer block with weight sharing.
+
+    Architecture: LayerNorm -> Attention -> Residual -> LayerNorm -> FFN -> Residual
+    """
+
+    def __init__(
+        self,
+        embed_dim: int,
+        n_heads: int = 8,
+        ffn_dim: Optional[int] = None,
+        dropout: float = 0.0,
+        max_height: int = 64,
+        max_width: int = 48,
+        use_swiglu: bool = True,
+    ):
+        super().__init__()
+        ffn_dim = ffn_dim or int(embed_dim * 4)
+
+        self.norm1 = RMSNorm(embed_dim)
+        self.attn = GridAttention(
+            embed_dim=embed_dim,
+            n_heads=n_heads,
+            dropout=dropout,
+            max_height=max_height,
+            max_width=max_width,
+        )
+        self.norm2 = RMSNorm(embed_dim)
+        self.ffn = FeedForward(
+            embed_dim=embed_dim,
+            hidden_dim=ffn_dim,
+            dropout=dropout,
+            use_swiglu=use_swiglu,
+        )
+
+    def forward(
+        self,
+        x: torch.Tensor,
+        mask: Optional[torch.Tensor] = None,
+        causal: bool = False,
+    ) -> torch.Tensor:
+        """
+        Forward pass through recursive block.
+
+        Args:
+            x: Input tensor (batch, height, width, embed_dim)
+            mask: Optional attention mask
+            causal: Whether to use causal masking
+
+        Returns:
+            Output tensor (batch, height, width, embed_dim)
+        """
+        # Attention with residual
+        x = x + self.attn(self.norm1(x), mask, causal)
+        # FFN with residual
+        x = x + self.ffn(self.norm2(x))
+        return x
+
+
+class IterationController:
+    """Controller for early stopping based on confidence threshold.
+
+    Monitors hidden state to determine when the model is confident
+    enough in its predictions to stop iterating.
+    """
+
+    def __init__(
+        self,
+        q_threshold: float = 0.95,
+        min_iterations: int = 2,
+        max_iterations: int = 8,
+    ):
+        self.q_threshold = q_threshold
+        self.min_iterations = min_iterations
+        self.max_iterations = max_iterations
+
+    def _compute_confidence(self, hidden: torch.Tensor) -> torch.Tensor:
+        """
+        Compute confidence score from hidden state.
+
+        Uses inverse of normalized variance as a confidence measure.
+        Low variance = high confidence (model is settled on a solution).
+
+        Args:
+            hidden: Hidden state (batch, height, width, embed_dim)
+
+        Returns:
+            Confidence scores (batch,)
+        """
+        # Flatten spatial dimensions
+        batch_size = hidden.shape[0]
+        hidden_flat = hidden.view(batch_size, -1, hidden.shape[-1])
+
+        # Compute variance across spatial positions
+        variance = hidden_flat.var(dim=1).mean(dim=-1)  # (batch,)
+
+        # Convert to confidence (lower variance = higher confidence)
+        # Use sigmoid to normalize to [0, 1]
+        confidence = torch.sigmoid(-torch.log(variance + 1e-8) - 2.0)
+
+        return confidence
+
+    def should_stop(
+        self,
+        hidden: torch.Tensor,
+        iteration: int,
+        q_hat: Optional[torch.Tensor] = None,
+    ) -> Tuple[bool, torch.Tensor]:
+        """
+        Determine whether to stop iteration.
+
+        Args:
+            hidden: Current hidden state
+            iteration: Current iteration number (0-indexed)
+            q_hat: Optional explicit confidence from Q-head
+
+        Returns:
+            Tuple of (should_stop, confidence)
+        """
+        if iteration < self.min_iterations - 1:
+            # Always do minimum iterations
+            confidence = self._compute_confidence(hidden)
+            return False, confidence
+
+        if iteration >= self.max_iterations - 1:
+            # Always stop at max
+            confidence = self._compute_confidence(hidden) if q_hat is None else q_hat
+            return True, confidence
+
+        # Use provided q_hat or compute from hidden state
+        if q_hat is not None:
+            confidence = torch.sigmoid(q_hat)
+        else:
+            confidence = self._compute_confidence(hidden)
+
+        # Stop if all samples exceed threshold
+        should_stop = (confidence > self.q_threshold).all().item()
+
+        return should_stop, confidence

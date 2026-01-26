@@ -1,0 +1,45 @@
+# Code Repair Pipeline Configuration
+# INTEG-002: End-to-End Pipeline
+
+# Pipeline-level settings
+pipeline:
+  model_preset: base
+  max_context_length: 4096
+  max_repair_attempts: 3
+  use_mamba_context: true
+  use_rlm_decomposition: true
+  device: auto
+  timeout_seconds: 30.0
+  validate_output: true
+  language: python
+  include_explanation: true
+  log_level: INFO
+
+# Mamba configuration (long-context understanding)
+mamba:
+  d_model: 768
+  n_layers: 24
+  d_state: 16
+  d_conv: 4
+  expand: 2
+  max_context_length: 100000
+  use_cache: true
+  dtype: float32
+
+# TRM configuration (iterative refinement)
+trm:
+  grid_height: 64
+  grid_width: 48
+  d_model: 256
+  n_heads: 8
+  max_iterations: 8
+  early_stop_threshold: 0.95
+  use_halting: true
+
+# RLM configuration (task decomposition)
+rlm:
+  max_generation_attempts: 3
+  max_debug_attempts: 5
+  use_templates: true
+  enable_type_inference: true
+  variable_extraction_mode: hybrid

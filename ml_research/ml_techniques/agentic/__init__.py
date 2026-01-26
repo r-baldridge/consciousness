@@ -48,6 +48,7 @@ Tools are defined as:
 from dataclasses import dataclass, field
 from typing import Any, Callable, Dict, List, Optional, Tuple, Union, TYPE_CHECKING
 from enum import Enum
+import time
 from abc import abstractmethod
 
 from .. import TechniqueBase, TechniqueResult, TechniqueConfig, TechniqueCategory
@@ -817,6 +818,38 @@ class Reflexion(TechniqueBase):
 # MULTI-AGENT
 # =============================================================================
 
+class CoordinationPattern(Enum):
+    """Coordination patterns for multi-agent systems."""
+    DEBATE = "debate"           # Agents argue positions, judge decides
+    DIVISION = "division"       # Coordinator splits work among specialists
+    HIERARCHICAL = "hierarchical"  # Manager directs workers
+    PEER_REVIEW = "peer_review"    # Agents review each other's work
+
+
+class MessageType(Enum):
+    """Types of messages in multi-agent communication."""
+    PROPOSAL = "proposal"       # Initial proposal/answer
+    CRITIQUE = "critique"       # Criticism of proposal
+    REBUTTAL = "rebuttal"       # Response to critique
+    JUDGMENT = "judgment"       # Final decision
+    TASK = "task"               # Task assignment
+    RESULT = "result"           # Task result
+    REVIEW = "review"           # Peer review
+    REVISION = "revision"       # Revised work
+
+
+@dataclass
+class AgentMessage:
+    """A message passed between agents."""
+    sender_id: str
+    receiver_id: str
+    content: str
+    message_type: MessageType
+    round_num: int = 0
+    timestamp: float = field(default_factory=time.time)
+    metadata: Dict[str, Any] = field(default_factory=dict)
+
+
 @dataclass
 class AgentSpec:
     """Specification for an agent in multi-agent system."""
@@ -826,22 +859,128 @@ class AgentSpec:
     model: Optional[Any] = None
     tools: List[ToolSpec] = field(default_factory=list)
     system_prompt: str = ""
+    capabilities: List[str] = field(default_factory=list)
+
+
+@dataclass
+class ConversationHistory:
+    """Tracks all messages in a multi-agent conversation."""
+    messages: List[AgentMessage] = field(default_factory=list)
+
+    def add(self, message: AgentMessage) -> None:
+        """Add a message to history."""
+        self.messages.append(message)
+
+    def get_by_sender(self, sender_id: str) -> List[AgentMessage]:
+        """Get all messages from a specific sender."""
+        return [m for m in self.messages if m.sender_id == sender_id]
+
+    def get_by_type(self, msg_type: MessageType) -> List[AgentMessage]:
+        """Get all messages of a specific type."""
+        return [m for m in self.messages if m.message_type == msg_type]
+
+    def get_round(self, round_num: int) -> List[AgentMessage]:
+        """Get all messages from a specific round."""
+        return [m for m in self.messages if m.round_num == round_num]
+
+    def format_for_context(self, max_messages: int = 20) -> str:
+        """Format recent history for inclusion in prompts."""
+        recent = self.messages[-max_messages:]
+        lines = []
+        for msg in recent:
+            lines.append(f"[{msg.sender_id} -> {msg.receiver_id}] ({msg.message_type.value}): {msg.content[:200]}")
+        return "\n".join(lines)
+
+
+class ConsensusProtocol:
+    """Protocols for reaching consensus among agents."""
+
+    @staticmethod
+    def majority_vote(responses: List[str]) -> Tuple[str, float]:
+        """Return the most common response and its confidence."""
+        from collections import Counter
+        if not responses:
+            return "", 0.0
+        counts = Counter(responses)
+        winner, count = counts.most_common(1)[0]
+        confidence = count / len(responses)
+        return winner, confidence
+
+    @staticmethod
+    def unanimous(responses: List[str]) -> Tuple[bool, Optional[str]]:
+        """Check if all responses agree."""
+        if not responses:
+            return False, None
+        unique = set(responses)
+        if len(unique) == 1:
+            return True, responses[0]
+        return False, None
+
+    @staticmethod
+    def weighted_average(scores: List[Tuple[str, float]]) -> str:
+        """Select response with highest weight/confidence."""
+        if not scores:
+            return ""
+        return max(scores, key=lambda x: x[1])[0]
+
+    @staticmethod
+    def merge_responses(responses: List[str], separator: str = "\n\n") -> str:
+        """Merge multiple responses into one."""
+        return separator.join(responses)
 
 
 class MultiAgent(TechniqueBase):
     """
     Multi-agent collaboration patterns.
 
+    Paper references:
+        - "Improving Factuality and Reasoning in LMs through Multiagent Debate"
+          (Du et al., 2023) https://arxiv.org/abs/2305.14325
+        - "ChatEval: Towards Better LLM-based Evaluators through Multi-Agent Debate"
+          (Chan et al., 2023) https://arxiv.org/abs/2308.07201
+
     Patterns:
-        - Debate: Agents argue positions, judge decides
-        - Division: Specialized agents handle subtasks
-        - Hierarchical: Manager coordinates workers
-        - Peer review: Agents check each other's work
+        DEBATE: Multiple agents argue positions, judge decides
+            - Proposer generates initial answer
+            - Critic finds flaws and counterarguments
+            - Proposer refines based on critique
+            - Judge evaluates final arguments
+
+        DIVISION: Coordinator splits work among specialists
+            - Coordinator decomposes task into subtasks
+            - Workers are assigned subtasks based on capabilities
+            - Results are aggregated by coordinator
+
+        HIERARCHICAL: Manager directs workers
+            - Manager creates strategy/plan
+            - Workers receive instructions and execute
+            - Workers report results
+            - Manager reviews and adjusts
+
+        PEER_REVIEW: Agents review each other's work
+            - Worker A produces initial output
+            - Worker B reviews and critiques
+            - Worker A revises based on feedback
+            - Iterate until consensus
 
     Configuration:
         agents: List of agent specifications
-        coordination: Coordination pattern
+        coordination: Coordination pattern (debate/division/hierarchical/peer_review)
         max_rounds: Maximum interaction rounds
+        consensus_threshold: Confidence threshold for consensus (0.0-1.0)
+
+    Usage:
+        agents = [
+            AgentSpec("proposer", "proposer", "Generates initial proposals"),
+            AgentSpec("critic", "critic", "Critiques proposals"),
+            AgentSpec("judge", "judge", "Makes final decisions"),
+        ]
+        ma = MultiAgent(
+            agents=agents,
+            coordination="debate",
+            max_rounds=3,
+        )
+        result = ma.run("Should we use microservices or monolith?")
     """
 
     TECHNIQUE_ID = "multi_agent"
@@ -849,28 +988,541 @@ class MultiAgent(TechniqueBase):
 
     def __init__(
         self,
+        backend: Optional[Any] = None,
         agents: Optional[List[AgentSpec]] = None,
-        coordination: str = "hierarchical",  # hierarchical, debate, peer, division
+        coordination: str = "hierarchical",
         max_rounds: int = 5,
+        consensus_threshold: float = 0.7,
         **kwargs,
     ):
         super().__init__(**kwargs)
+        self.backend = backend
         self.agents = {a.agent_id: a for a in (agents or [])}
         self.coordination = coordination
         self.max_rounds = max_rounds
+        self.consensus_threshold = consensus_threshold
+        self.history = ConversationHistory()
+
+    def _get_agent_response(
+        self,
+        agent: AgentSpec,
+        prompt: str,
+        context: str = "",
+    ) -> str:
+        """Get a response from an agent (uses backend or placeholder)."""
+        full_prompt = f"{agent.system_prompt}\n\n{context}\n\n{prompt}" if context else f"{agent.system_prompt}\n\n{prompt}"
+
+        if self.backend:
+            if hasattr(self.backend, 'generate'):
+                return self.backend.generate(full_prompt)
+            elif callable(self.backend):
+                return self.backend(full_prompt)
+
+        # Placeholder responses based on role
+        role_responses = {
+            "proposer": f"I propose the following solution: Based on the requirements, we should...",
+            "critic": f"I see several issues with this proposal: First, the approach may not scale well...",
+            "judge": f"After reviewing both arguments, I conclude that the proposal has merit but needs refinement...",
+            "manager": f"Here is the plan: We will divide this into subtasks and assign them to workers...",
+            "worker": f"Task completed. Here are the results: I have analyzed the assigned portion...",
+            "reviewer": f"Review feedback: The work is generally good but I suggest these improvements...",
+            "coordinator": f"I will decompose this task into the following subtasks...",
+        }
+        return role_responses.get(agent.role, f"Response from {agent.role}: Processing the request...")
+
+    def _ensure_default_agents(self, pattern: str) -> None:
+        """Ensure required agents exist for the pattern."""
+        if pattern == "debate":
+            defaults = [
+                AgentSpec("proposer", "proposer", "Generates proposals", system_prompt="You propose solutions and defend them."),
+                AgentSpec("critic", "critic", "Critiques proposals", system_prompt="You find flaws in proposals."),
+                AgentSpec("judge", "judge", "Makes final decisions", system_prompt="You evaluate arguments fairly."),
+            ]
+        elif pattern == "division":
+            defaults = [
+                AgentSpec("coordinator", "coordinator", "Decomposes and assigns tasks", system_prompt="You break down tasks and coordinate workers."),
+                AgentSpec("worker_1", "worker", "Executes subtasks", system_prompt="You complete assigned subtasks."),
+                AgentSpec("worker_2", "worker", "Executes subtasks", system_prompt="You complete assigned subtasks."),
+            ]
+        elif pattern == "hierarchical":
+            defaults = [
+                AgentSpec("manager", "manager", "Plans and reviews", system_prompt="You create plans and review work."),
+                AgentSpec("worker_1", "worker", "Executes instructions", system_prompt="You follow manager instructions."),
+                AgentSpec("worker_2", "worker", "Executes instructions", system_prompt="You follow manager instructions."),
+            ]
+        elif pattern == "peer_review":
+            defaults = [
+                AgentSpec("author", "author", "Produces initial work", system_prompt="You create initial content."),
+                AgentSpec("reviewer", "reviewer", "Reviews and suggests", system_prompt="You review and provide feedback."),
+            ]
+        else:
+            defaults = []
+
+        for agent in defaults:
+            if agent.agent_id not in self.agents:
+                self.agents[agent.agent_id] = agent
+
+    def _run_debate(
+        self,
+        task: str,
+        trace: List[Dict],
+    ) -> Dict[str, Any]:
+        """Execute debate coordination pattern."""
+        self._ensure_default_agents("debate")
+
+        proposer = self.agents.get("proposer")
+        critic = self.agents.get("critic")
+        judge = self.agents.get("judge")
+
+        if not all([proposer, critic, judge]):
+            return {"error": "Debate requires proposer, critic, and judge agents"}
+
+        current_proposal = ""
+
+        for round_num in range(self.max_rounds):
+            # Proposer generates or refines proposal
+            if round_num == 0:
+                proposal_prompt = f"Task: {task}\n\nGenerate an initial proposal to address this task."
+            else:
+                proposal_prompt = f"Task: {task}\n\nPrevious proposal: {current_proposal}\n\nCritique received: {critique}\n\nRefine your proposal based on the critique."
+
+            proposal = self._get_agent_response(proposer, proposal_prompt, self.history.format_for_context())
+            current_proposal = proposal
+
+            self.history.add(AgentMessage(
+                sender_id="proposer",
+                receiver_id="critic",
+                content=proposal,
+                message_type=MessageType.PROPOSAL,
+                round_num=round_num,
+            ))
+
+            trace.append({
+                "action": "proposal",
+                "round": round_num,
+                "content_preview": proposal[:100],
+            })
+
+            # Critic critiques the proposal
+            critique_prompt = f"Task: {task}\n\nProposal to critique:\n{proposal}\n\nProvide constructive criticism. Identify flaws, gaps, and suggest improvements."
+            critique = self._get_agent_response(critic, critique_prompt, self.history.format_for_context())
+
+            self.history.add(AgentMessage(
+                sender_id="critic",
+                receiver_id="proposer",
+                content=critique,
+                message_type=MessageType.CRITIQUE,
+                round_num=round_num,
+            ))
+
+            trace.append({
+                "action": "critique",
+                "round": round_num,
+                "content_preview": critique[:100],
+            })
+
+        # Judge makes final decision
+        judge_prompt = f"""Task: {task}
+
+Final proposal:
+{current_proposal}
+
+Debate history:
+{self.history.format_for_context()}
+
+As the judge, evaluate the final proposal. Consider:
+1. Does it address the original task?
+2. How well did it respond to critiques?
+3. What is your final verdict?
+
+Provide your judgment."""
+
+        judgment = self._get_agent_response(judge, judge_prompt)
+
+        self.history.add(AgentMessage(
+            sender_id="judge",
+            receiver_id="all",
+            content=judgment,
+            message_type=MessageType.JUDGMENT,
+            round_num=self.max_rounds,
+        ))
+
+        trace.append({
+            "action": "judgment",
+            "content_preview": judgment[:100],
+        })
+
+        return {
+            "final_proposal": current_proposal,
+            "judgment": judgment,
+            "rounds_completed": self.max_rounds,
+            "message_count": len(self.history.messages),
+        }
+
+    def _run_division(
+        self,
+        task: str,
+        trace: List[Dict],
+    ) -> Dict[str, Any]:
+        """Execute division coordination pattern."""
+        self._ensure_default_agents("division")
+
+        coordinator = self.agents.get("coordinator")
+        workers = [a for a in self.agents.values() if a.role == "worker"]
+
+        if not coordinator or not workers:
+            return {"error": "Division requires coordinator and worker agents"}
+
+        # Coordinator decomposes task
+        decompose_prompt = f"""Task to decompose: {task}
+
+You have {len(workers)} workers available. Break this task into subtasks that can be done in parallel.
+List each subtask clearly, one per line, prefixed with "SUBTASK:"."""
+
+        decomposition = self._get_agent_response(coordinator, decompose_prompt)
+
+        # Parse subtasks (simple extraction)
+        subtasks = []
+        for line in decomposition.split('\n'):
+            if 'SUBTASK:' in line.upper():
+                subtask = line.split(':', 1)[-1].strip()
+                if subtask:
+                    subtasks.append(subtask)
+
+        # If no structured subtasks found, create generic ones
+        if not subtasks:
+            subtasks = [f"Part {i+1} of the task" for i in range(len(workers))]
+
+        trace.append({
+            "action": "decompose",
+            "subtask_count": len(subtasks),
+            "subtasks": subtasks[:5],
+        })
+
+        # Assign subtasks to workers
+        results = []
+        for i, (worker, subtask) in enumerate(zip(workers, subtasks[:len(workers)])):
+            self.history.add(AgentMessage(
+                sender_id="coordinator",
+                receiver_id=worker.agent_id,
+                content=subtask,
+                message_type=MessageType.TASK,
+                round_num=0,
+            ))
+
+            worker_prompt = f"Original task: {task}\n\nYour assigned subtask: {subtask}\n\nComplete this subtask and provide your results."
+            result = self._get_agent_response(worker, worker_prompt)
+
+            results.append({
+                "worker": worker.agent_id,
+                "subtask": subtask,
+                "result": result,
+            })
+
+            self.history.add(AgentMessage(
+                sender_id=worker.agent_id,
+                receiver_id="coordinator",
+                content=result,
+                message_type=MessageType.RESULT,
+                round_num=0,
+            ))
+
+            trace.append({
+                "action": "worker_result",
+                "worker": worker.agent_id,
+                "subtask_preview": subtask[:50],
+            })
+
+        # Coordinator aggregates results
+        aggregate_prompt = f"""Original task: {task}
+
+Worker results:
+{chr(10).join(f"- {r['worker']}: {r['result'][:200]}" for r in results)}
+
+Aggregate these results into a coherent final answer."""
+
+        final_result = self._get_agent_response(coordinator, aggregate_prompt)
+
+        trace.append({
+            "action": "aggregate",
+            "content_preview": final_result[:100],
+        })
+
+        return {
+            "subtasks": subtasks,
+            "worker_results": results,
+            "aggregated_result": final_result,
+            "workers_used": len(results),
+        }
+
+    def _run_hierarchical(
+        self,
+        task: str,
+        trace: List[Dict],
+    ) -> Dict[str, Any]:
+        """Execute hierarchical coordination pattern."""
+        self._ensure_default_agents("hierarchical")
+
+        manager = self.agents.get("manager")
+        workers = [a for a in self.agents.values() if a.role == "worker"]
+
+        if not manager or not workers:
+            return {"error": "Hierarchical requires manager and worker agents"}
+
+        results_by_round = []
+
+        for round_num in range(self.max_rounds):
+            # Manager creates plan/instructions
+            if round_num == 0:
+                plan_prompt = f"Task: {task}\n\nCreate a plan and provide specific instructions for {len(workers)} workers."
+            else:
+                prev_results = results_by_round[-1] if results_by_round else []
+                plan_prompt = f"""Task: {task}
+
+Previous round results:
+{chr(10).join(f"- {r['worker']}: {r['result'][:100]}" for r in prev_results)}
+
+Review the results and provide updated instructions for the next round, or indicate if the task is complete."""
+
+            plan = self._get_agent_response(manager, plan_prompt, self.history.format_for_context())
+
+            trace.append({
+                "action": "manager_plan",
+                "round": round_num,
+                "content_preview": plan[:100],
+            })
+
+            # Check if manager indicates completion
+            if "complete" in plan.lower() and "task" in plan.lower():
+                break
+
+            # Workers execute instructions
+            round_results = []
+            for worker in workers:
+                self.history.add(AgentMessage(
+                    sender_id="manager",
+                    receiver_id=worker.agent_id,
+                    content=plan,
+                    message_type=MessageType.TASK,
+                    round_num=round_num,
+                ))
+
+                worker_prompt = f"Manager instructions:\n{plan}\n\nExecute your part of these instructions."
+                result = self._get_agent_response(worker, worker_prompt)
+
+                round_results.append({
+                    "worker": worker.agent_id,
+                    "result": result,
+                })
+
+                self.history.add(AgentMessage(
+                    sender_id=worker.agent_id,
+                    receiver_id="manager",
+                    content=result,
+                    message_type=MessageType.RESULT,
+                    round_num=round_num,
+                ))
+
+            results_by_round.append(round_results)
+
+            trace.append({
+                "action": "workers_execute",
+                "round": round_num,
+                "workers_count": len(round_results),
+            })
+
+        # Manager provides final summary
+        summary_prompt = f"""Task: {task}
+
+All round results:
+{chr(10).join(f"Round {i}: {[r['result'][:50] for r in results]}" for i, results in enumerate(results_by_round))}
+
+Provide a final summary and conclusion."""
+
+        final_summary = self._get_agent_response(manager, summary_prompt)
+
+        return {
+            "rounds_completed": len(results_by_round),
+            "results_by_round": results_by_round,
+            "final_summary": final_summary,
+        }
+
+    def _run_peer_review(
+        self,
+        task: str,
+        trace: List[Dict],
+    ) -> Dict[str, Any]:
+        """Execute peer review coordination pattern."""
+        self._ensure_default_agents("peer_review")
+
+        author = self.agents.get("author")
+        reviewer = self.agents.get("reviewer")
+
+        if not author or not reviewer:
+            return {"error": "Peer review requires author and reviewer agents"}
+
+        # Author produces initial work
+        author_prompt = f"Task: {task}\n\nProduce your initial work addressing this task."
+        current_work = self._get_agent_response(author, author_prompt)
+
+        self.history.add(AgentMessage(
+            sender_id="author",
+            receiver_id="reviewer",
+            content=current_work,
+            message_type=MessageType.PROPOSAL,
+            round_num=0,
+        ))
+
+        trace.append({
+            "action": "initial_work",
+            "content_preview": current_work[:100],
+        })
+
+        review_history = []
+
+        for round_num in range(self.max_rounds):
+            # Reviewer reviews
+            review_prompt = f"""Task: {task}
+
+Work to review:
+{current_work}
+
+Provide detailed feedback. Be constructive and specific. If the work is satisfactory, say "APPROVED"."""
+
+            review = self._get_agent_response(reviewer, review_prompt, self.history.format_for_context())
+
+            self.history.add(AgentMessage(
+                sender_id="reviewer",
+                receiver_id="author",
+                content=review,
+                message_type=MessageType.REVIEW,
+                round_num=round_num,
+            ))
+
+            review_history.append({
+                "round": round_num,
+                "review": review,
+            })
+
+            trace.append({
+                "action": "review",
+                "round": round_num,
+                "content_preview": review[:100],
+            })
+
+            # Check if approved
+            if "APPROVED" in review.upper():
+                break
+
+            # Author revises
+            revision_prompt = f"""Task: {task}
+
+Your previous work:
+{current_work}
+
+Reviewer feedback:
+{review}
+
+Revise your work based on the feedback."""
+
+            revised_work = self._get_agent_response(author, revision_prompt, self.history.format_for_context())
+            current_work = revised_work
+
+            self.history.add(AgentMessage(
+                sender_id="author",
+                receiver_id="reviewer",
+                content=revised_work,
+                message_type=MessageType.REVISION,
+                round_num=round_num,
+            ))
+
+            trace.append({
+                "action": "revision",
+                "round": round_num,
+                "content_preview": revised_work[:100],
+            })
+
+        return {
+            "final_work": current_work,
+            "review_rounds": len(review_history),
+            "review_history": review_history,
+            "approved": "APPROVED" in review_history[-1]["review"].upper() if review_history else False,
+        }
 
     def run(self, input_data: Any, context: Optional[Dict] = None) -> TechniqueResult:
         import time
         start = time.time()
 
-        # Placeholder implementation
-        return TechniqueResult(
-            success=True,
-            output={"placeholder": "MultiAgent not yet fully implemented"},
-            technique_id=self.TECHNIQUE_ID,
-            execution_time_ms=(time.time() - start) * 1000,
-            intermediate_steps=[],
-        )
+        task = input_data if isinstance(input_data, str) else str(input_data)
+        trace: List[Dict] = []
+
+        # Reset history for new run
+        self.history = ConversationHistory()
+
+        self._call_hooks("pre_run", task=task)
+
+        trace.append({
+            "action": "start",
+            "coordination": self.coordination,
+            "agents": list(self.agents.keys()),
+            "max_rounds": self.max_rounds,
+        })
+
+        try:
+            # Dispatch to appropriate pattern
+            if self.coordination == "debate":
+                result = self._run_debate(task, trace)
+            elif self.coordination == "division":
+                result = self._run_division(task, trace)
+            elif self.coordination == "hierarchical":
+                result = self._run_hierarchical(task, trace)
+            elif self.coordination == "peer_review":
+                result = self._run_peer_review(task, trace)
+            else:
+                return TechniqueResult(
+                    success=False,
+                    output=None,
+                    technique_id=self.TECHNIQUE_ID,
+                    execution_time_ms=(time.time() - start) * 1000,
+                    intermediate_steps=trace,
+                    error=f"Unknown coordination pattern: {self.coordination}",
+                )
+
+            if "error" in result:
+                return TechniqueResult(
+                    success=False,
+                    output=result,
+                    technique_id=self.TECHNIQUE_ID,
+                    execution_time_ms=(time.time() - start) * 1000,
+                    intermediate_steps=trace,
+                    error=result["error"],
+                )
+
+            self._call_hooks("post_run", result=result)
+
+            return TechniqueResult(
+                success=True,
+                output=result,
+                technique_id=self.TECHNIQUE_ID,
+                execution_time_ms=(time.time() - start) * 1000,
+                intermediate_steps=trace,
+                metadata={
+                    "coordination_pattern": self.coordination,
+                    "message_count": len(self.history.messages),
+                    "agents_used": list(self.agents.keys()),
+                },
+            )
+
+        except Exception as e:
+            self._call_hooks("on_error", error=e)
+            return TechniqueResult(
+                success=False,
+                output=None,
+                technique_id=self.TECHNIQUE_ID,
+                execution_time_ms=(time.time() - start) * 1000,
+                intermediate_steps=trace,
+                error=str(e),
+            )
 
 
 # =============================================================================
@@ -2051,6 +2703,9 @@ Generate an improved response that addresses these issues:"""
 # =============================================================================
 
 __all__ = [
+    # Enums
+    "CoordinationPattern",
+    "MessageType",
     # Data classes
     "ToolParameter",
     "ToolSpec",
@@ -2058,11 +2713,15 @@ __all__ = [
     "ToolResult",
     "PlanStep",
     "AgentSpec",
+    "AgentMessage",
+    "ConversationHistory",
     "TreeNode",
     "ReWOOPlan",
     "MonologueEntry",
     "ToolToken",
     "CritiqueResult",
+    # Utility classes
+    "ConsensusProtocol",
     # Techniques
     "ReAct",
     "ToolCalling",

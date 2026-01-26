@@ -25,6 +25,12 @@ from .layers import (
     GridEmbedding,
     MLPSequence,
     RMSNorm,
+    # Code repair extensions
+    GridPositionalEncoding,
+    GridAttention,
+    RecursiveBlock,
+    FeedForward,
+    IterationController,
 )
 
 
@@ -484,5 +490,447 @@ class TRM(nn.Module):
                 "use_stable_max": self.config.use_stable_max,
                 "q_threshold": self.config.q_threshold,
             },
+            "model_state_dict": self.state_dict(),
+        }, path)
+
+
+# =============================================================================
+# Code Repair Architecture (64x48 Grid)
+# =============================================================================
+
+
+@dataclass
+class CodeRepairConfig:
+    """Configuration for Code Repair TRM model.
+
+    Designed for code repair tasks with 64x48 grid input.
+
+    Attributes:
+        grid_height: Height of input grid (lines of code).
+        grid_width: Width of input grid (tokens per line).
+        vocab_size: BPE vocabulary size.
+        embed_dim: Embedding dimension.
+        n_heads: Number of attention heads.
+        ffn_dim: Feed-forward hidden dimension.
+        n_blocks: Number of recursive blocks (weight-shared).
+        max_iterations: Maximum recursion iterations.
+        min_iterations: Minimum iterations before early stopping.
+        dropout: Dropout probability.
+        q_threshold: Confidence threshold for early stopping.
+        use_gradient_checkpointing: Enable gradient checkpointing for memory efficiency.
+    """
+
+    # Grid configuration (for code)
+    grid_height: int = 64
+    grid_width: int = 48
+    vocab_size: int = 32768
+
+    # Model architecture
+    embed_dim: int = 256
+    n_heads: int = 8
+    ffn_dim: int = 1024
+    n_blocks: int = 6  # Weight-shared blocks
+
+    # Recursion parameters
+    max_iterations: int = 8
+    min_iterations: int = 2
+
+    # Training
+    dropout: float = 0.0
+    q_threshold: float = 0.95
+
+    # Memory optimization
+    use_gradient_checkpointing: bool = False
+
+    @property
+    def max_seq_len(self) -> int:
+        """Maximum sequence length."""
+        return self.grid_height * self.grid_width
+
+    @property
+    def effective_depth(self) -> int:
+        """Effective depth through recursion."""
+        return self.max_iterations * self.n_blocks
+
+    @classmethod
+    def for_code_repair_tiny(cls) -> "CodeRepairConfig":
+        """Tiny config for unit testing (~1M params with small vocab)."""
+        return cls(
+            vocab_size=1024,
+            embed_dim=64,
+            n_heads=4,
+            ffn_dim=256,
+            n_blocks=2,
+            max_iterations=4,
+        )
+
+    @classmethod
+    def for_code_repair_small(cls) -> "CodeRepairConfig":
+        """Small config (~9M params with 32K vocab).
+
+        Note: With 32K BPE vocab, embeddings alone are ~8M params.
+        This is the minimum practical size for code repair.
+        """
+        return cls(
+            embed_dim=128,
+            n_heads=4,
+            ffn_dim=512,
+            n_blocks=4,
+        )
+
+    @classmethod
+    def for_code_repair_base(cls) -> "CodeRepairConfig":
+        """Base config (~12M params with 32K vocab).
+
+        Suitable for single-GPU training.
+        """
+        return cls(
+            embed_dim=160,
+            n_heads=8,
+            ffn_dim=640,
+            n_blocks=6,
+        )
+
+    @classmethod
+    def for_code_repair_large(cls) -> "CodeRepairConfig":
+        """Large config (~23M params with 32K vocab).
+
+        Higher capacity for complex code repair tasks.
+        """
+        return cls(
+            embed_dim=256,
+            n_heads=8,
+            ffn_dim=1024,
+            n_blocks=6,
+        )
+
+    @classmethod
+    def for_arc_agi_7m(cls) -> "CodeRepairConfig":
+        """7M param config optimized for ARC-AGI (smaller vocab).
+
+        With vocab_size=256 (for discrete ARC colors), we can achieve
+        the target 7M parameter count while having meaningful model capacity.
+        """
+        return cls(
+            vocab_size=256,  # ARC uses 10 colors + padding
+            embed_dim=256,
+            n_heads=8,
+            ffn_dim=1024,
+            n_blocks=6,
+            grid_height=30,  # ARC max grid size
+            grid_width=30,
+        )
+
+
+class CodeRepairDeepRecursion(nn.Module):
+    """Deep recursion module for code repair with weight sharing.
+
+    Key features:
+    - Weight sharing across iterations (8 iterations, 6 blocks = 42 effective layers)
+    - Early stopping based on confidence threshold
+    - Support for gradient checkpointing
+    - Attention hooks for visualization
+    """
+
+    def __init__(self, config: CodeRepairConfig):
+        super().__init__()
+        self.config = config
+        self.max_iterations = config.max_iterations
+        self.n_blocks = config.n_blocks
+        self.use_gradient_checkpointing = config.use_gradient_checkpointing
+
+        # Weight-shared recursive blocks
+        self.blocks = nn.ModuleList([
+            RecursiveBlock(
+                embed_dim=config.embed_dim,
+                n_heads=config.n_heads,
+                ffn_dim=config.ffn_dim,
+                dropout=config.dropout,
+                max_height=config.grid_height,
+                max_width=config.grid_width,
+                use_swiglu=True,
+            )
+            for _ in range(config.n_blocks)
+        ])
+
+        # Iteration controller for early stopping
+        self.controller = IterationController(
+            q_threshold=config.q_threshold,
+            min_iterations=config.min_iterations,
+            max_iterations=config.max_iterations,
+        )
+
+        # Optional Q-head for confidence prediction
+        self.q_head = nn.Sequential(
+            RMSNorm(config.embed_dim),
+            nn.Linear(config.embed_dim, config.embed_dim // 2),
+            nn.GELU(),
+            nn.Linear(config.embed_dim // 2, 1),
+        )
+        nn.init.zeros_(self.q_head[-1].weight)
+        nn.init.zeros_(self.q_head[-1].bias)
+
+        # Hooks for attention visualization
+        self._attention_hooks = {}
+
+    def _apply_block(
+        self,
+        block: RecursiveBlock,
+        x: torch.Tensor,
+        mask: Optional[torch.Tensor],
+    ) -> torch.Tensor:
+        """Apply a single block with optional gradient checkpointing."""
+        if self.use_gradient_checkpointing and self.training:
+            return torch.utils.checkpoint.checkpoint(
+                block, x, mask, use_reentrant=False
+            )
+        return block(x, mask)
+
+    def _compute_q_hat(self, hidden: torch.Tensor) -> torch.Tensor:
+        """Compute confidence score from hidden state."""
+        # Global average pooling
+        pooled = hidden.mean(dim=(1, 2))  # (batch, embed_dim)
+        q_hat = self.q_head(pooled).squeeze(-1)  # (batch,)
+        return q_hat
+
+    def forward(
+        self,
+        x: torch.Tensor,
+        mask: Optional[torch.Tensor] = None,
+        return_all_iterations: bool = False,
+    ) -> Tuple[torch.Tensor, Dict[str, Any]]:
+        """
+        Perform deep recursion with weight sharing.
+
+        Args:
+            x: Input tensor (batch, height, width, embed_dim)
+            mask: Optional attention mask (batch, height, width)
+            return_all_iterations: Whether to return all intermediate states
+
+        Returns:
+            Tuple of (output, info_dict):
+                - output: Final hidden state (batch, height, width, embed_dim)
+                - info_dict: Dictionary with iteration info
+        """
+        all_states = [] if return_all_iterations else None
+        iterations_performed = 0
+
+        for iteration in range(self.max_iterations):
+            # Apply all blocks (weight sharing across iterations)
+            for block_idx, block in enumerate(self.blocks):
+                x = self._apply_block(block, x, mask)
+
+            iterations_performed = iteration + 1
+
+            # Store intermediate state if requested
+            if return_all_iterations:
+                all_states.append(x.detach().clone())
+
+            # Check early stopping (only during inference)
+            if not self.training:
+                q_hat = self._compute_q_hat(x)
+                should_stop, confidence = self.controller.should_stop(
+                    x, iteration, q_hat
+                )
+                if should_stop:
+                    break
+
+        # Final confidence computation
+        q_hat = self._compute_q_hat(x)
+        confidence = torch.sigmoid(q_hat)
+
+        info = {
+            "iterations": iterations_performed,
+            "confidence": confidence,
+            "q_hat": q_hat,
+        }
+
+        if return_all_iterations:
+            info["all_states"] = all_states
+
+        return x, info
+
+
+class CodeRepairTRM(nn.Module):
+    """Tiny Recursive Model for Code Repair.
+
+    A 7M parameter recursive reasoning architecture for code repair tasks.
+    Input: 64 rows x 48 tokens grid (representing code)
+    Output: Repaired code grid
+
+    Key innovations:
+    - 8 recursive iterations with weight sharing
+    - 42 effective layers of depth
+    - Early stopping based on confidence threshold
+    - Grid-aware 2D attention with relative position encoding
+
+    Architecture:
+        Input (batch, 64, 48) token IDs
+                |
+                v
+        Token Embedding + Position Encoding
+                |
+                v
+        +-------------------+
+        | Deep Recursion    |<---+
+        | (6 weight-shared  |    | 8 iterations
+        |  blocks)          |    |
+        +-------------------+----+
+                |
+                v
+        Early Stop if confident
+                |
+                v
+        Output Head -> (batch, 64, 48, vocab) logits
+    """
+
+    def __init__(self, config: CodeRepairConfig):
+        super().__init__()
+        self.config = config
+
+        # Token embedding
+        self.embedding = nn.Embedding(config.vocab_size, config.embed_dim)
+
+        # 2D positional encoding
+        self.pos_encoding = GridPositionalEncoding(
+            embed_dim=config.embed_dim,
+            max_height=config.grid_height,
+            max_width=config.grid_width,
+            dropout=config.dropout,
+        )
+
+        # Deep recursion module
+        self.recursion = CodeRepairDeepRecursion(config)
+
+        # Output head
+        self.output_norm = RMSNorm(config.embed_dim)
+        self.output_head = nn.Linear(config.embed_dim, config.vocab_size, bias=False)
+
+        # Initialize weights
+        self.apply(self._init_weights)
+
+    def _init_weights(self, module: nn.Module):
+        """Initialize model weights."""
+        if isinstance(module, nn.Linear):
+            nn.init.normal_(module.weight, std=0.02)
+            if module.bias is not None:
+                nn.init.zeros_(module.bias)
+        elif isinstance(module, nn.Embedding):
+            nn.init.normal_(module.weight, std=0.02)
+
+    def forward(
+        self,
+        x: torch.Tensor,
+        mask: Optional[torch.Tensor] = None,
+        labels: Optional[torch.Tensor] = None,
+    ) -> Tuple[torch.Tensor, Dict[str, Any]]:
+        """
+        Forward pass.
+
+        Args:
+            x: Input token IDs (batch, height, width) - [batch, 64, 48]
+            mask: Optional attention mask (batch, height, width)
+            labels: Optional target token IDs for loss computation
+
+        Returns:
+            Tuple of (logits, info):
+                - logits: Output logits (batch, height, width, vocab_size)
+                - info: Dictionary with iteration info and optional loss
+        """
+        batch_size, height, width = x.shape
+
+        # Token embedding: (batch, height, width, embed_dim)
+        emb = self.embedding(x)
+
+        # Add positional encoding
+        emb = emb + self.pos_encoding(x)
+
+        # Deep recursion
+        hidden, info = self.recursion(emb, mask)
+
+        # Output projection
+        hidden = self.output_norm(hidden)
+        logits = self.output_head(hidden)
+
+        # Compute loss if labels provided
+        if labels is not None:
+            loss = F.cross_entropy(
+                logits.view(-1, self.config.vocab_size),
+                labels.view(-1),
+                ignore_index=0,  # Assuming 0 is pad token
+            )
+            info["loss"] = loss
+
+        return logits, info
+
+    @torch.no_grad()
+    def generate(
+        self,
+        x: torch.Tensor,
+        mask: Optional[torch.Tensor] = None,
+        max_iterations: Optional[int] = None,
+    ) -> Dict[str, Any]:
+        """
+        Generate repaired code.
+
+        Args:
+            x: Input token IDs (batch, height, width)
+            mask: Optional attention mask
+            max_iterations: Override max iterations
+
+        Returns:
+            Dictionary with:
+                - output: Predicted token IDs (batch, height, width)
+                - logits: Output logits
+                - iterations: Number of iterations performed
+                - confidence: Model confidence
+        """
+        self.eval()
+
+        # Temporarily override max iterations if specified
+        original_max = self.recursion.max_iterations
+        if max_iterations is not None:
+            self.recursion.max_iterations = max_iterations
+
+        logits, info = self.forward(x, mask)
+
+        # Restore original
+        if max_iterations is not None:
+            self.recursion.max_iterations = original_max
+
+        output = logits.argmax(dim=-1)
+
+        return {
+            "output": output,
+            "logits": logits,
+            "iterations": info["iterations"],
+            "confidence": info["confidence"],
+        }
+
+    def num_parameters(self, trainable_only: bool = True) -> int:
+        """Count model parameters."""
+        if trainable_only:
+            return sum(p.numel() for p in self.parameters() if p.requires_grad)
+        return sum(p.numel() for p in self.parameters())
+
+    @classmethod
+    def from_config(cls, config: CodeRepairConfig) -> "CodeRepairTRM":
+        """Create model from configuration."""
+        return cls(config)
+
+    @classmethod
+    def from_pretrained(cls, path: str) -> "CodeRepairTRM":
+        """Load pretrained model."""
+        checkpoint = torch.load(path, map_location="cpu")
+        config = CodeRepairConfig(**checkpoint["config"])
+        model = cls(config)
+        model.load_state_dict(checkpoint["model_state_dict"])
+        return model
+
+    def save_pretrained(self, path: str):
+        """Save model checkpoint."""
+        import dataclasses
+        torch.save({
+            "config": dataclasses.asdict(self.config),
             "model_state_dict": self.state_dict(),
         }, path)
