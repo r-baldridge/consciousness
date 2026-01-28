@@ -1,0 +1,27 @@
+agent:
+  default_mode: architect
+  max_iterations: 50
+  timeout: 300
+
+  approval:
+    enabled: true
+    default_channel: console
+    timeout: 300
+
+  memory:
+    context_window: 100000
+    episodic_enabled: true
+    semantic_enabled: true
+    checkpoint_interval: 10
+
+backend:
+  provider: anthropic
+  model: claude-sonnet-4-20250514
+  temperature: 0.7
+  max_tokens: 4096
+
+  fallback:
+    enabled: true
+    providers:
+      - openai
+      - ollama

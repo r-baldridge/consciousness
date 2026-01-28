@@ -1,0 +1,22 @@
+tools:
+  builtin:
+    - file_tools
+    - git_tools
+    - shell_tools
+    - search_tools
+    - web_tools
+
+  permissions:
+    default: read
+    dangerous:
+      - shell_tools.bash
+      - file_tools.write
+    require_approval:
+      - git_tools.commit
+      - git_tools.push
+
+  sandbox:
+    enabled: true
+    type: subprocess  # none, subprocess, docker
+    timeout: 30
+    memory_limit_mb: 512

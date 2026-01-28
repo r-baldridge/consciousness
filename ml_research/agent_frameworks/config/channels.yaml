@@ -1,0 +1,26 @@
+channels:
+  console:
+    type: console
+    enabled: true
+
+  slack:
+    type: slack
+    enabled: false
+    webhook_url: ${SLACK_WEBHOOK_URL}
+    channel: "#agent-approvals"
+
+  email:
+    type: email
+    enabled: false
+    smtp_host: ${SMTP_HOST}
+    smtp_port: 587
+    from_address: agent@example.com
+
+escalation:
+  default_chain:
+    - name: primary
+      channels: [console]
+      timeout: 300
+    - name: secondary
+      channels: [slack, email]
+      timeout: 600
