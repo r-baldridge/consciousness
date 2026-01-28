@@ -16,6 +16,8 @@ Matsuoka is remembered for his clear, down‑to‑earth Dharma talks, his commit
 
 Year Event
 
+1918
+
 Born in Ōita Prefecture, Kyushu, Japan.
 
 1936‑1942
