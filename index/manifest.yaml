@@ -1,0 +1,64 @@
+# 40-Form Consciousness Repository Manifest
+header:
+  version: "2.0"
+  generated: "2026-01-29"
+  total_forms: 40
+  total_files: 1069
+  total_markdown: 774
+
+info:
+  id: 0
+  name: Background Information
+  slug: 00_Info
+  desc: Cross-cutting references on neuroscience, quantum consciousness, ethics, 4E cognition, integration
+  files: 18
+  md: 18
+  py: 0
+  test: false
+  research: false
+  specs: 0
+  tags: [neuroscience, ethics, integration]
+  xrefs: [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,28,36]
+  tier: 3
+
+forms:
+- {id: 1, name: Visual Consciousness, slug: 01-visual, desc: "Subjective experience of seeing; visual binding, qualia, and neural correlates of sight", files: 23, md: 16, py: 4, test: true, research: true, specs: 4, tags: [vision, qualia, binding-problem], xrefs: [2,9,14,16,25], tier: 1}
+- {id: 2, name: Auditory Consciousness, slug: 02-auditory, desc: "Conscious experience of sound; cochlear processing, auditory cortex, temporal binding", files: 24, md: 17, py: 4, test: true, research: true, specs: 4, tags: [audition, psychoacoustics, temporal-processing], xrefs: [1,9,14,16], tier: 1}
+- {id: 3, name: Somatosensory Consciousness, slug: 03-somatosensory, desc: "Touch, temperature, pain, pressure, and proprioceptive sensation awareness", files: 23, md: 16, py: 4, test: true, research: true, specs: 4, tags: [touch, pain, proprioception], xrefs: [6,7,9,16,18], tier: 1}
+- {id: 4, name: Olfactory Consciousness, slug: 04-olfactory, desc: "Subjective experience of smell; chemical detection, scent memory, emotional links", files: 23, md: 16, py: 4, test: true, research: true, specs: 4, tags: [olfaction, chemical-sensing, memory], xrefs: [5,7,9,12], tier: 1}
+- {id: 5, name: Gustatory Consciousness, slug: 05-gustatory, desc: "Taste and flavor experience integrating chemical detection, olfaction, and culture", files: 23, md: 16, py: 4, test: true, research: true, specs: 4, tags: [taste, flavor, multisensory], xrefs: [4,6,7,9], tier: 1}
+- {id: 6, name: Interoceptive Consciousness, slug: 06-interoceptive, desc: "Internal body signal awareness including heartbeat, breathing, hunger, visceral states", files: 23, md: 16, py: 4, test: true, research: true, specs: 4, tags: [interoception, homeostasis, embodiment], xrefs: [3,7,8,18,36], tier: 1}
+- {id: 7, name: Emotional Consciousness, slug: 07-emotional, desc: "Subjective emotion experience; affective neuroscience, valence, and feeling states", files: 23, md: 16, py: 4, test: true, research: true, specs: 4, tags: [emotion, affect, valence], xrefs: [6,8,12,18,39], tier: 1}
+- {id: 8, name: Arousal Consciousness, slug: 08-arousal, desc: "Foundational wakefulness and vigilance that gates all other consciousness forms", files: 26, md: 19, py: 4, test: true, research: true, specs: 5, tags: [arousal, wakefulness, gating], xrefs: [13,14,18,22,27], tier: 1}
+- {id: 9, name: Perceptual Consciousness, slug: 09-perceptual, desc: "External stimulus awareness and attentional allocation; perceptual binding and gestalt", files: 23, md: 16, py: 4, test: true, research: true, specs: 4, tags: [perception, attention, gestalt], xrefs: [1,2,3,14,16,25], tier: 1}
+- {id: 10, name: Self-Recognition, slug: 10-self-recognition, desc: "Self-other distinction, agency attribution, and foundational self-awareness", files: 23, md: 16, py: 4, test: true, research: true, specs: 4, tags: [self-awareness, agency, identity], xrefs: [11,12,19,21,30], tier: 1}
+- {id: 11, name: Meta-Consciousness, slug: 11-meta-consciousness, desc: "Thinking about thinking; metacognitive monitoring of mental states and processes", files: 23, md: 16, py: 4, test: true, research: true, specs: 4, tags: [metacognition, introspection, self-monitoring], xrefs: [10,15,19,23,28], tier: 1}
+- {id: 12, name: Narrative Consciousness, slug: 12-narrative-consciousness, desc: "Autobiographical narrative construction; story-based identity and temporal coherence", files: 26, md: 19, py: 4, test: true, research: true, specs: 5, tags: [narrative, autobiography, identity], xrefs: [10,11,19,28,39], tier: 1}
+- {id: 13, name: Integrated Information, slug: 13-integrated-information, desc: "IIT framework; phi computation, information integration, mathematical consciousness theory", files: 27, md: 18, py: 4, test: true, research: true, specs: 4, tags: [IIT, phi, information-integration], xrefs: [8,14,17,18,21], tier: 1}
+- {id: 14, name: Global Workspace, slug: 14-global-workspace, desc: "GWT framework; global broadcasting, conscious access, workspace competition", files: 28, md: 19, py: 4, test: true, research: true, specs: 5, tags: [GWT, broadcasting, workspace], xrefs: [8,13,15,16,17], tier: 1}
+- {id: 15, name: Higher-Order Thought, slug: 15-higher-order-thought, desc: "HOT theory; consciousness requires higher-order representation of mental states", files: 28, md: 19, py: 4, test: true, research: true, specs: 4, tags: [HOT-theory, higher-order, representation], xrefs: [11,14,16,19,28], tier: 1}
+- {id: 16, name: Predictive Coding, slug: 16-predictive-coding, desc: "Predictive brain hypothesis; top-down prediction, error minimization, free energy", files: 25, md: 16, py: 4, test: true, research: true, specs: 4, tags: [prediction, free-energy, bayesian], xrefs: [9,14,17,18,21], tier: 1}
+- {id: 17, name: Recurrent Processing, slug: 17-recurrent-processing, desc: "Consciousness via recurrent neural feedback; feedforward vs recurrent distinction", files: 25, md: 16, py: 4, test: true, research: true, specs: 4, tags: [recurrence, feedback, temporal-dynamics], xrefs: [13,14,16,18,25], tier: 1}
+- {id: 18, name: Primary Consciousness, slug: 18-primary-consciousness, desc: "Most fundamental awareness; basic phenomenal experience, qualia, what-it-is-like-ness", files: 22, md: 16, py: 4, test: true, research: true, specs: 4, tags: [phenomenal, qualia, primary-experience], xrefs: [8,13,17,19,36], tier: 1}
+- {id: 19, name: Reflective Consciousness, slug: 19-reflective-consciousness, desc: "Self-examination and introspection; thinking about one's own thinking processes", files: 22, md: 16, py: 4, test: true, research: true, specs: 4, tags: [reflection, introspection, phenomenology], xrefs: [10,11,15,18,28], tier: 1}
+- {id: 20, name: Collective Consciousness, slug: 20-collective-consciousness, desc: "Group-level awareness and distributed cognition transcending individual agents", files: 22, md: 16, py: 4, test: true, research: true, specs: 4, tags: [collective, distributed-cognition, emergence], xrefs: [21,33,34,13,14], tier: 1}
+- {id: 21, name: Artificial Consciousness, slug: 21-artificial-consciousness, desc: "Engineering conscious-like phenomena in machines; computational awareness", files: 22, md: 16, py: 4, test: true, research: true, specs: 4, tags: [AI, machine-consciousness, computation], xrefs: [13,14,16,20,40], tier: 1}
+- {id: 22, name: Dream Consciousness, slug: 22-dream-consciousness, desc: "Oneiric awareness during sleep; dream generation, REM, memory consolidation", files: 22, md: 16, py: 4, test: true, research: true, specs: 4, tags: [dreams, REM, sleep], xrefs: [8,12,23,27,37], tier: 1}
+- {id: 23, name: Lucid Dream Consciousness, slug: 23-lucid-dream, desc: "Conscious awareness and control during dreams; metacognition in sleep", files: 25, md: 16, py: 4, test: true, research: true, specs: 4, tags: [lucid-dreaming, dream-control, metacognition], xrefs: [11,22,27,36], tier: 1}
+- {id: 24, name: Locked-In Consciousness, slug: 24-locked-in, desc: "Preserved awareness despite motor impairment; BCI and consciousness detection", files: 25, md: 16, py: 4, test: true, research: true, specs: 4, tags: [locked-in, BCI, consciousness-detection], xrefs: [8,13,25,26,21], tier: 1}
+- {id: 25, name: Blindsight, slug: 25-blindsight, desc: "Visual processing without conscious awareness; action-perception dissociation", files: 25, md: 16, py: 4, test: true, research: true, specs: 4, tags: [blindsight, unconscious-processing, dissociation], xrefs: [1,9,17,24,26], tier: 1}
+- {id: 26, name: Split-Brain Consciousness, slug: 26-split-brain, desc: "Divided consciousness from hemispheric disconnection; unity of awareness", files: 25, md: 16, py: 4, test: true, research: true, specs: 4, tags: [split-brain, lateralization, corpus-callosum], xrefs: [10,13,24,25,14], tier: 1}
+- {id: 27, name: Altered States, slug: 27-altered-state, desc: "Non-ordinary awareness; state transitions, meditation, flow, network reorganization", files: 124, md: 85, py: 8, test: true, research: true, specs: 5, tags: [altered-states, meditation, flow], xrefs: [8,22,23,36,37], tier: 2}
+- {id: 28, name: Philosophical Consciousness, slug: 28-philosophy, desc: "Systematic philosophical inquiry; ontology, epistemology, phenomenology, hard problem", files: 30, md: 23, py: 5, test: true, research: true, specs: 4, tags: [philosophy, ontology, hard-problem], xrefs: [11,15,18,19,29,40], tier: 2}
+- {id: 29, name: Folk and Indigenous Wisdom, slug: 29-folk-wisdom, desc: "Oral traditions, animistic practices, indigenous knowledge systems", files: 23, md: 19, py: 2, test: true, research: true, specs: 4, tags: [indigenous, oral-tradition, animism], xrefs: [28,30,34,36,37], tier: 3}
+- {id: 30, name: Animal Cognition, slug: 30-animal-cognition, desc: "Animal minds, comparative psychology, cognitive ethology, cross-species awareness", files: 22, md: 18, py: 2, test: true, research: true, specs: 4, tags: [animal-cognition, ethology, comparative], xrefs: [10,18,29,31,33], tier: 3}
+- {id: 31, name: Plant Intelligence, slug: 31-plant-intelligence, desc: "Plant cognition, chemical signaling, mycorrhizal communication, non-neural intelligence", files: 22, md: 18, py: 2, test: true, research: true, specs: 4, tags: [plant-intelligence, chemical-signaling, distributed], xrefs: [20,30,32,33,34], tier: 3}
+- {id: 32, name: Fungal Intelligence, slug: 32-fungal-intelligence, desc: "Mycorrhizal network cognition, slime mold computation, wood-wide-web", files: 22, md: 18, py: 2, test: true, research: true, specs: 4, tags: [fungal-networks, mycorrhizal, slime-mold], xrefs: [20,31,33,34,40], tier: 3}
+- {id: 33, name: Swarm Intelligence, slug: 33-swarm-intelligence, desc: "Emergent collective behavior from decentralized agents; stigmergy and self-organization", files: 22, md: 18, py: 2, test: true, research: true, specs: 4, tags: [swarm, emergence, self-organization], xrefs: [20,31,32,34,21], tier: 3}
+- {id: 34, name: Gaia Intelligence, slug: 34-gaia-intelligence, desc: "Planetary self-regulation; Gaia hypothesis, Earth system science, ecological consciousness", files: 23, md: 18, py: 2, test: true, research: true, specs: 4, tags: [gaia, planetary, homeostasis], xrefs: [20,29,31,32,33], tier: 3}
+- {id: 35, name: Developmental Consciousness, slug: 35-developmental-consciousness, desc: "Consciousness emergence and change across lifespan from prenatal to end-of-life", files: 22, md: 18, py: 2, test: true, research: true, specs: 4, tags: [developmental, lifespan, childhood], xrefs: [10,11,18,38,39], tier: 3}
+- {id: 36, name: Contemplative States, slug: 36-contemplative-states, desc: "Meditation and contemplative practices; jhana, samadhi, mindfulness, neurophenomenology", files: 23, md: 18, py: 2, test: true, research: true, specs: 4, tags: [meditation, contemplative, mindfulness], xrefs: [6,11,18,27,37], tier: 3}
+- {id: 37, name: Psychedelic Consciousness, slug: 37-psychedelic-consciousness, desc: "Entheogenic states; 5-HT2A pharmacology, DMN disruption, therapeutic applications", files: 23, md: 18, py: 2, test: true, research: true, specs: 4, tags: [psychedelic, entheogen, DMN], xrefs: [22,27,29,36,39], tier: 3}
+- {id: 38, name: Neurodivergent Consciousness, slug: 38-neurodivergent-consciousness, desc: "Neurological diversity as natural variation; cognitive profiles and accommodation", files: 23, md: 18, py: 2, test: true, research: true, specs: 4, tags: [neurodiversity, autism, ADHD], xrefs: [10,18,35,39,28], tier: 3}
+- {id: 39, name: Trauma Consciousness, slug: 39-trauma-consciousness, desc: "How trauma alters consciousness; dissociation, fragmentation, resilience-based healing", files: 23, md: 18, py: 2, test: true, research: true, specs: 4, tags: [trauma, dissociation, resilience], xrefs: [7,12,27,35,38], tier: 3}
+- {id: 40, name: Xenoconsciousness, slug: 40-xenoconsciousness, desc: "Hypothetical alien minds; substrate independence, multiple realizability, detection", files: 23, md: 18, py: 2, test: true, research: true, specs: 4, tags: [xenoconsciousness, alien-minds, substrate-independence], xrefs: [21,28,32,33,34], tier: 3}

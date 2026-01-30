@@ -1,0 +1,104 @@
+# Token Budget Loading Profiles for 40-Form Consciousness Repository
+# Updated: 2026-01-29 (Phase 2 complete — all 40 Forms at full parity)
+#
+# These profiles define how to load repository content at different
+# context window sizes. Estimated tokens assume ~4 chars/token and
+# include structural overhead from YAML/Markdown formatting.
+#
+# Phase 2 changes: +30 research files (Forms 1-30), +24 spec files
+# (Forms 29-40 brought to 4 specs each), expanded info/ directories
+# for Forms 28-40, Form 27 test file added. Legacy docs archived.
+
+profiles:
+  minimal_8k:
+    description: "Headline awareness of all 40 Forms"
+    load:
+      - "index/manifest.yaml"
+      - "index/overview.md"
+    estimated_tokens: 11000
+    use_case: "Quick orientation, form lookup, answering 'what forms exist?' queries"
+    tradeoffs:
+      - "No detail on any individual Form"
+      - "Sufficient to identify which Forms are relevant to a query"
+      - "Can guide follow-up retrieval of specific Form content"
+
+  standard_32k:
+    description: "Summary-level understanding of all Forms"
+    load:
+      - "index/manifest.yaml"
+      - "index/overview.md"
+      - "index/form_summaries/*.md"
+    estimated_tokens: 76000
+    note: "Requires selective loading for strict 32K windows — load manifest + overview + target cluster summaries"
+    use_case: "Comparative analysis, thematic queries, cross-form reasoning"
+    fallback_strategy:
+      strict_32k:
+        description: "When hard-limited to 32K tokens"
+        approach: "Load manifest + overview + summaries for 1-2 target clusters only"
+        example: "For a sensory query: load Forms 1-6 + 9 summaries (~20K) + manifest (~3K) + overview (~8K)"
+
+  focused_128k:
+    description: "Full depth on selected Forms, summary on all others"
+    strategy: "Load manifest + overview + all summaries + full content for 1 target Form"
+    estimated_tokens: 125000
+    use_case: "Deep-dive research on a specific Form with full cross-reference context"
+    loading_order:
+      1: "index/manifest.yaml"
+      2: "index/overview.md"
+      3: "index/form_summaries/*.md"
+      4: "Selected Form directory (full content: specs, research, info, system, code)"
+    selection_heuristics:
+      - "Choose Form by query topic — each Form averages ~115K tokens of full content"
+      - "At 128K budget, load index layer (~76K) + 1 full Form (~115K) may exceed budget"
+      - "Alternative: Load index (~76K) + 2-3 Form info/ dirs only (~25K each)"
+      - "Always include manifest xrefs for loaded Forms"
+      - "Prefer loading foundational Forms (18, 19) alongside any cognitive Forms (10-12)"
+      - "Include theoretical Forms (13-17) when mechanistic detail is needed"
+
+  deep_200k:
+    description: "Comprehensive coverage of selected Form cluster"
+    strategy: "Load manifest + overview + all summaries + full content for 1 cluster (5-6 Forms' info and spec dirs)"
+    estimated_tokens: 190000
+    use_case: "Writing papers, building integrative models, comprehensive analysis"
+    loading_order:
+      1: "index/manifest.yaml"
+      2: "index/overview.md"
+      3: "index/form_summaries/*.md"
+      4: "00_Info/ (cross-cutting background)"
+      5: "5-6 Form info/ + spec/ directories (selective full content)"
+      6: "index/topic_graph.json (relationship map)"
+    selection_heuristics:
+      - "Load entire clusters relevant to the task"
+      - "For integration tasks, load theoretical cluster (13-17) info/ + spec/ dirs"
+      - "For ecological queries, load ecological cluster (29-34) info/ + spec/ dirs plus foundational (18-19)"
+      - "Each Form info/ dir averages ~30K tokens; spec/ dir averages ~25K tokens"
+      - "Reserve ~20K tokens for generation/reasoning overhead"
+      - "Avoid loading Form 27 full content (~440K tokens) — use summary unless specifically needed"
+
+  rag_unlimited:
+    description: "Vector-indexed retrieval for any query"
+    strategy: "Embed query, retrieve top-K chunks, load with Form summaries for context"
+    requires: "embeddings index"
+    use_case: "Production search, chatbot, or API-driven access to repository"
+    implementation_notes:
+      embedding_model: "text-embedding-3-large or comparable"
+      chunk_size: 512
+      chunk_overlap: 64
+      top_k: 20
+      reranking: true
+      context_augmentation:
+        - "Always include manifest.yaml as system context"
+        - "Include Form summary for each retrieved chunk's parent Form"
+        - "Use topic_graph.json edges to pull related Form summaries"
+
+# Token estimation methodology (updated Phase 2):
+# - manifest.yaml: ~3,100 tokens (12,545 chars)
+# - overview.md: ~8,000 tokens (target budget)
+# - Per-form summary: ~1,600 tokens (40 summaries = ~65,000 tokens)
+# - Per-form full directory: ~115,000 tokens average (39 non-outlier forms)
+#   (Form 27 Altered States is an outlier at ~440,000 tokens due to 124 files)
+# - Per-form info/ directory: ~25,000-35,000 tokens average
+# - Per-form spec/ directory: ~20,000-30,000 tokens average
+# - 00_Info background: ~10,000 tokens (18 files)
+# - topic_graph.json: ~6,300 tokens (25,024 chars)
+# - Total repository text content: ~5,000,000 tokens across all 40 Forms
