@@ -63,3 +63,7 @@ FORMS_31-40_EXPANSION_PLAN.md
 logs/
 .venv311/
 start the next session.md
+
+# Generated embedding artifacts (regenerate with: python3 index/embeddings/chunker.py)
+index/embeddings/chunks.jsonl
+index/embeddings/metadata.json
