@@ -172,25 +172,25 @@ Composable patterns for model deployment:
 
 ## Key Features
 
-### 🧠 **Multi-Paradigm Foundation**
+### **Multi-Paradigm Foundation**
 - Neuroscience for human brain-based consciousness
 - Philosophy for wisdom traditions East and West
 - Ecology for plant, fungal, and ecosystem intelligence
 - Speculation for hypothetical and alien minds
 
-### 🌍 **Beyond Human Neurology**
+### **Beyond Human Neurology**
 - Plant intelligence: Chemical signaling and root networks
 - Fungal networks: The "wood wide web" of mycorrhizal communication
 - Swarm intelligence: Emergent behavior in collective systems
 - Gaia hypothesis: Planetary-scale self-regulation
 
-### 🔄 **Dynamic Integration**
+### **Dynamic Integration**
 - Forms automatically coordinate based on input requirements
 - Cross-paradigm synthesis enables novel insights
 - Context determines which consciousness types become active
 - Emergent behavior from form interactions
 
-### 🎯 **Specialized Processing**
+### **Specialized Processing**
 - Each form optimized for specific types of awareness
 - 40 distinct processing modalities working in concert
 - Handles edge cases through specialized forms
@@ -353,3 +353,5 @@ git commit --no-verify
 ---
 
 *A consciousness architecture that spans from human neuroscience to planetary intelligence—40 forms of awareness working together to understand minds in all their diversity.*
+
+- may it benefit all sentient beings - gasho
